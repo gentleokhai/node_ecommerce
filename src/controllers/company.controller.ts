@@ -19,17 +19,23 @@ export const CreateCompany = (
     zipCode,
   } = <CreateCompanyInput>req.body;
 
-  const createdCompany = Company.create({
-    businessName,
-    businessType,
-    industry,
-    employeeRange,
-    streetNumber,
-    address,
-    city,
-    state,
-    zipCode,
-  });
+  const user = req.user;
 
-  return res.json(createdCompany);
+  if (user) {
+    const createdCompany = Company.create({
+      businessName,
+      businessType,
+      industry,
+      employeeRange,
+      streetNumber,
+      address,
+      city,
+      state,
+      zipCode,
+    });
+
+    return res.json(createdCompany);
+  }
+
+  return res.json({ message: 'User information not found' });
 };
