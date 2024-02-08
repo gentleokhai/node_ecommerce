@@ -1,6 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface UserDoc extends Document {
+  email: string;
+  phoneNumber: string;
+  password: string;
+  salt: string;
   firstName: string;
   lastName: string;
   gender: string;
@@ -10,6 +14,10 @@ interface UserDoc extends Document {
 
 const UserSchema = new Schema(
   {
+    email: { type: String, required: true },
+    password: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
+    salt: { type: String, required: true },
     firstName: { type: String },
     lastName: { type: String },
     gender: { type: String },
