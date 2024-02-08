@@ -2,16 +2,15 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import { MONGO_URI } from './config';
-import { UserRoute } from './routes';
-import { AccountRoute } from './routes/AccountRoute';
+import { CompanyRoute, UserRoute } from './routes';
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/account', AccountRoute);
 app.use('/user', UserRoute);
+app.use('/company', CompanyRoute);
 
 mongoose
   .connect(MONGO_URI)
