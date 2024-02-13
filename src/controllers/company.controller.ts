@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateCompanyInput } from '../dto/Company.dto';
+import { CreateCompanyInput } from '../dto/company/types';
 import { Company } from '../models';
 
 export const CreateCompany = (
