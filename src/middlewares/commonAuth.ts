@@ -1,4 +1,4 @@
-import { UserAuthPayload } from '../dto/User.dto';
+import { UserAuthPayload } from '../dto/user/types';
 import { Request, Response, NextFunction } from 'express';
 import { ValidateSignature } from '../utility';
 
@@ -15,11 +15,11 @@ export const Authenticate = async (
   res: Response,
   next: NextFunction
 ) => {
-  const validate = await ValidateSignature(req);
+  const validate = await ValidateSignature(req, res);
 
   if (validate) {
     next();
   } else {
-    return res.json({ message: 'User not authorized' });
+    return res.status(401).json({ message: 'User not authorized' });
   }
 };

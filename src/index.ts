@@ -3,12 +3,14 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import { MONGO_URI } from './config';
 import { CompanyRoute, UserRoute } from './routes';
+import { AuthRoute } from './routes/AuthRoute';
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use('/auth', AuthRoute);
 app.use('/user', UserRoute);
 app.use('/company', CompanyRoute);
 
