@@ -1,40 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import { CreateCompanyInput } from '../dto/company/types';
 import { Company } from '../models';
+import { createCompany } from '../services/company.service';
 
-export const CreateCompany = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const {
-    businessName,
-    businessType,
-    industry,
-    employeeRange,
-    streetNumber,
-    address,
-    city,
-    state,
-    zipCode,
-  } = <CreateCompanyInput>req.body;
-
+export const createCompanyService = async (req: Request, res: Response) => {
   const user = req.user;
 
   if (user) {
-    const createdCompany = Company.create({
-      businessName,
-      businessType,
-      industry,
-      employeeRange,
-      streetNumber,
-      address,
-      city,
-      state,
-      zipCode,
-    });
+    const companyService = await createCompany(req.body);
 
-    return res.json(createdCompany);
+    return res.status(201).json(companyService);
   }
 
   return res.json({ message: 'User information not found' });
