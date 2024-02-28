@@ -4,8 +4,10 @@ import mongoose from 'mongoose';
 import { MONGO_URI } from './config';
 import { CompanyRoute, UserRoute } from './routes';
 import { AuthRoute } from './routes/AuthRoute';
+import cors from 'cors';
 
 const app = express();
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateUserInput, UserLoginPayload } from '../dto/user/types';
 import { User } from '../models';
 import { login, signup } from '../services';
 
-const findUser = async (id: string | undefined, email?: string) => {
+const findUser = async (userId: string | undefined, email?: string) => {
   if (email) {
     return await User.findOne({ email: email });
   } else {
-    return await User.findById(id);
+    return await User.findOne({ userId: userId });
   }
 };
 
@@ -28,7 +27,7 @@ export const loginController = async (req: Request, res: Response) => {
 
   if (existingUser !== null) {
     const loginService = await login(req.body, {
-      id: existingUser.id,
+      userId: existingUser.userId,
       email: existingUser.email,
       password: existingUser.password,
       salt: existingUser.salt,

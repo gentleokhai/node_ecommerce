@@ -1,4 +1,3 @@
-import { Request, Response, NextFunction } from 'express';
 import { CreateCompanyInput } from '../dto/company/types';
 import { Company } from '../models';
 
@@ -7,9 +6,11 @@ export const createCompany = (data: CreateCompanyInput) => {
     businessName,
     businessType,
     industry,
-    employeeRange,
-    streetNumber,
-    address,
+    companySize,
+    addressNumber,
+    buyingCurrency,
+    sellingCurrency,
+    street,
     city,
     state,
     zipCode,
@@ -19,9 +20,11 @@ export const createCompany = (data: CreateCompanyInput) => {
     businessName,
     businessType,
     industry,
-    employeeRange,
-    streetNumber,
-    address,
+    companySize,
+    addressNumber,
+    buyingCurrency,
+    sellingCurrency,
+    street,
     city,
     state,
     zipCode,

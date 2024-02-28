@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateUserInput } from '../dto/user/types';
+import { CreateUserInput, EditUserInput } from '../dto/user/types';
 import { User } from '../models';
 import { GeneratePassword, GenerateSalt } from '../utility';
 
-export const FindUser = async (id: string | undefined, email?: string) => {
+export const FindUser = async (userId: string | undefined, email?: string) => {
   if (email) {
     return await User.findOne({ email: email });
   } else {
-    return await User.findById(id);
+    return await User.findOne({ userId: userId });
   }
 };
 
@@ -31,7 +31,7 @@ export const CreateUser = async (
     const salt = await GenerateSalt();
     const accountPassword = await GeneratePassword(password, salt);
 
-    const createdUser = await User.create({
+    await User.create({
       email,
       password: accountPassword,
       phoneNumber,
@@ -43,7 +43,6 @@ export const CreateUser = async (
     });
 
     const result = {
-      id: createdUser.id,
       email,
       firstName,
       lastName,
@@ -53,5 +52,56 @@ export const CreateUser = async (
     };
 
     return res.json(result);
+  }
+};
+
+export const updateUserController = async (req: Request, res: Response) => {
+  const { email, phoneNumber, firstName, lastName, gender, role } = <
+    EditUserInput
+  >req.body;
+
+  const user = req.user;
+
+  if (user) {
+    try {
+      const existingUser = await FindUser(user?.userId);
+
+      if (existingUser !== null) {
+        existingUser.firstName = firstName;
+        existingUser.lastName = lastName;
+        // existingUser.email = email;
+        // existingUser.phoneNumber = phoneNumber;
+        existingUser.gender = gender;
+        existingUser.role = role;
+
+        await existingUser.save();
+
+        const result = {
+          firstName,
+          lastName,
+          email,
+          gender,
+          role,
+          phoneNumber,
+        };
+        return res.json(result);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  return res.status(400).json({ message: 'User information not found' });
+};
+
+export const associateUserWithCompany = async (
+  userId: string,
+  companyId: string
+) => {
+  try {
+    await User.findByIdAndUpdate(userId, { company: companyId });
+  } catch (err) {
+    throw err;
   }
 };

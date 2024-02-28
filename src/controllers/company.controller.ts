@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateCompanyInput } from '../dto/company/types';
-import { Company } from '../models';
 import { createCompany } from '../services/company.service';
+import { associateUserWithCompany } from './user.controller';
 
-export const createCompanyService = async (req: Request, res: Response) => {
+export const createCompanyController = async (req: Request, res: Response) => {
   const user = req.user;
 
   if (user) {
     const companyService = await createCompany(req.body);
+
+    await associateUserWithCompany(companyService.businessId, user.userId);
 
     return res.status(201).json(companyService);
   }

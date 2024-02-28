@@ -22,12 +22,12 @@ export const signup = async (data: SignupPayload) => {
   });
 
   const signature = GenerateSignature({
-    id: createdUser.id,
+    userId: createdUser.userId,
     email: email,
   });
 
   const result = {
-    id: createdUser.id,
+    userId: createdUser.userId,
     email: email,
     token: signature,
   };
@@ -49,11 +49,11 @@ export const login = async (
 
   if (validation) {
     const signature = GenerateSignature({
-      id: existingUser.id,
+      userId: existingUser.userId,
       email: existingUser.email,
     });
 
     return { token: signature, isValidated: true };
-  } 
-    return { isValidated: false };
+  }
+  return { isValidated: false };
 };

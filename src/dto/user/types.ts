@@ -9,8 +9,18 @@ export interface CreateUserInput {
   role: string;
 }
 
+export interface EditUserInput {
+  email: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
+  title: string;
+  gender: string;
+  role: string;
+}
+
 export interface ExistingUser {
-  id: string;
+  userId: string;
   email: string;
   password: string;
   salt: string;
@@ -22,6 +32,6 @@ export interface UserLoginPayload {
 }
 
 export interface UserAuthPayload {
-  id: string;
   email: string;
+  userId: string;
 }

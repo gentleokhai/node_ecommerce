@@ -1,17 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateUserInput, UserLoginPayload } from '../dto/user';
+import { CreateUserInput, EditUserInput } from '../dto/user';
 import { User } from '../models';
 import { GeneratePassword, GenerateSalt } from '../utility';
 
-export const findUser = async (id: string | undefined, email?: string) => {
+export const FindUser = async (userId: string | undefined, email?: string) => {
   if (email) {
     return await User.findOne({ email: email });
   } else {
-    return await User.findById(id);
+    return await User.findOne({ userId: userId });
   }
 };
 
-export const CreateUser = async (
+export const createUser = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -23,7 +23,7 @@ export const CreateUser = async (
   const user = req.user;
 
   if (user) {
-    const existingUser = await findUser('', email);
+    const existingUser = await FindUser('', email);
 
     if (existingUser !== null)
       return res.json({ message: 'An account already exists with this email' });
@@ -54,4 +54,34 @@ export const CreateUser = async (
 
     return res.json(result);
   }
+};
+
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email, phoneNumber, firstName, lastName, gender, role } = <
+    EditUserInput
+  >req.body;
+
+  const user = req.user;
+
+  if (user) {
+    const existingUser = await FindUser(user.userId);
+
+    if (existingUser !== null) {
+      existingUser.firstName = firstName;
+      existingUser.lastName = lastName;
+      existingUser.email = email;
+      existingUser.phoneNumber = phoneNumber;
+      existingUser.gender = gender;
+      existingUser.role = role;
+
+      const savedResult = existingUser.save();
+      return res.json(savedResult);
+    }
+  }
+
+  return res.json({ message: 'User information not found' });
 };
