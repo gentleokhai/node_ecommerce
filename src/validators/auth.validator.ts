@@ -11,10 +11,11 @@ export const signupValidator = async (
     if (!req.body) {
       return res.status(400).send({ message: 'Missing request body!' });
     }
-    const user = new SignupValidationSchema();
-    user.email = req.body.email;
-    user.password = req.body.password;
-    user.phoneNumber = req.body.phoneNumber;
+    const user = new SignupValidationSchema(
+      req.body.email,
+      req.body.phoneNumber,
+      req.body.password
+    );
 
     await validateOrReject(user);
 
@@ -39,7 +40,7 @@ export const loginValidator = async (
     if (!req.body) {
       return res.status(400).send({ message: 'Missing request body!' });
     }
-    const user = new LoginValidationSchema();
+    const user = new LoginValidationSchema(req.body.email, req.body.password);
     user.email = req.body.email;
     user.password = req.body.password;
 
