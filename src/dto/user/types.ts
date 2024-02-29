@@ -9,7 +9,7 @@ export interface CreateUserInput {
   role: string;
 }
 
-export interface EditUserInput {
+export interface UpdateUserInput {
   email: string;
   phoneNumber: string;
   firstName: string;

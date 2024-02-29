@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateUserInput, EditUserInput } from '../dto/user/types';
+import { CreateUserInput, UpdateUserInput } from '../dto/user/types';
 import { User } from '../models';
 import { GeneratePassword, GenerateSalt } from '../utility';
 
@@ -57,7 +57,7 @@ export const CreateUser = async (
 
 export const updateUserController = async (req: Request, res: Response) => {
   const { email, phoneNumber, firstName, lastName, gender, role } = <
-    EditUserInput
+    UpdateUserInput
   >req.body;
 
   const user = req.user;
