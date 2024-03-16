@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { Gender } from '../dto/user';
 
 interface UserDoc extends Document {
-  userId: string;
   email: string;
   phoneNumber: string;
   password: string;
@@ -15,11 +15,7 @@ interface UserDoc extends Document {
 
 const UserSchema = new Schema(
   {
-    userId: {
-      type: Schema.Types.ObjectId,
-      default: new mongoose.Types.ObjectId(),
-    },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, index: true },
     password: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     salt: { type: String, required: true },
@@ -27,13 +23,14 @@ const UserSchema = new Schema(
     lastName: { type: String },
     gender: { type: String },
     address: { type: String },
-    role: { type: String },
+    role: { type: String, enum: Object.values(Gender), index: true },
     company: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
     branch: { type: mongoose.Schema.Types.ObjectId, ref: 'branch' },
   },
   {
     toJSON: {
       transform(_, ret) {
+        ret.id = ret._id.toString();
         delete ret.__v;
         delete ret._id;
         delete ret.createdAt, delete ret.updatedAt;

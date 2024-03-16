@@ -20,7 +20,7 @@ export interface UpdateUserInput {
 }
 
 export interface ExistingUser {
-  userId: string;
+  id: string;
   email: string;
   password: string;
   salt: string;
@@ -33,5 +33,11 @@ export interface UserLoginPayload {
 
 export interface UserAuthPayload {
   email: string;
-  userId: string;
+  id: string;
+}
+
+export enum Gender {
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHERS = 'others',
 }

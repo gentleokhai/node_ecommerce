@@ -2,11 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import { User } from '../models';
 import { login, signup } from '../services';
 
-const findUser = async (userId: string | undefined, email?: string) => {
+const findUser = async (id: string | undefined, email?: string) => {
   if (email) {
     return await User.findOne({ email: email });
   } else {
-    return await User.findOne({ userId: userId });
+    return await User.findOne({ id: id });
   }
 };
 
@@ -27,7 +27,7 @@ export const loginController = async (req: Request, res: Response) => {
 
   if (existingUser !== null) {
     const loginService = await login(req.body, {
-      userId: existingUser.userId,
+      id: existingUser.id,
       email: existingUser.email,
       password: existingUser.password,
       salt: existingUser.salt,

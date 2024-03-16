@@ -3,11 +3,11 @@ import { CreateUserInput, UpdateUserInput } from '../dto/user/types';
 import { User } from '../models';
 import { GeneratePassword, GenerateSalt } from '../utility';
 
-export const FindUser = async (userId: string | undefined, email?: string) => {
+export const FindUser = async (id: string | undefined, email?: string) => {
   if (email) {
     return await User.findOne({ email: email });
   } else {
-    return await User.findOne({ userId: userId });
+    return await User.findOne({ id: id });
   }
 };
 
@@ -64,7 +64,7 @@ export const updateUserController = async (req: Request, res: Response) => {
 
   if (user) {
     try {
-      const existingUser = await FindUser(user?.userId);
+      const existingUser = await FindUser(user?.id);
 
       if (existingUser !== null) {
         existingUser.firstName = firstName;

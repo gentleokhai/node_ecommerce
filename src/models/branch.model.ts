@@ -1,23 +1,17 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface BranchDoc extends Document {
-  branchName: string;
+  name: string;
 }
 
 const BranchSchema = new Schema(
   {
-    branchName: { type: String },
-    branchId: {
-      type: Schema.Types.ObjectId,
-      default: new mongoose.Types.ObjectId,
-    },
-    company: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
+    name: { type: String },
   },
   {
     toJSON: {
       transform(_, ret) {
-        delete ret.password;
-        delete ret.salt;
+        ret.id = ret._id.toString();
         delete ret.__v;
         delete ret.createdAt, delete ret.updatedAt;
       },

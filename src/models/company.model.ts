@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface CompanyDoc extends Document {
-  businessId: string;
   businessType: string;
   businessName: string;
   industry: string;
@@ -17,10 +16,6 @@ interface CompanyDoc extends Document {
 
 const CompanySchema = new Schema(
   {
-    businessId: {
-      type: Schema.Types.ObjectId,
-      default: new mongoose.Types.ObjectId(),
-    },
     businessType: { type: String },
     businessName: { type: String },
     industry: { type: String },
@@ -31,11 +26,13 @@ const CompanySchema = new Schema(
     city: { type: String },
     state: { type: String },
     zipCode: { type: String },
+    branch: [{ type: mongoose.Schema.Types.ObjectId, ref: 'branch' }],
     users: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
   },
   {
     toJSON: {
       transform(_, ret) {
+        ret.id = ret._id.toString();
         delete ret.password;
         delete ret.salt;
         delete ret.__v;

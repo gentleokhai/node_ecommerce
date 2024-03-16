@@ -8,7 +8,7 @@ export const createCompanyController = async (req: Request, res: Response) => {
   if (user) {
     const companyService = await createCompany(req.body);
 
-    await associateUserWithCompany(companyService.businessId, user.userId);
+    await associateUserWithCompany(companyService.id, user.id);
 
     return res.status(201).json(companyService);
   }
