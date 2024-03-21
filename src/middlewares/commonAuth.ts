@@ -1,4 +1,4 @@
-import { UserAuthPayload } from '../dto/user/types';
+import { UserAuthPayload } from '../dto/employee/types';
 import { Request, Response, NextFunction } from 'express';
 import { ValidateSignature } from '../utility';
 

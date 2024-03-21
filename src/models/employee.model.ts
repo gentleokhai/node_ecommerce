@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { Gender } from '../dto/user';
+import { Gender, Status } from '../dto/general';
 
-interface UserDoc extends Document {
+interface EmployeeDoc extends Document {
   email: string;
   phoneNumber: string;
   password: string;
@@ -10,20 +10,26 @@ interface UserDoc extends Document {
   lastName: string;
   gender: string;
   role: string;
+  jobTitle: string;
   address: string;
+  dateOfEmployment: Date;
+  status: string;
 }
 
-const UserSchema = new Schema(
+const EmployeeSchema = new Schema(
   {
     email: { type: String, required: true, unique: true, index: true },
     password: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     salt: { type: String, required: true },
-    firstName: { type: String },
-    lastName: { type: String },
-    gender: { type: String },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    gender: { type: String, enum: Object.values(Gender), index: true },
     address: { type: String },
-    role: { type: String, enum: Object.values(Gender), index: true },
+    role: { type: String },
+    jobTitle: { type: String, required: true, index: true },
+    dateOfEmployment: { type: Date, required: true },
+    status: { type: String, enum: Object.values(Status), index: true },
     company: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
     branch: { type: mongoose.Schema.Types.ObjectId, ref: 'branch' },
   },
@@ -40,6 +46,6 @@ const UserSchema = new Schema(
   }
 );
 
-const User = mongoose.model<UserDoc>('user', UserSchema);
+const Employee = mongoose.model<EmployeeDoc>('employee', EmployeeSchema);
 
-export { User };
+export { Employee };

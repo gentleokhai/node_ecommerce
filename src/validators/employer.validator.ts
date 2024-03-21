@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
-import { UpdateUserValidationSchema } from '../dto/user';
+import { UpdateEmployerValidationSchema } from '../dto/employer';
 
 export const createOrUpdateUserValidator = async (
   req: Request,
@@ -11,7 +11,7 @@ export const createOrUpdateUserValidator = async (
     if (!req.body) {
       return res.status(400).send({ message: 'Missing request body!' });
     }
-    const data = new UpdateUserValidationSchema(
+    const data = new UpdateEmployerValidationSchema(
       req.body.email,
       req.body.phoneNumber,
       req.body.password,

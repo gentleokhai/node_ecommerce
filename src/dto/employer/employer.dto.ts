@@ -1,7 +1,7 @@
 import { IsString, IsPhoneNumber, IsOptional, IsEmail } from 'class-validator';
-import { CreateUserInput } from './types';
+import { UpdateEmployerInput } from './types';
 
-export class UpdateUserValidationSchema implements CreateUserInput {
+export class UpdateEmployerValidationSchema implements UpdateEmployerInput {
   @IsEmail()
   @IsOptional()
   email: string;

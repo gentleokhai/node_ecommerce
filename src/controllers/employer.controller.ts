@@ -1,63 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateUserInput, UpdateUserInput } from '../dto/user/types';
-import { User } from '../models';
+import { UpdateEmployerInput } from '../dto/employer/types';
+import { Employee } from '../models';
+import { createEmployee } from '../services';
 import { GeneratePassword, GenerateSalt } from '../utility';
 
 export const FindUser = async (id: string | undefined, email?: string) => {
   if (email) {
-    return await User.findOne({ email: email });
+    return await Employee.findOne({ email: email });
   } else {
-    return await User.findOne({ id: id });
+    return await Employee.findOne({ id: id });
   }
 };
 
-export const CreateUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { email, password, phoneNumber, firstName, lastName, gender, role } = <
-    CreateUserInput
-  >req.body;
-
-  const user = req.user;
-
-  if (user) {
-    const existingUser = await FindUser('', email);
-
-    if (existingUser !== null)
-      return res.json({ message: 'An account already exists with this email' });
-
-    const salt = await GenerateSalt();
-    const accountPassword = await GeneratePassword(password, salt);
-
-    await User.create({
-      email,
-      password: accountPassword,
-      phoneNumber,
-      firstName,
-      salt,
-      lastName,
-      gender,
-      role,
-    });
-
-    const result = {
-      email,
-      firstName,
-      lastName,
-      gender,
-      role,
-      phoneNumber,
-    };
-
-    return res.json(result);
-  }
-};
-
-export const updateUserController = async (req: Request, res: Response) => {
+export const updateEmployerController = async (req: Request, res: Response) => {
   const { email, phoneNumber, firstName, lastName, gender, role } = <
-    UpdateUserInput
+    UpdateEmployerInput
   >req.body;
 
   const user = req.user;
@@ -73,6 +30,8 @@ export const updateUserController = async (req: Request, res: Response) => {
         // existingUser.phoneNumber = phoneNumber;
         existingUser.gender = gender;
         existingUser.role = role;
+
+        //TODO: make the frontend include email and phone number for this update endpoint
 
         await existingUser.save();
 
@@ -100,7 +59,7 @@ export const associateUserWithCompany = async (
   companyId: string
 ) => {
   try {
-    await User.findByIdAndUpdate(userId, { company: companyId });
+    await Employee.findByIdAndUpdate(userId, { company: companyId });
   } catch (err) {
     throw err;
   }

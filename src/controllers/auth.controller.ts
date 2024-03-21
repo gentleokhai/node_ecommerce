@@ -1,19 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
-import { User } from '../models';
+import { Employer } from '../models';
 import { login, signup } from '../services';
 
-const findUser = async (id: string | undefined, email?: string) => {
+const findEmployer = async (id: string | undefined, email?: string) => {
   if (email) {
-    return await User.findOne({ email: email });
+    return await Employer.findOne({ email: email });
   } else {
-    return await User.findOne({ id: id });
+    return await Employer.findOne({ id: id });
   }
 };
 
 export const signupController = async (req: Request, res: Response) => {
-  const existingUser = await findUser('', req.body.email);
+  const existingEmployer = await findEmployer('', req.body.email);
 
-  if (existingUser !== null)
+  if (existingEmployer !== null)
     return res
       .status(400)
       .json({ message: 'An account already exists with this email' });
@@ -23,14 +23,14 @@ export const signupController = async (req: Request, res: Response) => {
 };
 
 export const loginController = async (req: Request, res: Response) => {
-  const existingUser = await findUser('', req.body.email);
+  const existingEmployer = await findEmployer('', req.body.email);
 
-  if (existingUser !== null) {
+  if (existingEmployer !== null) {
     const loginService = await login(req.body, {
-      id: existingUser.id,
-      email: existingUser.email,
-      password: existingUser.password,
-      salt: existingUser.salt,
+      id: existingEmployer.id,
+      email: existingEmployer.email,
+      password: existingEmployer.password,
+      salt: existingEmployer.salt,
     });
 
     if (loginService.isValidated) {
