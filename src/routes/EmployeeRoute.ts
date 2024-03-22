@@ -1,15 +1,22 @@
 import express from 'express';
 import {
   createEmployeeController,
-  getEmployeeController,
+  getEmployeeByIdController,
+  getEmployeesController,
+  updateEmployeeController,
 } from '../controllers/employee.controller';
 import { Authenticate } from '../middlewares';
-import { createOrUpdateUserValidator } from '../validators/employer.validator';
+import {
+  createEmployeeValidator,
+  updateEmployeeValidator,
+} from '../validators/employee.validator';
 
 const router = express.Router();
 
 router.use(Authenticate);
-router.get('', getEmployeeController);
-router.post('', createEmployeeController);
+router.get('', getEmployeesController);
+router.get('/:id', getEmployeeByIdController);
+router.post('', createEmployeeValidator, createEmployeeController);
+router.patch('/:id', updateEmployeeValidator, updateEmployeeController);
 
 export { router as EmployeeRoute };

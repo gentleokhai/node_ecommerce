@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
-import { UpdateEmployerValidationSchema } from '../dto/employer';
+import {
+  UpdateEmployerInput,
+  UpdateEmployerValidationSchema,
+} from '../dto/employer';
 
-export const createOrUpdateUserValidator = async (
-  req: Request,
+export const createOrUpdateEmployerValidator = async (
+  req: Request<any, any, UpdateEmployerInput>,
   res: Response,
   next: NextFunction
 ) => {
@@ -11,18 +14,16 @@ export const createOrUpdateUserValidator = async (
     if (!req.body) {
       return res.status(400).send({ message: 'Missing request body!' });
     }
-    const data = new UpdateEmployerValidationSchema(
-      req.body.email,
-      req.body.phoneNumber,
-      req.body.password,
-      req.body.firstName,
-      req.body.lastName,
-      req.body.title,
-      req.body.role,
-      req.body.gender
-    );
 
-    await validateOrReject(data);
+    const { firstName, lastName, role, gender } = req.body;
+
+    const employer = new UpdateEmployerValidationSchema();
+    employer.firstName = firstName;
+    employer.lastName = lastName;
+    employer.role = role;
+    employer.gender = gender;
+
+    await validateOrReject(employer);
 
     next();
   } catch (e: any) {

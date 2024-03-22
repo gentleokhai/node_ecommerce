@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { Gender } from '../dto/general';
 
-interface EmployerDoc extends Document {
+export interface EmployerDoc extends Document {
   email: string;
   phoneNumber: string;
   password: string;
@@ -11,6 +11,7 @@ interface EmployerDoc extends Document {
   gender: string;
   role: string;
   address: string;
+  company: string;
 }
 
 const EmployerSchema = new Schema(

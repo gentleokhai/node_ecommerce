@@ -10,11 +10,8 @@ export interface CreateEmployerInput {
 }
 
 export interface UpdateEmployerInput {
-  email: string;
-  phoneNumber: string;
   firstName: string;
   lastName: string;
-  title: string;
   gender: string;
   role: string;
 }

@@ -14,7 +14,6 @@ export const FindEmployee = async (id: string | undefined, email?: string) => {
 export const createEmployee = async (data: CreateEmployeeInput) => {
   const {
     email,
-    password,
     phoneNumber,
     firstName,
     lastName,
@@ -22,22 +21,19 @@ export const createEmployee = async (data: CreateEmployeeInput) => {
     role,
     jobTitle,
     dateOfEmployment,
+    company,
   } = data;
-
-  const salt = await GenerateSalt();
-  const accountPassword = await GeneratePassword(password, salt);
 
   const createdUser = await Employee.create({
     email,
-    password: accountPassword,
     phoneNumber,
     firstName,
-    salt,
     lastName,
     gender,
     role,
     jobTitle,
     dateOfEmployment,
+    company,
     status: Status.DEACTIVATED,
   });
 
@@ -50,6 +46,7 @@ export const createEmployee = async (data: CreateEmployeeInput) => {
     role,
     phoneNumber,
     jobTitle,
+    company,
     dateOfEmployment,
   };
 

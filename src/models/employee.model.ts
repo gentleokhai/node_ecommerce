@@ -12,25 +12,29 @@ interface EmployeeDoc extends Document {
   role: string;
   jobTitle: string;
   address: string;
-  dateOfEmployment: Date;
+  dateOfEmployment: string;
   status: string;
 }
 
 const EmployeeSchema = new Schema(
   {
     email: { type: String, required: true, unique: true, index: true },
-    password: { type: String, required: true },
+    password: { type: String },
     phoneNumber: { type: String, required: true },
-    salt: { type: String, required: true },
+    salt: { type: String },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     gender: { type: String, enum: Object.values(Gender), index: true },
     address: { type: String },
     role: { type: String },
     jobTitle: { type: String, required: true, index: true },
-    dateOfEmployment: { type: Date, required: true },
+    dateOfEmployment: { type: String, required: true },
     status: { type: String, enum: Object.values(Status), index: true },
-    company: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'company',
+    },
     branch: { type: mongoose.Schema.Types.ObjectId, ref: 'branch' },
   },
   {
