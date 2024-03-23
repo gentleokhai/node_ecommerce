@@ -8,14 +8,14 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = require("./config");
 const routes_1 = require("./routes");
-const AuthRoute_1 = require("./routes/AuthRoute");
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
-app.use('/auth', AuthRoute_1.AuthRoute);
-app.use('/user', routes_1.UserRoute);
+app.use('/auth', routes_1.AuthRoute);
+app.use('/employer', routes_1.EmployerRoute);
+app.use('/employee', routes_1.EmployeeRoute);
 app.use('/company', routes_1.CompanyRoute);
 mongoose_1.default
     .connect(config_1.MONGO_URI)

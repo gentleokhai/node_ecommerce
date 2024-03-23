@@ -10,13 +10,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCompanyController = void 0;
+const models_1 = require("../models");
 const company_service_1 = require("../services/company.service");
-const user_controller_1 = require("./user.controller");
 const createCompanyController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
     if (user) {
+        const employer = yield models_1.Employer.findById(user.id);
+        if (employer && employer.company) {
+            return res
+                .status(400)
+                .json({ message: 'Employer already has a company registered' });
+        }
         const companyService = yield (0, company_service_1.createCompany)(req.body);
-        yield (0, user_controller_1.associateUserWithCompany)(companyService.id, user.id);
+        yield models_1.Employer.findByIdAndUpdate(user.id, { company: companyService.id });
         return res.status(201).json(companyService);
     }
     return res.json({ message: 'User information not found' });

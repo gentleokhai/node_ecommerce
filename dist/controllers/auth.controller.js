@@ -12,17 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginController = exports.signupController = void 0;
 const models_1 = require("../models");
 const services_1 = require("../services");
-const findUser = (id, email) => __awaiter(void 0, void 0, void 0, function* () {
+const findEmployer = (id, email) => __awaiter(void 0, void 0, void 0, function* () {
     if (email) {
-        return yield models_1.User.findOne({ email: email });
+        return yield models_1.Employer.findOne({ email: email });
     }
     else {
-        return yield models_1.User.findOne({ id: id });
+        return yield models_1.Employer.findOne({ id: id });
     }
 });
 const signupController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const existingUser = yield findUser('', req.body.email);
-    if (existingUser !== null)
+    const existingEmployer = yield findEmployer('', req.body.email);
+    if (existingEmployer !== null)
         return res
             .status(400)
             .json({ message: 'An account already exists with this email' });
@@ -31,13 +31,13 @@ const signupController = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.signupController = signupController;
 const loginController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const existingUser = yield findUser('', req.body.email);
-    if (existingUser !== null) {
+    const existingEmployer = yield findEmployer('', req.body.email);
+    if (existingEmployer !== null) {
         const loginService = yield (0, services_1.login)(req.body, {
-            id: existingUser.id,
-            email: existingUser.email,
-            password: existingUser.password,
-            salt: existingUser.salt,
+            id: existingEmployer.id,
+            email: existingEmployer.email,
+            password: existingEmployer.password,
+            salt: existingEmployer.salt,
         });
         if (loginService.isValidated) {
             return res.status(200).json({ token: loginService.token });
