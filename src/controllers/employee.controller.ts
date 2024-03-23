@@ -1,5 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreateEmployeeInput } from '../dto/employee';
+import {
+  CreateEmployeeInput,
+  FilterTypes,
+  UpdateEmployeeAccessInput,
+  UpdateEmployeeInput,
+  UpdateEmployeeStatusInput,
+} from '../dto/employee';
 import { Employee } from '../models';
 import { createEmployee } from '../services';
 
@@ -33,11 +39,10 @@ export const updateEmployeeController = async (req: Request, res: Response) => {
     firstName,
     lastName,
     gender,
-    role,
     jobTitle,
     dateOfEmployment,
     phoneNumber,
-  } = <CreateEmployeeInput>req.body;
+  } = <UpdateEmployeeInput>req.body;
 
   const id = req.params.id;
 
@@ -48,7 +53,6 @@ export const updateEmployeeController = async (req: Request, res: Response) => {
       existingEmployee.firstName = firstName;
       existingEmployee.lastName = lastName;
       existingEmployee.gender = gender;
-      existingEmployee.role = role;
       existingEmployee.jobTitle = jobTitle;
       existingEmployee.dateOfEmployment = dateOfEmployment;
       existingEmployee.phoneNumber = phoneNumber;
@@ -65,8 +69,42 @@ export const updateEmployeeController = async (req: Request, res: Response) => {
 };
 
 export const getEmployeesController = async (req: Request, res: Response) => {
+  const status = req.query.status as string;
+  const accessType = req.query.accessType as string;
+  const keyword = req.query.keyword as string;
+  const sort = req.query.sort as string;
+
+  const filter: FilterTypes = {};
+  if (status) filter.status = status;
+  if (accessType) filter.accessType = accessType;
+
+  let sortOptions: { [key: string]: any } = { createdAt: -1, firstName: 'asc' }; // Default sorting
+
+  if (sort) {
+    const [sortField, sortOrderString] = sort.split(':');
+    const sortOrder: number = sortOrderString === 'desc' ? -1 : 1;
+    sortOptions[sortField] = sortOrder;
+  }
+
+  let keywordQuery = {};
+  if (keyword) {
+    keywordQuery = {
+      $or: [
+        { firstName: { $regex: keyword, $options: 'i' } },
+        { lastName: { $regex: keyword, $options: 'i' } },
+      ],
+    };
+  }
+
+  const query = {
+    ...filter,
+    ...keywordQuery,
+  };
+
   try {
-    const employees = await Employee.find().select('-password -salt');
+    const employees = await Employee.find(query)
+      .sort(sortOptions)
+      .select('-password -salt');
 
     res.status(200).json(employees);
   } catch (error) {
@@ -86,5 +124,57 @@ export const getEmployeeByIdController = async (
     res.status(200).json(employee);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching data' });
+  }
+};
+
+export const updateEmployeeAccessController = async (
+  req: Request,
+  res: Response
+) => {
+  const { accessType } = <UpdateEmployeeAccessInput>req.body;
+
+  const id = req.params.id;
+
+  try {
+    const existingEmployee = await FindEmployee(id);
+
+    if (existingEmployee !== null) {
+      existingEmployee.accessType = accessType;
+
+      await existingEmployee.save();
+
+      return res.json(existingEmployee);
+    } else {
+      return res.status(400).json({ message: 'Employee does not exist' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const updateEmployeeStatusController = async (
+  req: Request<any, any, UpdateEmployeeStatusInput>,
+  res: Response
+) => {
+  const id = req.params.id;
+
+  const { status } = req.body;
+
+  try {
+    const existingEmployee = await FindEmployee(id);
+
+    if (existingEmployee !== null) {
+      existingEmployee.status = status;
+
+      await existingEmployee.save();
+
+      return res.json(existingEmployee);
+    } else {
+      return res.status(400).json({ message: 'Employee does not exist' });
+    }
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };

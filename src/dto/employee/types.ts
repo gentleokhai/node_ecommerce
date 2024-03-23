@@ -4,10 +4,19 @@ export interface CreateEmployeeInput {
   firstName: string;
   lastName: string;
   gender: string;
-  role: string;
+  status: string;
+  accessType: string;
   jobTitle: string;
   dateOfEmployment: string;
   company: string;
+}
+
+export interface UpdateEmployeeAccessInput {
+  accessType: string;
+}
+
+export interface UpdateEmployeeStatusInput {
+  status: string;
 }
 
 export interface UpdateEmployeeInput {
@@ -16,7 +25,6 @@ export interface UpdateEmployeeInput {
   firstName: string;
   lastName: string;
   gender: string;
-  role: string;
   jobTitle: string;
   dateOfEmployment: string;
 }
@@ -29,4 +37,17 @@ export interface UserLoginPayload {
 export interface UserAuthPayload {
   email: string;
   id: string;
+}
+
+export interface FilterTypes {
+  accessType?: string;
+  status?: string;
+  keyword?: string;
+}
+
+export type SortOrder = 1 | -1;
+
+export interface SortOptions {
+  createdAt: number;
+  firstName: 'asc' | 'desc';
 }

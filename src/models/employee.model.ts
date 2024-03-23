@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { Gender, Status } from '../dto/general';
+import { AccessType, Gender, Status } from '../dto/general';
 
 interface EmployeeDoc extends Document {
   email: string;
@@ -9,7 +9,7 @@ interface EmployeeDoc extends Document {
   firstName: string;
   lastName: string;
   gender: string;
-  role: string;
+  accessType: string;
   jobTitle: string;
   address: string;
   dateOfEmployment: string;
@@ -26,7 +26,7 @@ const EmployeeSchema = new Schema(
     lastName: { type: String, required: true },
     gender: { type: String, enum: Object.values(Gender), index: true },
     address: { type: String },
-    role: { type: String },
+    accessType: { type: String, enum: Object.values(AccessType), index: true },
     jobTitle: { type: String, required: true, index: true },
     dateOfEmployment: { type: String, required: true },
     status: { type: String, enum: Object.values(Status), index: true },

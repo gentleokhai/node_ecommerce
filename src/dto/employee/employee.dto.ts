@@ -6,8 +6,19 @@ import {
   Validate,
   IsOptional,
 } from 'class-validator';
-import { IsValidMongoId } from '../general';
-import { CreateEmployeeInput } from './types';
+import {
+  AccessType,
+  Gender,
+  IsEnumValue,
+  IsValidMongoId,
+  Status,
+} from '../general';
+import {
+  CreateEmployeeInput,
+  UpdateEmployeeStatusInput,
+  UpdateEmployeeAccessInput,
+  UpdateEmployeeInput,
+} from './types';
 
 export class CreateEmployeeValidationSchema implements CreateEmployeeInput {
   @IsEmail()
@@ -36,19 +47,26 @@ export class CreateEmployeeValidationSchema implements CreateEmployeeInput {
 
   @IsString()
   @IsNotEmpty()
+  @IsEnumValue(Status)
+  status!: string;
+
+  @IsString()
+  @IsNotEmpty()
   @Validate(IsValidMongoId)
   company!: string;
 
   @IsString()
   @IsNotEmpty()
-  role!: string;
+  @IsEnumValue(AccessType)
+  accessType!: string;
 
   @IsString()
   @IsNotEmpty()
+  @IsEnumValue(Gender)
   gender!: string;
 }
 
-export class UpdateEmployeeValidationSchema implements CreateEmployeeInput {
+export class UpdateEmployeeValidationSchema implements UpdateEmployeeInput {
   @IsEmail()
   @IsOptional()
   @IsNotEmpty()
@@ -88,10 +106,22 @@ export class UpdateEmployeeValidationSchema implements CreateEmployeeInput {
   @IsString()
   @IsOptional()
   @IsNotEmpty()
-  role!: string;
-
-  @IsString()
-  @IsOptional()
-  @IsNotEmpty()
+  @IsEnumValue(Gender)
   gender!: string;
+}
+
+export class UpdateEmployeeAccessValidationSchema
+  implements UpdateEmployeeAccessInput
+{
+  @IsString()
+  @IsNotEmpty()
+  @IsEnumValue(AccessType)
+  accessType!: string;
+}
+
+export class UpdateEmployeeStatusSchema implements UpdateEmployeeStatusInput {
+  @IsString()
+  @IsNotEmpty()
+  @IsEnumValue(Status)
+  status!: string;
 }
