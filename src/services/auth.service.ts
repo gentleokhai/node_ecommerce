@@ -1,6 +1,6 @@
 import { SignupPayload, SignInPayload } from '../dto/auth';
-import { ExistingUser } from '../dto/user';
-import { User } from '../models';
+import { ExistingUser } from '../dto/general';
+import { Employer } from '../models';
 import {
   GeneratePassword,
   GenerateSalt,
@@ -14,7 +14,7 @@ export const signup = async (data: SignupPayload) => {
   const salt = await GenerateSalt();
   const accountPassword = await GeneratePassword(password, salt);
 
-  const createdUser = await User.create({
+  const createdEmployer = await Employer.create({
     email,
     password: accountPassword,
     phoneNumber,
@@ -22,12 +22,12 @@ export const signup = async (data: SignupPayload) => {
   });
 
   const signature = GenerateSignature({
-    id: createdUser.id,
+    id: createdEmployer.id,
     email: email,
   });
 
   const result = {
-    id: createdUser.id,
+    id: createdEmployer.id,
     email: email,
     token: signature,
   };

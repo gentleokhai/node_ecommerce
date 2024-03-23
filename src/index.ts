@@ -2,8 +2,12 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import { MONGO_URI } from './config';
-import { CompanyRoute, UserRoute } from './routes';
-import { AuthRoute } from './routes/AuthRoute';
+import {
+  CompanyRoute,
+  EmployerRoute,
+  AuthRoute,
+  EmployeeRoute,
+} from './routes';
 import cors from 'cors';
 
 const app = express();
@@ -13,7 +17,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/auth', AuthRoute);
-app.use('/user', UserRoute);
+app.use('/employer', EmployerRoute);
+app.use('/employee', EmployeeRoute);
 app.use('/company', CompanyRoute);
 
 mongoose

@@ -9,19 +9,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateCompanyValidationSchema = void 0;
 const class_validator_1 = require("class-validator");
 class CreateCompanyValidationSchema {
-    constructor(businessName, businessType, industry, companySize, addressNumber, buyingCurrency, sellingCurrency, street, city, state, zipCode) {
-        this.businessName = businessName;
-        this.businessType = businessType;
-        this.industry = industry;
-        this.companySize = companySize;
-        this.addressNumber = addressNumber;
-        this.buyingCurrency = buyingCurrency;
-        this.sellingCurrency = sellingCurrency;
-        this.street = street;
-        this.city = city;
-        this.state = state;
-        this.zipCode = zipCode;
-    }
 }
 exports.CreateCompanyValidationSchema = CreateCompanyValidationSchema;
 __decorate([

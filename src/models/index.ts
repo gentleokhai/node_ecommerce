@@ -1,2 +1,3 @@
-export * from './user.model';
+export * from './employee.model';
 export * from './company.model';
+export * from './employer.model';

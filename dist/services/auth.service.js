@@ -16,18 +16,18 @@ const signup = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, phoneNumber } = data;
     const salt = yield (0, utility_1.GenerateSalt)();
     const accountPassword = yield (0, utility_1.GeneratePassword)(password, salt);
-    const createdUser = yield models_1.User.create({
+    const createdEmployer = yield models_1.Employer.create({
         email,
         password: accountPassword,
         phoneNumber,
         salt,
     });
     const signature = (0, utility_1.GenerateSignature)({
-        id: createdUser.id,
+        id: createdEmployer.id,
         email: email,
     });
     const result = {
-        id: createdUser.id,
+        id: createdEmployer.id,
         email: email,
         token: signature,
     };

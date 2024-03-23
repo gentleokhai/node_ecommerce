@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
-import { CreateCompanyValidationSchema } from '../dto/company';
+import {
+  CreateCompanyInput,
+  CreateCompanyValidationSchema,
+} from '../dto/company';
 
 export const createCompanyValidator = async (
-  req: Request,
+  req: Request<any, any, CreateCompanyInput>,
   res: Response,
   next: NextFunction
 ) => {
@@ -11,21 +14,35 @@ export const createCompanyValidator = async (
     if (!req.body) {
       return res.status(400).send({ message: 'Missing request body!' });
     }
-    const data = new CreateCompanyValidationSchema(
-      req.body.businessName,
-      req.body.businessType,
-      req.body.industry,
-      req.body.companySize,
-      req.body.addressNumber,
-      req.body.buyingCurrency,
-      req.body.sellingCurrency,
-      req.body.street,
-      req.body.city,
-      req.body.state,
-      req.body.zipCode
-    );
 
-    await validateOrReject(data);
+    const {
+      businessName,
+      businessType,
+      industry,
+      companySize,
+      addressNumber,
+      buyingCurrency,
+      sellingCurrency,
+      street,
+      city,
+      state,
+      zipCode,
+    } = req.body;
+
+    const company = new CreateCompanyValidationSchema();
+    company.businessName = businessName;
+    company.businessType = businessType;
+    company.industry = industry;
+    company.companySize = companySize;
+    company.addressNumber = addressNumber;
+    company.buyingCurrency = buyingCurrency;
+    company.sellingCurrency = sellingCurrency;
+    company.street = street;
+    company.city = city;
+    company.state = state;
+    company.zipCode = zipCode;
+
+    await validateOrReject(company);
 
     next();
   } catch (e: any) {
