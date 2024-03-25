@@ -31,7 +31,7 @@ export const getEmployerController = async (req: Request, res: Response) => {
 };
 
 export const updateEmployerController = async (req: Request, res: Response) => {
-  const { firstName, lastName, gender, role } = <UpdateEmployerInput>req.body;
+  const { firstName, lastName, gender } = <UpdateEmployerInput>req.body;
 
   const user = req.user;
 
@@ -42,7 +42,6 @@ export const updateEmployerController = async (req: Request, res: Response) => {
       existingUser.firstName = firstName;
       existingUser.lastName = lastName;
       existingUser.gender = gender;
-      existingUser.role = role;
 
       await existingUser.save();
 

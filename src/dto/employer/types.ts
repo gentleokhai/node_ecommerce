@@ -13,5 +13,4 @@ export interface UpdateEmployerInput {
   firstName: string;
   lastName: string;
   gender: string;
-  role: string;
 }

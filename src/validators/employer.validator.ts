@@ -15,12 +15,11 @@ export const createOrUpdateEmployerValidator = async (
       return res.status(400).send({ message: 'Missing request body!' });
     }
 
-    const { firstName, lastName, role, gender } = req.body;
+    const { firstName, lastName, gender } = req.body;
 
     const employer = new UpdateEmployerValidationSchema();
     employer.firstName = firstName;
     employer.lastName = lastName;
-    employer.role = role;
     employer.gender = gender;
 
     await validateOrReject(employer);

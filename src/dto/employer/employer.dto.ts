@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { Gender, IsEnumValue } from '../general';
 import { UpdateEmployerInput } from './types';
 
 export class UpdateEmployerValidationSchema implements UpdateEmployerInput {
@@ -14,11 +15,6 @@ export class UpdateEmployerValidationSchema implements UpdateEmployerInput {
 
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
-  role!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsOptional()
+  @IsEnumValue(Gender)
   gender!: string;
 }
