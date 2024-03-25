@@ -40,7 +40,7 @@ const getEmployerController = (req, res) => __awaiter(void 0, void 0, void 0, fu
 });
 exports.getEmployerController = getEmployerController;
 const updateEmployerController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { firstName, lastName, gender, role } = req.body;
+    const { firstName, lastName, gender } = req.body;
     const user = req.user;
     try {
         const existingUser = yield (0, exports.FindEmployer)(user === null || user === void 0 ? void 0 : user.id);
@@ -48,7 +48,6 @@ const updateEmployerController = (req, res) => __awaiter(void 0, void 0, void 0,
             existingUser.firstName = firstName;
             existingUser.lastName = lastName;
             existingUser.gender = gender;
-            existingUser.role = role;
             yield existingUser.save();
             return res.json(existingUser);
         }

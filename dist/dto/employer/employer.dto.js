@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateEmployerValidationSchema = void 0;
 const class_validator_1 = require("class-validator");
+const general_1 = require("../general");
 class UpdateEmployerValidationSchema {
 }
 exports.UpdateEmployerValidationSchema = UpdateEmployerValidationSchema;
@@ -24,10 +25,5 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsOptional)()
-], UpdateEmployerValidationSchema.prototype, "role", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsOptional)()
+    (0, general_1.IsEnumValue)(general_1.Gender)
 ], UpdateEmployerValidationSchema.prototype, "gender", void 0);

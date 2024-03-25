@@ -17,11 +17,10 @@ const createOrUpdateEmployerValidator = (req, res, next) => __awaiter(void 0, vo
         if (!req.body) {
             return res.status(400).send({ message: 'Missing request body!' });
         }
-        const { firstName, lastName, role, gender } = req.body;
+        const { firstName, lastName, gender } = req.body;
         const employer = new employer_1.UpdateEmployerValidationSchema();
         employer.firstName = firstName;
         employer.lastName = lastName;
-        employer.role = role;
         employer.gender = gender;
         yield (0, class_validator_1.validateOrReject)(employer);
         next();
