@@ -7,19 +7,36 @@ import {
   EmployerRoute,
   AuthRoute,
   EmployeeRoute,
+  ItemRoute,
 } from './routes';
 import cors from 'cors';
+import multer from 'multer';
+import path from 'path';
 
 const app = express();
 app.use(cors());
 
+export const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads');
+    console.log(req, 'here');
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + path.extname(file.originalname));
+  },
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(__dirname));
 
 app.use('/auth', AuthRoute);
 app.use('/employer', EmployerRoute);
 app.use('/employee', EmployeeRoute);
 app.use('/company', CompanyRoute);
+app.use('/item', ItemRoute);
 
 mongoose
   .connect(MONGO_URI)
