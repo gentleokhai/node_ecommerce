@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateEmployeeStatusController = exports.updateEmployeeAccessController = exports.getEmployeeByIdController = exports.getEmployeesController = exports.updateEmployeeController = exports.createEmployeeController = exports.FindEmployee = void 0;
+const filters_1 = require("../dto/employee/filters");
 const models_1 = require("../models");
 const services_1 = require("../services");
 const FindEmployee = (id, email) => __awaiter(void 0, void 0, void 0, function* () {
@@ -55,31 +56,7 @@ const updateEmployeeController = (req, res) => __awaiter(void 0, void 0, void 0,
 });
 exports.updateEmployeeController = updateEmployeeController;
 const getEmployeesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const status = req.query.status;
-    const accessType = req.query.accessType;
-    const keyword = req.query.keyword;
-    const sort = req.query.sort;
-    const filter = {};
-    if (status)
-        filter.status = status;
-    if (accessType)
-        filter.accessType = accessType;
-    let sortOptions = { createdAt: -1, firstName: 'asc' }; // Default sorting
-    if (sort) {
-        const [sortField, sortOrderString] = sort.split(':');
-        const sortOrder = sortOrderString === 'desc' ? -1 : 1;
-        sortOptions[sortField] = sortOrder;
-    }
-    let keywordQuery = {};
-    if (keyword) {
-        keywordQuery = {
-            $or: [
-                { firstName: { $regex: keyword, $options: 'i' } },
-                { lastName: { $regex: keyword, $options: 'i' } },
-            ],
-        };
-    }
-    const query = Object.assign(Object.assign({}, filter), keywordQuery);
+    const { query, sortOptions } = (0, filters_1.getEmployeesFilter)(req);
     try {
         const employees = yield models_1.Employee.find(query)
             .sort(sortOptions)

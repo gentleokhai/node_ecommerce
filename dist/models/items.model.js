@@ -23,32 +23,29 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Employee = void 0;
+exports.Item = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const general_1 = require("../dto/general");
-const EmployeeSchema = new mongoose_1.Schema({
-    email: { type: String, required: true, unique: true, index: true },
-    password: { type: String },
-    phoneNumber: { type: String, required: true },
-    salt: { type: String },
-    firstName: { type: String, required: true, index: true },
-    lastName: { type: String, required: true, index: true },
-    gender: { type: String, enum: Object.values(general_1.Gender), index: true },
-    address: { type: String },
-    accessType: { type: String, enum: Object.values(general_1.AccessType), index: true },
-    jobTitle: { type: String, required: true, index: true },
-    dateOfEmployment: { type: String, required: true },
-    status: { type: String, enum: Object.values(general_1.Status), index: true },
-    company: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        required: true,
-        ref: 'company',
-    },
-    branch: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'branch' },
+const ItemSchema = new mongoose_1.Schema({
+    image: { type: String, default: null },
+    name: { type: String, required: true },
+    category: { type: String, required: true },
+    unit: { type: String, required: true },
+    sku: { type: String, required: true },
+    weight: { type: String },
+    description: { type: String },
+    costPrice: { type: String, required: true },
+    sellingPrice: { type: String, required: true },
+    currency: { type: String, required: true },
+    wholesalePrice: { type: String, default: null },
+    quantityInPack: { type: String, default: null },
+    stock: { type: String, default: null },
+    lowStock: { type: String, default: null },
 }, {
     toJSON: {
         transform(_, ret) {
             ret.id = ret._id.toString();
+            delete ret.password;
+            delete ret.salt;
             delete ret.__v;
             delete ret._id;
             delete ret.createdAt, delete ret.updatedAt;
@@ -56,5 +53,5 @@ const EmployeeSchema = new mongoose_1.Schema({
     },
     timestamps: true,
 });
-const Employee = mongoose_1.default.model('employee', EmployeeSchema);
-exports.Employee = Employee;
+const Item = mongoose_1.default.model('item', ItemSchema);
+exports.Item = Item;
