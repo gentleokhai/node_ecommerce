@@ -13,7 +13,7 @@ interface ItemDoc extends Document {
   sellingPrice: string;
   wholesalePrice: string;
   quantityInPack: string;
-  openingStock: string;
+  stock: string;
   lowStock: string;
 }
 
@@ -31,7 +31,7 @@ const ItemSchema = new Schema(
     currency: { type: String, required: true },
     wholesalePrice: { type: String, default: null },
     quantityInPack: { type: String, default: null },
-    openingStock: { type: String, default: null },
+    stock: { type: String, default: null },
     lowStock: { type: String, default: null },
   },
   {

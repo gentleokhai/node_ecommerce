@@ -1,6 +1,12 @@
 import express from 'express';
 import multer from 'multer';
-import { createItemController } from '../controllers/item.controller';
+import {
+  createItemController,
+  getItemByIdController,
+  getItemsController,
+  updateItemPriceController,
+  updateItemStockController,
+} from '../controllers/item.controller';
 import { Authenticate } from '../middlewares';
 import path from 'path';
 
@@ -19,5 +25,9 @@ const upload = multer({ storage: storage });
 
 router.use(Authenticate);
 router.post('', upload.single('image'), createItemController);
+router.get('', getItemsController);
+router.get('/:id', getItemByIdController);
+router.patch('/:id/price', updateItemPriceController);
+router.patch('/:id/stock', updateItemStockController);
 
 export { router as ItemRoute };
