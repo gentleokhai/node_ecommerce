@@ -40,8 +40,8 @@ export interface UserAuthPayload {
 }
 
 export interface FilterTypes {
-  accessType?: string;
-  status?: string;
+  accessType?: { $in: string[] };
+  status?: { $in: string[] };
   keyword?: string;
 }
 

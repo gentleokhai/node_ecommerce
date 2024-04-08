@@ -6,6 +6,7 @@ import {
   UpdateEmployeeInput,
   UpdateEmployeeStatusInput,
 } from '../dto/employee';
+import { getEmployeesFilter } from '../dto/employee/filters';
 import { Employee } from '../models';
 import { createEmployee } from '../services';
 
@@ -69,37 +70,7 @@ export const updateEmployeeController = async (req: Request, res: Response) => {
 };
 
 export const getEmployeesController = async (req: Request, res: Response) => {
-  const status = req.query.status as string;
-  const accessType = req.query.accessType as string;
-  const keyword = req.query.keyword as string;
-  const sort = req.query.sort as string;
-
-  const filter: FilterTypes = {};
-  if (status) filter.status = status;
-  if (accessType) filter.accessType = accessType;
-
-  let sortOptions: { [key: string]: any } = { createdAt: -1, firstName: 'asc' }; // Default sorting
-
-  if (sort) {
-    const [sortField, sortOrderString] = sort.split(':');
-    const sortOrder: number = sortOrderString === 'desc' ? -1 : 1;
-    sortOptions[sortField] = sortOrder;
-  }
-
-  let keywordQuery = {};
-  if (keyword) {
-    keywordQuery = {
-      $or: [
-        { firstName: { $regex: keyword, $options: 'i' } },
-        { lastName: { $regex: keyword, $options: 'i' } },
-      ],
-    };
-  }
-
-  const query = {
-    ...filter,
-    ...keywordQuery,
-  };
+  const { query, sortOptions } = getEmployeesFilter(req);
 
   try {
     const employees = await Employee.find(query)
