@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import {
   CreateEmployeeInput,
-  FilterTypes,
   UpdateEmployeeAccessInput,
   UpdateEmployeeInput,
   UpdateEmployeeStatusInput,
@@ -90,7 +89,13 @@ export const getEmployeeByIdController = async (
   const id = req.params.id;
 
   try {
-    const employee = await FindEmployee(id);
+    const employee = await Employee.findById(id)
+      .select('-password -salt')
+      .populate('jobTitle')
+      .populate({
+        path: 'company',
+        select: 'businessName industry id',
+      });
 
     res.status(200).json(employee);
   } catch (error) {

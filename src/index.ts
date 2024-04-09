@@ -29,7 +29,6 @@ export const storage = multer.diskStorage({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(__dirname));
 
 app.use('/auth', AuthRoute);

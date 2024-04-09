@@ -21,7 +21,11 @@ const ItemSchema = new Schema(
   {
     image: { type: String, default: null },
     name: { type: String, required: true },
-    category: { type: String, required: true },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'category',
+    },
     unit: { type: String, required: true },
     sku: { type: String, required: true },
     weight: { type: String },

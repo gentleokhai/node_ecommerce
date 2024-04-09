@@ -9,6 +9,12 @@ import {
 } from '../controllers/item.controller';
 import { Authenticate } from '../middlewares';
 import path from 'path';
+import {
+  createCategoryController,
+  getCategoryController,
+} from '../controllers/category.controller';
+import { createCategoryValidator } from '../validators/category.validator';
+import { createItemValidator } from '../validators/item.validator';
 
 const router = express.Router();
 
@@ -24,8 +30,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.use(Authenticate);
-router.post('', upload.single('image'), createItemController);
+router.post(
+  '',
+  upload.single('image'),
+  createItemValidator,
+  createItemController
+);
 router.get('', getItemsController);
+router.post('/category', createCategoryValidator, createCategoryController);
+router.get('/category', getCategoryController);
 router.get('/:id', getItemByIdController);
 router.patch('/:id/price', updateItemPriceController);
 router.patch('/:id/stock', updateItemStockController);

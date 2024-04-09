@@ -39,6 +39,7 @@ export class CreateEmployeeValidationSchema implements CreateEmployeeInput {
 
   @IsString()
   @IsNotEmpty()
+  @Validate(IsValidMongoId)
   jobTitle!: string;
 
   @IsString()
@@ -90,6 +91,7 @@ export class UpdateEmployeeValidationSchema implements UpdateEmployeeInput {
   @IsString()
   @IsOptional()
   @IsNotEmpty()
+  @Validate(IsValidMongoId)
   jobTitle!: string;
 
   @IsString()
