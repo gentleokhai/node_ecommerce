@@ -30,7 +30,8 @@ __decorate([
 ], CreateEmployeeValidationSchema.prototype, "lastName", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.Validate)(general_1.IsValidMongoId)
 ], CreateEmployeeValidationSchema.prototype, "jobTitle", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
@@ -82,7 +83,8 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.Validate)(general_1.IsValidMongoId)
 ], UpdateEmployeeValidationSchema.prototype, "jobTitle", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),

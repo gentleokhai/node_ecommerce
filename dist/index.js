@@ -25,7 +25,6 @@ exports.storage = multer_1.default.diskStorage({
 });
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express_1.default.static(__dirname));
 app.use('/auth', routes_1.AuthRoute);
 app.use('/employer', routes_1.EmployerRoute);

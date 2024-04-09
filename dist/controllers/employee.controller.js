@@ -71,7 +71,13 @@ exports.getEmployeesController = getEmployeesController;
 const getEmployeeByIdController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     try {
-        const employee = yield (0, exports.FindEmployee)(id);
+        const employee = yield models_1.Employee.findById(id)
+            .select('-password -salt')
+            .populate('jobTitle')
+            .populate({
+            path: 'company',
+            select: 'businessName industry id',
+        });
         res.status(200).json(employee);
     }
     catch (error) {

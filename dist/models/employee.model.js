@@ -36,7 +36,12 @@ const EmployeeSchema = new mongoose_1.Schema({
     gender: { type: String, enum: Object.values(general_1.Gender), index: true },
     address: { type: String },
     accessType: { type: String, enum: Object.values(general_1.AccessType), index: true },
-    jobTitle: { type: String, required: true, index: true },
+    jobTitle: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        required: true,
+        ref: 'jobs',
+        index: true,
+    },
     dateOfEmployment: { type: String, required: true },
     status: { type: String, enum: Object.values(general_1.Status), index: true },
     company: {

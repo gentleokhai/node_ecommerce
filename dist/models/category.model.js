@@ -23,33 +23,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Item = void 0;
+exports.Category = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const ItemSchema = new mongoose_1.Schema({
-    image: { type: String, default: null },
-    name: { type: String, required: true },
-    category: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        required: true,
-        ref: 'category',
-    },
-    unit: { type: String, required: true },
-    sku: { type: String, required: true },
-    weight: { type: String },
-    description: { type: String },
-    costPrice: { type: String, required: true },
-    sellingPrice: { type: String, required: true },
-    currency: { type: String, required: true },
-    wholesalePrice: { type: String, default: null },
-    quantityInPack: { type: String, default: null },
-    stock: { type: String, default: null },
-    lowStock: { type: String, default: null },
+const CategorySchema = new mongoose_1.Schema({
+    name: { type: String },
 }, {
     toJSON: {
         transform(_, ret) {
             ret.id = ret._id.toString();
-            delete ret.password;
-            delete ret.salt;
             delete ret.__v;
             delete ret._id;
             delete ret.createdAt, delete ret.updatedAt;
@@ -57,5 +38,5 @@ const ItemSchema = new mongoose_1.Schema({
     },
     timestamps: true,
 });
-const Item = mongoose_1.default.model('item', ItemSchema);
-exports.Item = Item;
+const Category = mongoose_1.default.model('category', CategorySchema);
+exports.Category = Category;
