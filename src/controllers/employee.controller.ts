@@ -74,7 +74,8 @@ export const getEmployeesController = async (req: Request, res: Response) => {
   try {
     const employees = await Employee.find(query)
       .sort(sortOptions)
-      .select('-password -salt');
+      .select('-password -salt')
+      .populate('jobTitle');
 
     res.status(200).json(employees);
   } catch (error) {
