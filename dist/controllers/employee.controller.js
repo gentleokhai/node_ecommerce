@@ -60,7 +60,8 @@ const getEmployeesController = (req, res) => __awaiter(void 0, void 0, void 0, f
     try {
         const employees = yield models_1.Employee.find(query)
             .sort(sortOptions)
-            .select('-password -salt');
+            .select('-password -salt')
+            .populate('jobTitle');
         res.status(200).json(employees);
     }
     catch (error) {
