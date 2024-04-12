@@ -5,26 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemRoute = void 0;
 const express_1 = __importDefault(require("express"));
-const multer_1 = __importDefault(require("multer"));
 const item_controller_1 = require("../controllers/item.controller");
 const middlewares_1 = require("../middlewares");
-const path_1 = __importDefault(require("path"));
 const category_controller_1 = require("../controllers/category.controller");
 const category_validator_1 = require("../validators/category.validator");
 const item_validator_1 = require("../validators/item.validator");
+const multer_1 = require("../config/multer");
 const router = express_1.default.Router();
 exports.ItemRoute = router;
-const storage = multer_1.default.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path_1.default.resolve(__dirname, '../../src/uploads'));
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
-    },
-});
-const upload = (0, multer_1.default)({ storage: storage });
 router.use(middlewares_1.Authenticate);
-router.post('', upload.single('image'), item_validator_1.createItemValidator, item_controller_1.createItemController);
+router.post('', multer_1.upload.single('image'), item_validator_1.createItemValidator, item_controller_1.createItemController);
 router.get('', item_controller_1.getItemsController);
 router.post('/category', category_validator_1.createCategoryValidator, category_controller_1.createCategoryController);
 router.get('/category', category_controller_1.getCategoryController);

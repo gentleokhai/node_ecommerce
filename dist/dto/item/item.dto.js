@@ -51,11 +51,11 @@ __decorate([
 ], CreateItemValidationSchema.prototype, "sellingPrice", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsOptional)()
 ], CreateItemValidationSchema.prototype, "wholesalePrice", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsOptional)()
 ], CreateItemValidationSchema.prototype, "quantityInPack", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
