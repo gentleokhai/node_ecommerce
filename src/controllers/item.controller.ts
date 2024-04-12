@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
+import { upload } from '../config/cloudinary';
 import { CreateItem, UpdateItemPrice, UpdateItemStock } from '../dto/item';
 import { getItemsFilter } from '../dto/item/filters';
 import { Item } from '../models/items.model';
 import { createItem } from '../services/item.service';
+import fs from 'fs';
 
 export const createItemController = async (
   req: Request<any, any, CreateItem>,
@@ -30,8 +32,15 @@ export const createItemController = async (
   if (existingItem !== null)
     return res.json({ message: 'An item already exists with this name' });
 
+  const uploader = async (path: string) => await upload(path, 'Zulu');
+
+  const filePath = req.file?.path as string;
+  const cloudImage = await uploader(filePath);
+
+  fs.unlinkSync(filePath);
+
   const createItemService = await createItem({
-    image: req.file && req.file.filename,
+    image: cloudImage.url,
     name,
     category,
     unit,
@@ -54,7 +63,7 @@ export const getItemsController = async (req: Request, res: Response) => {
   const { query, sortOptions } = getItemsFilter(req);
 
   try {
-    const items = await Item.find(query).sort(sortOptions);
+    const items = await Item.find(query).sort(sortOptions).populate('category');
 
     res.status(200).json(items);
   } catch (error) {

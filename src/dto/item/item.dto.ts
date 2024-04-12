@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsMimeType, Validate } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsMimeType,
+  Validate,
+  IsOptional,
+} from 'class-validator';
 import { IsValidMongoId } from '../general';
 import { CreateItem } from './types';
 
@@ -41,11 +47,11 @@ export class CreateItemValidationSchema implements CreateItem {
   sellingPrice!: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   wholesalePrice!: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   quantityInPack!: string;
 
   @IsString()
