@@ -25,7 +25,7 @@ export const getItemsFilter = (req: Request) => {
     if (sortField === 'createdAt') {
       const sortOrder: number = sortOrderString === 'desc' ? -1 : 1;
       sortOptions[sortField] = sortOrder;
-    } else if (sortField === 'firstName') {
+    } else if (sortField === 'name') {
       const sortOrder: string = sortOrderString === 'desc' ? 'desc' : 'asc';
       sortOptions[sortField] = sortOrder;
     }
@@ -38,10 +38,7 @@ export const getItemsFilter = (req: Request) => {
     const keywords = keyword.split(' ').filter(Boolean);
     keywordQuery = {
       $or: keywords.map((keyword) => ({
-        $or: [
-          { firstName: { $regex: keyword, $options: 'i' } },
-          { lastName: { $regex: keyword, $options: 'i' } },
-        ],
+        $or: [{ name: { $regex: keyword, $options: 'i' } }],
       })),
     };
   }

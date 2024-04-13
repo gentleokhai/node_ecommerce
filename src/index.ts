@@ -13,8 +13,13 @@ import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
 
+const corsOptions = {
+  origin: 'https://zulu-dev.vercel.app',
+  optionsSuccessStatus: 200,
+};
+
 const app = express();
-app.use(cors());
+app.use(cors(corsOptions));
 
 export const storage = multer.diskStorage({
   destination: (req, file, cb) => {
