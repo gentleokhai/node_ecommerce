@@ -1,6 +1,6 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
+import mongoose, { Error } from 'mongoose';
 import { MONGO_URI } from './config';
 import {
   CompanyRoute,
@@ -16,6 +16,7 @@ import path from 'path';
 const corsOptions = {
   origin: 'https://zulu-dev.vercel.app',
   optionsSuccessStatus: 200,
+  credentials: true,
 };
 
 const app = express();
@@ -35,6 +36,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(__dirname));
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!');
+});
 
 app.use('/auth', AuthRoute);
 app.use('/employer', EmployerRoute);
