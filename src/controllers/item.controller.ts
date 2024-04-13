@@ -56,9 +56,6 @@ export const createItemController = async (
     lowStock,
   });
 
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
   res.status(201).json(createItemService);
 };
 

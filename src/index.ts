@@ -14,7 +14,7 @@ import multer from 'multer';
 import path from 'path';
 
 const corsOptions = {
-  origin: 'https://zulu-dev.vercel.app',
+  origin: '*',
   optionsSuccessStatus: 200,
   credentials: true,
 };
@@ -38,7 +38,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
+  console.error(err);
   res.status(500).send('Something went wrong!');
 });
 
