@@ -4,7 +4,6 @@ import { CreateItem, UpdateItemPrice, UpdateItemStock } from '../dto/item';
 import { getItemsFilter } from '../dto/item/filters';
 import { Item } from '../models/items.model';
 import { createItem } from '../services/item.service';
-import fs from 'fs';
 
 export const createItemController = async (
   req: Request<any, any, CreateItem>,
@@ -12,6 +11,7 @@ export const createItemController = async (
   next: NextFunction
 ) => {
   const {
+    image,
     name,
     category,
     unit,
@@ -32,12 +32,11 @@ export const createItemController = async (
   if (existingItem !== null)
     return res.json({ message: 'An item already exists with this name' });
 
-  const uploader = async (path: string) => await upload(path, 'Zulu');
+  const buffer = Buffer.from(image ?? '', 'base64');
 
-  const filePath = req.file?.path as string;
-  const cloudImage = await uploader(filePath);
+  const uploader = async (path: any) => await upload(path, 'Zulu');
 
-  fs.unlinkSync(filePath);
+  const cloudImage = await uploader(buffer);
 
   const createItemService = await createItem({
     image: cloudImage.url,

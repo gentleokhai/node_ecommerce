@@ -4,15 +4,15 @@ export type CreateItem = {
   category: string;
   unit: string;
   sku: string;
-  weight: string;
+  weight: number | null;
   currency: string;
   description: string;
-  costPrice: string;
-  sellingPrice: string;
-  wholesalePrice: string;
-  quantityInPack: string;
-  stock: string;
-  lowStock: string;
+  costPrice: number;
+  sellingPrice: number;
+  wholesalePrice: number | null;
+  quantityInPack: number | null;
+  stock: number;
+  lowStock: number;
 };
 
 export type UpdateItemPrice = {
