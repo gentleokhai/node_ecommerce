@@ -22,7 +22,7 @@ const getItemsFilter = (req) => {
             const sortOrder = sortOrderString === 'desc' ? -1 : 1;
             sortOptions[sortField] = sortOrder;
         }
-        else if (sortField === 'firstName') {
+        else if (sortField === 'name') {
             const sortOrder = sortOrderString === 'desc' ? 'desc' : 'asc';
             sortOptions[sortField] = sortOrder;
         }
@@ -35,10 +35,7 @@ const getItemsFilter = (req) => {
         const keywords = keyword.split(' ').filter(Boolean);
         keywordQuery = {
             $or: keywords.map((keyword) => ({
-                $or: [
-                    { firstName: { $regex: keyword, $options: 'i' } },
-                    { lastName: { $regex: keyword, $options: 'i' } },
-                ],
+                $or: [{ name: { $regex: keyword, $options: 'i' } }],
             })),
         };
     }

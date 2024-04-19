@@ -14,6 +14,7 @@ export const createItemValidator = async (
     }
 
     const {
+      image,
       name,
       category,
       unit,
@@ -30,6 +31,7 @@ export const createItemValidator = async (
     } = req.body;
 
     const item = new CreateItemValidationSchema();
+    item.image = image ?? '';
     item.name = name;
     item.category = category;
     item.sku = sku;

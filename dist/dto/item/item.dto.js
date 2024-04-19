@@ -15,6 +15,10 @@ exports.CreateItemValidationSchema = CreateItemValidationSchema;
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)()
+], CreateItemValidationSchema.prototype, "image", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)()
 ], CreateItemValidationSchema.prototype, "name", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
@@ -30,8 +34,12 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)()
 ], CreateItemValidationSchema.prototype, "sku", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 2,
+    }),
+    (0, class_validator_1.IsOptional)()
 ], CreateItemValidationSchema.prototype, "weight", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
@@ -39,29 +47,59 @@ __decorate([
 ], CreateItemValidationSchema.prototype, "currency", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsOptional)()
 ], CreateItemValidationSchema.prototype, "description", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 2,
+    }),
+    (0, class_validator_1.Min)(1),
     (0, class_validator_1.IsNotEmpty)()
 ], CreateItemValidationSchema.prototype, "costPrice", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 2,
+    }),
+    (0, class_validator_1.Min)(1),
     (0, class_validator_1.IsNotEmpty)()
 ], CreateItemValidationSchema.prototype, "sellingPrice", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 2,
+    }),
+    (0, class_validator_1.Min)(1),
     (0, class_validator_1.IsOptional)()
 ], CreateItemValidationSchema.prototype, "wholesalePrice", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 0,
+    }),
+    (0, class_validator_1.IsInt)({ message: 'quantity in pack must be a whole number.' }),
     (0, class_validator_1.IsOptional)()
 ], CreateItemValidationSchema.prototype, "quantityInPack", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 0,
+    }),
+    (0, class_validator_1.IsInt)({ message: 'stock must be a whole number.' }),
     (0, class_validator_1.IsNotEmpty)()
 ], CreateItemValidationSchema.prototype, "stock", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 0,
+    }),
+    (0, class_validator_1.IsInt)({ message: 'low stock must be a whole number.' }),
     (0, class_validator_1.IsNotEmpty)()
 ], CreateItemValidationSchema.prototype, "lowStock", void 0);

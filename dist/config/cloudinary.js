@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.upload = void 0;
 const cloudinary_1 = require("cloudinary");
 const dotenv_1 = __importDefault(require("dotenv"));
+const streamifier_1 = __importDefault(require("streamifier"));
 dotenv_1.default.config();
 cloudinary_1.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -13,21 +14,23 @@ cloudinary_1.v2.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 const upload = (file, folder) => {
-    return new Promise((resolve) => {
-        cloudinary_1.v2.uploader.upload(file, {
-            folder: folder,
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary_1.v2.uploader.upload_stream({
             resource_type: 'auto',
-            use_filename: true,
+            format: 'jpg',
+            folder: folder,
         }, (error, result) => {
             if (error) {
+                reject(error);
                 console.error('Error uploading file to Cloudinary:', error);
                 return;
             }
             resolve({
-                url: result === null || result === void 0 ? void 0 : result.url,
+                url: result === null || result === void 0 ? void 0 : result.secure_url,
                 id: result === null || result === void 0 ? void 0 : result.public_id,
             });
         });
+        streamifier_1.default.createReadStream(file).pipe(uploadStream);
     });
 };
 exports.upload = upload;

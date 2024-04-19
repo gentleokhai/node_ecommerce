@@ -1,14 +1,20 @@
 import {
   IsString,
   IsNotEmpty,
-  IsMimeType,
+  IsNumber,
   Validate,
   IsOptional,
+  IsInt,
+  Min,
 } from 'class-validator';
 import { IsValidMongoId } from '../general';
 import { CreateItem } from './types';
 
 export class CreateItemValidationSchema implements CreateItem {
+  @IsString()
+  @IsNotEmpty()
+  image!: string;
+
   @IsString()
   @IsNotEmpty()
   name!: string;
@@ -26,39 +32,73 @@ export class CreateItemValidationSchema implements CreateItem {
   @IsNotEmpty()
   sku!: string;
 
-  @IsString()
-  @IsNotEmpty()
-  weight!: string;
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 2,
+  })
+  @IsOptional()
+  weight!: number | null;
 
   @IsString()
   @IsNotEmpty()
   currency!: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   description!: string;
 
-  @IsString()
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 2,
+  })
+  @Min(1)
   @IsNotEmpty()
-  costPrice!: string;
+  costPrice!: number;
 
-  @IsString()
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 2,
+  })
+  @Min(1)
   @IsNotEmpty()
-  sellingPrice!: string;
+  sellingPrice!: number;
 
-  @IsString()
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 2,
+  })
+  @Min(1)
   @IsOptional()
-  wholesalePrice!: string;
+  wholesalePrice!: number | null;
 
-  @IsString()
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 0,
+  })
+  @IsInt({ message: 'quantity in pack must be a whole number.' })
   @IsOptional()
-  quantityInPack!: string;
+  quantityInPack!: number | null;
 
-  @IsString()
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 0,
+  })
+  @IsInt({ message: 'stock must be a whole number.' })
   @IsNotEmpty()
-  stock!: string;
+  stock!: number;
 
-  @IsString()
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 0,
+  })
+  @IsInt({ message: 'low stock must be a whole number.' })
   @IsNotEmpty()
-  lowStock!: string;
+  lowStock!: number;
 }

@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
+import streamifier from 'streamifier';
 dotenv.config();
 
 interface UploadResult {
@@ -13,27 +14,28 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const upload = (file: string, folder: string): Promise<UploadResult> => {
-  return new Promise((resolve) => {
-    cloudinary.uploader.upload(
-      file,
+const upload = (file: Buffer, folder: string): Promise<UploadResult> => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
       {
-        folder: folder,
         resource_type: 'auto',
-        use_filename: true,
+        format: 'jpg',
+        folder: folder,
       },
       (error, result) => {
         if (error) {
+          reject(error);
           console.error('Error uploading file to Cloudinary:', error);
           return;
         }
 
         resolve({
-          url: result?.url,
+          url: result?.secure_url,
           id: result?.public_id,
         });
       }
     );
+    streamifier.createReadStream(file).pipe(uploadStream);
   });
 };
 

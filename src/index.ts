@@ -22,6 +22,8 @@ const corsOptions = {
 const app = express();
 app.use(cors(corsOptions));
 
+app.use(bodyParser.json({ limit: '1.5mb' }));
+
 export const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads');
@@ -38,6 +40,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (!res.headersSent) {
+    res.status(401).json({ message: 'Unauthorized' });
+  }
+
   console.error(err);
   res.status(500).send('Something went wrong!');
 });
