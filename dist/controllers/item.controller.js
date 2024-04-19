@@ -8,26 +8,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateItemStockController = exports.updateItemPriceController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
 const cloudinary_1 = require("../config/cloudinary");
 const filters_1 = require("../dto/item/filters");
 const items_model_1 = require("../models/items.model");
 const item_service_1 = require("../services/item.service");
-const fs_1 = __importDefault(require("fs"));
 const createItemController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const { name, category, unit, sku, weight, description, currency, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
+    const { image, name, category, unit, sku, weight, description, currency, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
     const existingItem = yield items_model_1.Item.findOne({ name: name });
     if (existingItem !== null)
         return res.json({ message: 'An item already exists with this name' });
+    const buffer = Buffer.from(image !== null && image !== void 0 ? image : '', 'base64');
     const uploader = (path) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, cloudinary_1.upload)(path, 'Zulu'); });
-    const filePath = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
-    const cloudImage = yield uploader(filePath);
-    fs_1.default.unlinkSync(filePath);
+    const cloudImage = yield uploader(buffer);
     const createItemService = yield (0, item_service_1.createItem)({
         image: cloudImage.url,
         name,

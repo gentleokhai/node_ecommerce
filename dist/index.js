@@ -12,8 +12,14 @@ const routes_1 = require("./routes");
 const cors_1 = __importDefault(require("cors"));
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
+const corsOptions = {
+    origin: '*',
+    optionsSuccessStatus: 200,
+    credentials: true,
+};
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)(corsOptions));
+app.use(body_parser_1.default.json({ limit: '1.5mb' }));
 exports.storage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads');
@@ -26,6 +32,13 @@ exports.storage = multer_1.default.diskStorage({
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.static(__dirname));
+app.use((err, req, res, next) => {
+    if (!res.headersSent) {
+        res.status(401).json({ message: 'Unauthorized' });
+    }
+    console.error(err);
+    res.status(500).send('Something went wrong!');
+});
 app.use('/auth', routes_1.AuthRoute);
 app.use('/employer', routes_1.EmployerRoute);
 app.use('/employee', routes_1.EmployeeRoute);
