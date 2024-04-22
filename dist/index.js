@@ -32,9 +32,10 @@ exports.storage = multer_1.default.diskStorage({
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.static(__dirname));
-app.use((err) => {
-    console.error(err);
-});
+// app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+//   console.error(err);
+//   res.status(500).send('Something went wrong!');
+// });
 app.use('/auth', routes_1.AuthRoute);
 app.use('/employer', routes_1.EmployerRoute);
 app.use('/employee', routes_1.EmployeeRoute);
