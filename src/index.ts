@@ -40,10 +40,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  if (!req.headers) {
-    res.status(401).json({ message: 'Unauthorized' });
-  }
-
   console.error(err);
   res.status(500).send('Something went wrong!');
 });

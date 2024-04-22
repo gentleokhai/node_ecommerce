@@ -38,5 +38,7 @@ export const ValidateSignature = async (req: Request, res: Response) => {
       req.user = payload as UserAuthPayload;
     });
     return true;
+  } else {
+    return false;
   }
 };

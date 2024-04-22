@@ -46,5 +46,8 @@ const ValidateSignature = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
         return true;
     }
+    else {
+        return false;
+    }
 });
 exports.ValidateSignature = ValidateSignature;
