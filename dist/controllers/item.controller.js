@@ -20,7 +20,7 @@ const createItemController = (req, res, next) => __awaiter(void 0, void 0, void 
     if (existingItem !== null)
         return res.json({ message: 'An item already exists with this name' });
     const buffer = Buffer.from(image !== null && image !== void 0 ? image : '', 'base64');
-    const uploader = (path) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, cloudinary_1.upload)(path, 'Zulu'); });
+    const uploader = (path) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, cloudinary_1.upload)(path, 'Zulu', res); });
     const cloudImage = yield uploader(buffer);
     const createItemService = yield (0, item_service_1.createItem)({
         image: cloudImage.url,

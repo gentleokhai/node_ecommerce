@@ -34,7 +34,7 @@ export const createItemController = async (
 
   const buffer = Buffer.from(image ?? '', 'base64');
 
-  const uploader = async (path: any) => await upload(path, 'Zulu');
+  const uploader = async (path: any) => await upload(path, 'Zulu', res);
 
   const cloudImage = await uploader(buffer);
 

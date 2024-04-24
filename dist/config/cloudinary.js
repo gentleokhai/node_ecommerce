@@ -13,7 +13,7 @@ cloudinary_1.v2.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-const upload = (file, folder) => {
+const upload = (file, folder, res) => {
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary_1.v2.uploader.upload_stream({
             resource_type: 'auto',
@@ -21,7 +21,7 @@ const upload = (file, folder) => {
             folder: folder,
         }, (error, result) => {
             if (error) {
-                reject(error);
+                res.status(400).json({ message: 'Error uploading image' });
                 console.error('Error uploading file to Cloudinary:', error);
                 return;
             }

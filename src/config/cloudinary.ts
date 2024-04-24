@@ -1,6 +1,8 @@
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 import streamifier from 'streamifier';
+import { Response } from 'express';
+
 dotenv.config();
 
 interface UploadResult {
@@ -14,7 +16,11 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const upload = (file: Buffer, folder: string): Promise<UploadResult> => {
+const upload = (
+  file: Buffer,
+  folder: string,
+  res: Response
+): Promise<UploadResult> => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
@@ -24,7 +30,7 @@ const upload = (file: Buffer, folder: string): Promise<UploadResult> => {
       },
       (error, result) => {
         if (error) {
-          reject(error);
+          res.status(400).json({ message: 'Error uploading image' });
           console.error('Error uploading file to Cloudinary:', error);
           return;
         }
