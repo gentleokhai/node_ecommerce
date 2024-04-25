@@ -2,6 +2,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 import streamifier from 'streamifier';
 import { Response } from 'express';
+import { AppError } from '../utility/AppError';
 
 dotenv.config();
 
@@ -30,9 +31,8 @@ const upload = (
       },
       (error, result) => {
         if (error) {
-          res.status(400).json({ message: 'Error uploading image' });
           console.error('Error uploading file to Cloudinary:', error);
-          return;
+          throw new AppError('Error uploading image', 400);
         }
 
         resolve({

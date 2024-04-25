@@ -4,6 +4,7 @@ import {
   CreateCompanyInput,
   CreateCompanyValidationSchema,
 } from '../dto/company';
+import { AppError } from '../utility/AppError';
 
 export const createCompanyValidator = async (
   req: Request<any, any, CreateCompanyInput>,
@@ -12,7 +13,7 @@ export const createCompanyValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
 
     const {

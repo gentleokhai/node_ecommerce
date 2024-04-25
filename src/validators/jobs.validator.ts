@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
 import { CreateJob, CreateJobValidationSchema } from '../dto/jobs';
+import { AppError } from '../utility/AppError';
 
 export const createJobValidator = async (
   req: Request<any, any, CreateJob>,
@@ -9,7 +10,7 @@ export const createJobValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
 
     const { name } = req.body;

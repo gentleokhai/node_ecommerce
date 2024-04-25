@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { APP_SECRET } from '../config';
 import { Request, Response } from 'express';
 import { UserAuthPayload } from '../dto/employee';
+import { AppError } from '../utility/AppError';
 
 export const GenerateSalt = async () => {
   return await bcrypt.genSalt();
@@ -31,14 +32,12 @@ export const ValidateSignature = async (req: Request, res: Response) => {
   if (signature) {
     jwt.verify(signature.split(' ')[1], APP_SECRET, (err, payload) => {
       if (err instanceof TokenExpiredError) {
-        return res
-          .status(401)
-          .send({ message: 'Unauthorized! Access Token was expired!' });
+        throw new AppError('Unauthorized! Access Token was expired!', 401);
       }
       req.user = payload as UserAuthPayload;
     });
     return true;
   } else {
-    return false;
+    throw new AppError('Unauthorized! Access Token was expired!', 401);
   }
 };

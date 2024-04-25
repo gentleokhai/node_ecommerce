@@ -12,6 +12,7 @@ import {
 import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
+import errorHandler from './middlewares/errorHandler';
 
 const corsOptions = {
   origin: '*',
@@ -39,16 +40,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(__dirname));
 
-// app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-//   console.error(err);
-//   res.status(500).send('Something went wrong!');
-// });
-
 app.use('/auth', AuthRoute);
 app.use('/employer', EmployerRoute);
 app.use('/employee', EmployeeRoute);
 app.use('/company', CompanyRoute);
 app.use('/item', ItemRoute);
+
+app.use(errorHandler);
 
 mongoose
   .connect(MONGO_URI)

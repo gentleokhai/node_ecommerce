@@ -1,6 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { UpdateEmployerInput } from '../dto/employer/types';
 import { Employer } from '../models';
+import { tryCatch } from '../utility/tryCatch';
+import { AppError } from '../utility/AppError';
 
 export const FindEmployer = async (id: string | undefined, email?: string) => {
   if (email) {
@@ -10,32 +12,30 @@ export const FindEmployer = async (id: string | undefined, email?: string) => {
   }
 };
 
-export const getEmployerController = async (req: Request, res: Response) => {
-  const user = req.user;
+export const getEmployerController = tryCatch(
+  async (req: Request, res: Response) => {
+    const user = req.user;
 
-  if (user) {
-    try {
+    if (user) {
       const employer = await FindEmployer(user?.id);
 
       if (employer) {
         return res.status(200).json(employer);
       } else {
-        return res.status(400).json({ message: 'User information not found' });
+        throw new AppError('User information not found', 400);
       }
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching data' });
     }
+
+    throw new AppError('User information not found', 400);
   }
+);
 
-  return res.status(400).json({ message: 'User information not found' });
-};
+export const updateEmployerController = tryCatch(
+  async (req: Request, res: Response) => {
+    const { firstName, lastName, gender } = <UpdateEmployerInput>req.body;
 
-export const updateEmployerController = async (req: Request, res: Response) => {
-  const { firstName, lastName, gender } = <UpdateEmployerInput>req.body;
+    const user = req.user;
 
-  const user = req.user;
-
-  try {
     const existingUser = await FindEmployer(user?.id);
 
     if (existingUser !== null) {
@@ -47,9 +47,7 @@ export const updateEmployerController = async (req: Request, res: Response) => {
 
       return res.json(existingUser);
     }
-  } catch (error) {
-    return res.status(500).json({ message: 'Internal server error' });
-  }
 
-  return res.status(400).json({ message: 'User information not found' });
-};
+    throw new AppError('User information not found', 400);
+  }
+);

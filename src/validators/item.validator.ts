@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
 import { CreateItemValidationSchema } from '../dto/item/item.dto';
 import { CreateItem } from '../dto/item';
+import { AppError } from '../utility/AppError';
 
 export const createItemValidator = async (
   req: Request<any, any, CreateItem>,
@@ -10,7 +11,7 @@ export const createItemValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
 
     const {

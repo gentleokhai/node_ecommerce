@@ -1,30 +1,28 @@
 import { Request, Response } from 'express';
 import { CreateJob } from '../dto/jobs';
 import { Jobs } from '../models/jobs.model';
+import { tryCatch } from '../utility/tryCatch';
+import { AppError } from '../utility/AppError';
 
-export const createJobController = async (
-  req: Request<any, any, CreateJob>,
-  res: Response
-) => {
-  const { name } = req.body;
+export const createJobController = tryCatch(
+  async (req: Request<any, any, CreateJob>, res: Response) => {
+    const { name } = req.body;
 
-  const existingJob = await Jobs.findOne({ name: name });
+    const existingJob = await Jobs.findOne({ name: name });
 
-  if (existingJob !== null)
-    return res.json({ message: 'A job already exists with this title' });
+    if (existingJob !== null)
+      throw new AppError('A job already exists with this title', 400);
 
-  const createJobService = await Jobs.create({ name: name });
+    const createJobService = await Jobs.create({ name: name });
 
-  res.status(201).json(createJobService);
-};
+    res.status(201).json(createJobService);
+  }
+);
 
-export const getJobsController = async (req: Request, res: Response) => {
-  try {
+export const getJobsController = tryCatch(
+  async (req: Request, res: Response) => {
     const jobs = await Jobs.find();
 
     res.status(200).json(jobs);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Error fetching data' });
   }
-};
+);

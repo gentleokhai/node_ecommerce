@@ -1,25 +1,31 @@
-import { Request, Response, NextFunction } from 'express';
-import { Employer, EmployerDoc } from '../models';
+import { Request, Response } from 'express';
+import { Employer } from '../models';
 import { createCompany } from '../services/company.service';
+import { tryCatch } from '../utility/tryCatch';
+import { AppError } from '../utility/AppError';
 
-export const createCompanyController = async (req: Request, res: Response) => {
-  const user = req.user;
+export const createCompanyController = tryCatch(
+  async (req: Request, res: Response) => {
+    const user = req.user;
 
-  if (user) {
-    const employer: EmployerDoc | null = await Employer.findById(user.id);
+    if (!user) {
+      throw new AppError('User information not found', 400);
+    }
 
-    if (employer && employer.company) {
-      return res
-        .status(400)
-        .json({ message: 'Employer already has a company registered' });
+    const employer = await Employer.findById(user.id);
+
+    if (!employer) {
+      throw new AppError('Employer not found', 400);
+    }
+
+    if (employer.company) {
+      throw new AppError('Employer already has a company registered', 400);
     }
 
     const companyService = await createCompany(req.body);
 
     await Employer.findByIdAndUpdate(user.id, { company: companyService.id });
 
-    return res.status(201).json(companyService);
+    res.status(201).json(companyService);
   }
-
-  return res.json({ message: 'User information not found' });
-};
+);

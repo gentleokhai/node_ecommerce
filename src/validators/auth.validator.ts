@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
 import { LoginValidationSchema, SignupValidationSchema } from '../dto/auth';
+import { AppError } from '../utility/AppError';
 
 export const signupValidator = async (
   req: Request,
@@ -9,7 +10,7 @@ export const signupValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
     const user = new SignupValidationSchema(
       req.body.email,
@@ -38,7 +39,7 @@ export const loginValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
     const user = new LoginValidationSchema(req.body.email, req.body.password);
     user.email = req.body.email;

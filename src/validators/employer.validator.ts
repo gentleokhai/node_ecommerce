@@ -4,6 +4,7 @@ import {
   UpdateEmployerInput,
   UpdateEmployerValidationSchema,
 } from '../dto/employer';
+import { AppError } from '../utility/AppError';
 
 export const createOrUpdateEmployerValidator = async (
   req: Request<any, any, UpdateEmployerInput>,
@@ -12,7 +13,7 @@ export const createOrUpdateEmployerValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
 
     const { firstName, lastName, gender } = req.body;

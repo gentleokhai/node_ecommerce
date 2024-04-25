@@ -10,6 +10,7 @@ import {
   UpdateEmployeeInput,
   UpdateEmployeeValidationSchema,
 } from '../dto/employee';
+import { AppError } from '../utility/AppError';
 
 export const createEmployeeValidator = async (
   req: Request<any, any, CreateEmployeeInput>,
@@ -18,7 +19,7 @@ export const createEmployeeValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
 
     const {
@@ -67,7 +68,7 @@ export const updateEmployeeValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
 
     const {
@@ -110,7 +111,7 @@ export const updateEmployeeAccessValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
 
     const { accessType } = req.body;
@@ -139,7 +140,7 @@ export const updateEmployeeStatusValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
 
     const { status } = req.body;

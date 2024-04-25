@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Employer } from '../models';
 import { login, signup } from '../services';
+import { AppError } from '../utility/AppError';
+import { tryCatch } from '../utility/tryCatch';
 
 const findEmployer = async (id: string | undefined, email?: string) => {
   if (email) {
@@ -10,19 +12,19 @@ const findEmployer = async (id: string | undefined, email?: string) => {
   }
 };
 
-export const signupController = async (req: Request, res: Response) => {
-  const existingEmployer = await findEmployer('', req.body.email);
+export const signupController = tryCatch(
+  async (req: Request, res: Response) => {
+    const existingEmployer = await findEmployer('', req.body.email);
 
-  if (existingEmployer !== null)
-    return res
-      .status(400)
-      .json({ message: 'An account already exists with this email' });
+    if (existingEmployer !== null)
+      throw new AppError('An account already exists with this email', 400);
 
-  const signupService = await signup(req.body);
-  return res.status(201).json(signupService);
-};
+    const signupService = await signup(req.body);
+    return res.status(201).json(signupService);
+  }
+);
 
-export const loginController = async (req: Request, res: Response) => {
+export const loginController = tryCatch(async (req: Request, res: Response) => {
   const existingEmployer = await findEmployer('', req.body.email);
 
   if (existingEmployer !== null) {
@@ -34,11 +36,12 @@ export const loginController = async (req: Request, res: Response) => {
     });
 
     if (loginService.isValidated) {
-      return res.status(200).json({ token: loginService.token });
+      res.status(200).json({ token: loginService.token });
+      return;
     }
 
-    return res.status(400).json({ message: 'Login credentials are not valid' });
+    throw new AppError('Login credentials are not valid', 400);
   }
 
-  return res.status(400).json({ message: 'Login credentials are not valid' });
-};
+  throw new AppError('Login credentials are not valid', 400);
+});

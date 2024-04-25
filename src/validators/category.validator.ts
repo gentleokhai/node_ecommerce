@@ -4,6 +4,7 @@ import {
   CreateCategory,
   CreateCategoryValidationSchema,
 } from '../dto/category';
+import { AppError } from '../utility/AppError';
 
 export const createCategoryValidator = async (
   req: Request<any, any, CreateCategory>,
@@ -12,7 +13,7 @@ export const createCategoryValidator = async (
 ) => {
   try {
     if (!req.body) {
-      return res.status(400).send({ message: 'Missing request body!' });
+      throw new AppError('Missing request body!', 400);
     }
 
     const { name } = req.body;
