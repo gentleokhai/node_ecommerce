@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createOrUpdateEmployerValidator = void 0;
 const class_validator_1 = require("class-validator");
 const employer_1 = require("../dto/employer");
+const AppError_1 = require("../utility/AppError");
 const createOrUpdateEmployerValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const { firstName, lastName, gender } = req.body;
         const employer = new employer_1.UpdateEmployerValidationSchema();

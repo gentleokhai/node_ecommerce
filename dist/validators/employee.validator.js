@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateEmployeeStatusValidator = exports.updateEmployeeAccessValidator = exports.updateEmployeeValidator = exports.createEmployeeValidator = void 0;
 const class_validator_1 = require("class-validator");
 const employee_1 = require("../dto/employee");
+const AppError_1 = require("../utility/AppError");
 const createEmployeeValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const { firstName, lastName, email, phoneNumber, company, dateOfEmployment, jobTitle, status, gender, accessType, } = req.body;
         const employee = new employee_1.CreateEmployeeValidationSchema();
@@ -45,7 +46,7 @@ exports.createEmployeeValidator = createEmployeeValidator;
 const updateEmployeeValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const { firstName, lastName, email, phoneNumber, dateOfEmployment, jobTitle, gender, } = req.body;
         const employee = new employee_1.UpdateEmployeeValidationSchema();
@@ -72,7 +73,7 @@ exports.updateEmployeeValidator = updateEmployeeValidator;
 const updateEmployeeAccessValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const { accessType } = req.body;
         const employee = new employee_1.UpdateEmployeeAccessValidationSchema();
@@ -93,7 +94,7 @@ exports.updateEmployeeAccessValidator = updateEmployeeAccessValidator;
 const updateEmployeeStatusValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const { status } = req.body;
         const employee = new employee_1.UpdateEmployeeStatusSchema();

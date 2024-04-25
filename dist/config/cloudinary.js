@@ -7,6 +7,7 @@ exports.upload = void 0;
 const cloudinary_1 = require("cloudinary");
 const dotenv_1 = __importDefault(require("dotenv"));
 const streamifier_1 = __importDefault(require("streamifier"));
+const AppError_1 = require("../utility/AppError");
 dotenv_1.default.config();
 cloudinary_1.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -21,9 +22,8 @@ const upload = (file, folder, res) => {
             folder: folder,
         }, (error, result) => {
             if (error) {
-                res.status(400).json({ message: 'Error uploading image' });
                 console.error('Error uploading file to Cloudinary:', error);
-                return;
+                throw new AppError_1.AppError('Error uploading image', 400);
             }
             resolve({
                 url: result === null || result === void 0 ? void 0 : result.secure_url,

@@ -16,6 +16,7 @@ exports.ValidateSignature = exports.GenerateSignature = exports.ValidatePassword
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = require("../config");
+const AppError_1 = require("../utility/AppError");
 const GenerateSalt = () => __awaiter(void 0, void 0, void 0, function* () {
     return yield bcrypt_1.default.genSalt();
 });
@@ -38,16 +39,14 @@ const ValidateSignature = (req, res) => __awaiter(void 0, void 0, void 0, functi
     if (signature) {
         jsonwebtoken_1.default.verify(signature.split(' ')[1], config_1.APP_SECRET, (err, payload) => {
             if (err instanceof TokenExpiredError) {
-                return res
-                    .status(401)
-                    .send({ message: 'Unauthorized! Access Token was expired!' });
+                throw new AppError_1.AppError('Unauthorized! Access Token was expired!', 401);
             }
             req.user = payload;
         });
         return true;
     }
     else {
-        return false;
+        throw new AppError_1.AppError('Unauthorized! Access Token was expired!', 401);
     }
 });
 exports.ValidateSignature = ValidateSignature;

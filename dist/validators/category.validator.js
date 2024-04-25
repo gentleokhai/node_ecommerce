@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCategoryValidator = void 0;
 const class_validator_1 = require("class-validator");
 const category_1 = require("../dto/category");
+const AppError_1 = require("../utility/AppError");
 const createCategoryValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const { name } = req.body;
         const category = new category_1.CreateCategoryValidationSchema();

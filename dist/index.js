@@ -12,6 +12,7 @@ const routes_1 = require("./routes");
 const cors_1 = __importDefault(require("cors"));
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
+const errorHandler_1 = __importDefault(require("./middlewares/errorHandler"));
 const corsOptions = {
     origin: '*',
     optionsSuccessStatus: 200,
@@ -32,15 +33,12 @@ exports.storage = multer_1.default.diskStorage({
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.static(__dirname));
-// app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-//   console.error(err);
-//   res.status(500).send('Something went wrong!');
-// });
 app.use('/auth', routes_1.AuthRoute);
 app.use('/employer', routes_1.EmployerRoute);
 app.use('/employee', routes_1.EmployeeRoute);
 app.use('/company', routes_1.CompanyRoute);
 app.use('/item', routes_1.ItemRoute);
+app.use(errorHandler_1.default);
 mongoose_1.default
     .connect(config_1.MONGO_URI)
     .then(() => {

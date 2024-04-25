@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCompanyValidator = void 0;
 const class_validator_1 = require("class-validator");
 const company_1 = require("../dto/company");
+const AppError_1 = require("../utility/AppError");
 const createCompanyValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const { businessName, businessType, industry, companySize, addressNumber, buyingCurrency, sellingCurrency, street, city, state, zipCode, } = req.body;
         const company = new company_1.CreateCompanyValidationSchema();

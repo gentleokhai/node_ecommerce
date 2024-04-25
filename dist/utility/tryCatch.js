@@ -9,15 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Authenticate = void 0;
-const utility_1 = require("../utility");
-const Authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.tryCatch = void 0;
+const tryCatch = (controller) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield (0, utility_1.ValidateSignature)(req, res);
-        next();
+        yield controller(req, res);
     }
     catch (error) {
         next(error);
     }
 });
-exports.Authenticate = Authenticate;
+exports.tryCatch = tryCatch;

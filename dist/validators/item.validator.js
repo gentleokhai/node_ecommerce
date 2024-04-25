@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createItemValidator = void 0;
 const class_validator_1 = require("class-validator");
 const item_dto_1 = require("../dto/item/item.dto");
+const AppError_1 = require("../utility/AppError");
 const createItemValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const { image, name, category, unit, sku, weight, currency, description, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
         const item = new item_dto_1.CreateItemValidationSchema();

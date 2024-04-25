@@ -12,19 +12,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCompanyController = void 0;
 const models_1 = require("../models");
 const company_service_1 = require("../services/company.service");
-const createCompanyController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const tryCatch_1 = require("../utility/tryCatch");
+const AppError_1 = require("../utility/AppError");
+exports.createCompanyController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
-    if (user) {
-        const employer = yield models_1.Employer.findById(user.id);
-        if (employer && employer.company) {
-            return res
-                .status(400)
-                .json({ message: 'Employer already has a company registered' });
-        }
-        const companyService = yield (0, company_service_1.createCompany)(req.body);
-        yield models_1.Employer.findByIdAndUpdate(user.id, { company: companyService.id });
-        return res.status(201).json(companyService);
+    if (!user) {
+        throw new AppError_1.AppError('User information not found', 400);
     }
-    return res.json({ message: 'User information not found' });
-});
-exports.createCompanyController = createCompanyController;
+    const employer = yield models_1.Employer.findById(user.id);
+    if (!employer) {
+        throw new AppError_1.AppError('Employer not found', 400);
+    }
+    if (employer.company) {
+        throw new AppError_1.AppError('Employer already has a company registered', 400);
+    }
+    const companyService = yield (0, company_service_1.createCompany)(req.body);
+    yield models_1.Employer.findByIdAndUpdate(user.id, { company: companyService.id });
+    res.status(201).json(companyService);
+}));

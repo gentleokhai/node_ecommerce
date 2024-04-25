@@ -14,11 +14,13 @@ const cloudinary_1 = require("../config/cloudinary");
 const filters_1 = require("../dto/item/filters");
 const items_model_1 = require("../models/items.model");
 const item_service_1 = require("../services/item.service");
-const createItemController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const tryCatch_1 = require("../utility/tryCatch");
+const AppError_1 = require("../utility/AppError");
+exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { image, name, category, unit, sku, weight, description, currency, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
     const existingItem = yield items_model_1.Item.findOne({ name: name });
     if (existingItem !== null)
-        return res.json({ message: 'An item already exists with this name' });
+        throw new AppError_1.AppError('An item already exists with this name', 400);
     const buffer = Buffer.from(image !== null && image !== void 0 ? image : '', 'base64');
     const uploader = (path) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, cloudinary_1.upload)(path, 'Zulu', res); });
     const cloudImage = yield uploader(buffer);
@@ -39,67 +41,42 @@ const createItemController = (req, res, next) => __awaiter(void 0, void 0, void 
         lowStock,
     });
     res.status(201).json(createItemService);
-});
-exports.createItemController = createItemController;
-const getItemsController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+exports.getItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, sortOptions } = (0, filters_1.getItemsFilter)(req);
-    try {
-        const items = yield items_model_1.Item.find(query).sort(sortOptions).populate('category');
-        res.status(200).json(items);
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Error fetching data' });
-    }
-});
-exports.getItemsController = getItemsController;
-const getItemByIdController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const items = yield items_model_1.Item.find(query).sort(sortOptions).populate('category');
+    res.status(200).json(items);
+}));
+exports.getItemByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    try {
-        const item = yield items_model_1.Item.findById(id);
-        res.status(200).json(item);
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Error fetching data' });
-    }
-});
-exports.getItemByIdController = getItemByIdController;
-const updateItemPriceController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const item = yield items_model_1.Item.findById(id);
+    res.status(200).json(item);
+}));
+exports.updateItemPriceController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { costPrice, sellingPrice } = req.body;
     const id = req.params.id;
-    try {
-        const existingItem = yield items_model_1.Item.findById(id);
-        if (existingItem !== null) {
-            existingItem.costPrice = costPrice;
-            existingItem.sellingPrice = sellingPrice;
-            yield existingItem.save();
-            return res.json(existingItem);
-        }
-        else {
-            return res.status(400).json({ message: 'Item does not exist' });
-        }
+    const existingItem = yield items_model_1.Item.findById(id);
+    if (existingItem !== null) {
+        existingItem.costPrice = costPrice;
+        existingItem.sellingPrice = sellingPrice;
+        yield existingItem.save();
+        return res.json(existingItem);
     }
-    catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+    else {
+        throw new AppError_1.AppError('Item does not exist', 400);
     }
-});
-exports.updateItemPriceController = updateItemPriceController;
-const updateItemStockController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+exports.updateItemStockController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { stock, lowStock } = req.body;
     const id = req.params.id;
-    try {
-        const existingItem = yield items_model_1.Item.findById(id);
-        if (existingItem !== null) {
-            existingItem.stock = stock;
-            existingItem.lowStock = lowStock;
-            yield existingItem.save();
-            return res.json(existingItem);
-        }
-        else {
-            return res.status(400).json({ message: 'Item does not exist' });
-        }
+    const existingItem = yield items_model_1.Item.findById(id);
+    if (existingItem !== null) {
+        existingItem.stock = stock;
+        existingItem.lowStock = lowStock;
+        yield existingItem.save();
+        return res.json(existingItem);
     }
-    catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
+    else {
+        throw new AppError_1.AppError('Item does not exist', 400);
     }
-});
-exports.updateItemStockController = updateItemStockController;
+}));

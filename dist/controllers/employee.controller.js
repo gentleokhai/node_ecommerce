@@ -13,6 +13,8 @@ exports.updateEmployeeStatusController = exports.updateEmployeeAccessController 
 const filters_1 = require("../dto/employee/filters");
 const models_1 = require("../models");
 const services_1 = require("../services");
+const tryCatch_1 = require("../utility/tryCatch");
+const AppError_1 = require("../utility/AppError");
 const FindEmployee = (id, email) => __awaiter(void 0, void 0, void 0, function* () {
     if (email) {
         return yield models_1.Employee.findOne({ email: email });
@@ -22,106 +24,68 @@ const FindEmployee = (id, email) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.FindEmployee = FindEmployee;
-const createEmployeeController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createEmployeeController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     const existingUser = yield (0, exports.FindEmployee)('', email);
     if (existingUser !== null)
-        return res.json({ message: 'An account already exists with this email' });
+        throw new AppError_1.AppError('An account already exists with this email', 400);
     const createEmployeeService = yield (0, services_1.createEmployee)(req.body);
     res.status(201).json(createEmployeeService);
-});
-exports.createEmployeeController = createEmployeeController;
-const updateEmployeeController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+exports.updateEmployeeController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { firstName, lastName, gender, jobTitle, dateOfEmployment, phoneNumber, } = req.body;
     const id = req.params.id;
-    try {
-        const existingEmployee = yield (0, exports.FindEmployee)(id);
-        if (existingEmployee !== null) {
-            existingEmployee.firstName = firstName;
-            existingEmployee.lastName = lastName;
-            existingEmployee.gender = gender;
-            existingEmployee.jobTitle = jobTitle;
-            existingEmployee.dateOfEmployment = dateOfEmployment;
-            existingEmployee.phoneNumber = phoneNumber;
-            yield existingEmployee.save();
-            return res.json(existingEmployee);
-        }
-        else {
-            return res.status(400).json({ message: 'Employee does not exist' });
-        }
+    const existingEmployee = yield (0, exports.FindEmployee)(id);
+    if (!existingEmployee) {
+        throw new AppError_1.AppError('Employee does not exist', 400);
     }
-    catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-});
-exports.updateEmployeeController = updateEmployeeController;
-const getEmployeesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    existingEmployee.firstName = firstName;
+    existingEmployee.lastName = lastName;
+    existingEmployee.gender = gender;
+    existingEmployee.jobTitle = jobTitle;
+    existingEmployee.dateOfEmployment = dateOfEmployment;
+    existingEmployee.phoneNumber = phoneNumber;
+    const updatedEmployee = yield existingEmployee.save();
+    res.json(updatedEmployee);
+}));
+exports.getEmployeesController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, sortOptions } = (0, filters_1.getEmployeesFilter)(req);
-    try {
-        const employees = yield models_1.Employee.find(query)
-            .sort(sortOptions)
-            .select('-password -salt')
-            .populate('jobTitle');
-        res.status(200).json(employees);
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Error fetching data' });
-    }
-});
-exports.getEmployeesController = getEmployeesController;
-const getEmployeeByIdController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const employees = yield models_1.Employee.find(query)
+        .sort(sortOptions)
+        .select('-password -salt')
+        .populate('jobTitle');
+    res.status(200).json(employees);
+}));
+exports.getEmployeeByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    try {
-        const employee = yield models_1.Employee.findById(id)
-            .select('-password -salt')
-            .populate('jobTitle')
-            .populate({
-            path: 'company',
-            select: 'businessName industry id',
-        });
-        res.status(200).json(employee);
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Error fetching data' });
-    }
-});
-exports.getEmployeeByIdController = getEmployeeByIdController;
-const updateEmployeeAccessController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const employee = yield models_1.Employee.findById(id)
+        .select('-password -salt')
+        .populate('jobTitle')
+        .populate({
+        path: 'company',
+        select: 'businessName industry id',
+    });
+    res.status(200).json(employee);
+}));
+exports.updateEmployeeAccessController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { accessType } = req.body;
     const id = req.params.id;
-    try {
-        const existingEmployee = yield (0, exports.FindEmployee)(id);
-        if (existingEmployee !== null) {
-            existingEmployee.accessType = accessType;
-            yield existingEmployee.save();
-            return res.json(existingEmployee);
-        }
-        else {
-            return res.status(400).json({ message: 'Employee does not exist' });
-        }
+    const existingEmployee = yield (0, exports.FindEmployee)(id);
+    if (!existingEmployee) {
+        throw new AppError_1.AppError('Employee does not exist', 400);
     }
-    catch (error) {
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-});
-exports.updateEmployeeAccessController = updateEmployeeAccessController;
-const updateEmployeeStatusController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    existingEmployee.accessType = accessType;
+    yield existingEmployee.save();
+    return res.json(existingEmployee);
+}));
+exports.updateEmployeeStatusController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const { status } = req.body;
-    try {
-        const existingEmployee = yield (0, exports.FindEmployee)(id);
-        if (existingEmployee !== null) {
-            existingEmployee.status = status;
-            yield existingEmployee.save();
-            return res.json(existingEmployee);
-        }
-        else {
-            return res.status(400).json({ message: 'Employee does not exist' });
-        }
+    const existingEmployee = yield (0, exports.FindEmployee)(id);
+    if (!existingEmployee) {
+        throw new AppError_1.AppError('Employee does not exist', 400);
     }
-    catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-});
-exports.updateEmployeeStatusController = updateEmployeeStatusController;
+    existingEmployee.status = status;
+    yield existingEmployee.save();
+    return res.json(existingEmployee);
+}));

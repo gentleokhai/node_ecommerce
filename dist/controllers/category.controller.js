@@ -11,22 +11,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCategoryController = exports.createCategoryController = void 0;
 const category_model_1 = require("../models/category.model");
-const createCategoryController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const tryCatch_1 = require("../utility/tryCatch");
+const AppError_1 = require("../utility/AppError");
+exports.createCategoryController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = req.body;
-    const existingJob = yield category_model_1.Category.findOne({ name: name });
-    if (existingJob !== null)
-        return res.json({ message: 'A job already exists with this title' });
-    const createCategoryService = yield category_model_1.Category.create({ name: name });
+    const existingCategory = yield category_model_1.Category.findOne({ name });
+    if (existingCategory) {
+        throw new AppError_1.AppError('A category already exists with this name', 400);
+    }
+    const createCategoryService = yield category_model_1.Category.create({ name });
     res.status(201).json(createCategoryService);
-});
-exports.createCategoryController = createCategoryController;
-const getCategoryController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const category = yield category_model_1.Category.find();
-        res.status(200).json(category);
-    }
-    catch (error) {
-        res.status(500).json({ message: 'Error fetching data' });
-    }
-});
-exports.getCategoryController = getCategoryController;
+}));
+exports.getCategoryController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const category = yield category_model_1.Category.find();
+    res.status(200).json(category);
+}));

@@ -12,10 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginValidator = exports.signupValidator = void 0;
 const class_validator_1 = require("class-validator");
 const auth_1 = require("../dto/auth");
+const AppError_1 = require("../utility/AppError");
 const signupValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const user = new auth_1.SignupValidationSchema(req.body.email, req.body.phoneNumber, req.body.password);
         yield (0, class_validator_1.validateOrReject)(user);
@@ -34,7 +35,7 @@ exports.signupValidator = signupValidator;
 const loginValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {
-            return res.status(400).send({ message: 'Missing request body!' });
+            throw new AppError_1.AppError('Missing request body!', 400);
         }
         const user = new auth_1.LoginValidationSchema(req.body.email, req.body.password);
         user.email = req.body.email;

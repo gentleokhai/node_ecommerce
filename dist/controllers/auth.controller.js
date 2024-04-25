@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginController = exports.signupController = void 0;
 const models_1 = require("../models");
 const services_1 = require("../services");
+const AppError_1 = require("../utility/AppError");
+const tryCatch_1 = require("../utility/tryCatch");
 const findEmployer = (id, email) => __awaiter(void 0, void 0, void 0, function* () {
     if (email) {
         return yield models_1.Employer.findOne({ email: email });
@@ -20,17 +22,14 @@ const findEmployer = (id, email) => __awaiter(void 0, void 0, void 0, function* 
         return yield models_1.Employer.findOne({ id: id });
     }
 });
-const signupController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.signupController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingEmployer = yield findEmployer('', req.body.email);
     if (existingEmployer !== null)
-        return res
-            .status(400)
-            .json({ message: 'An account already exists with this email' });
+        throw new AppError_1.AppError('An account already exists with this email', 400);
     const signupService = yield (0, services_1.signup)(req.body);
     return res.status(201).json(signupService);
-});
-exports.signupController = signupController;
-const loginController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+}));
+exports.loginController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingEmployer = yield findEmployer('', req.body.email);
     if (existingEmployer !== null) {
         const loginService = yield (0, services_1.login)(req.body, {
@@ -40,10 +39,10 @@ const loginController = (req, res) => __awaiter(void 0, void 0, void 0, function
             salt: existingEmployer.salt,
         });
         if (loginService.isValidated) {
-            return res.status(200).json({ token: loginService.token });
+            res.status(200).json({ token: loginService.token });
+            return;
         }
-        return res.status(400).json({ message: 'Login credentials are not valid' });
+        throw new AppError_1.AppError('Login credentials are not valid', 400);
     }
-    return res.status(400).json({ message: 'Login credentials are not valid' });
-});
-exports.loginController = loginController;
+    throw new AppError_1.AppError('Login credentials are not valid', 400);
+}));
