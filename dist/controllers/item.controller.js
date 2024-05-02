@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateItemStockController = exports.updateItemPriceController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
+exports.deleteItemController = exports.updateItemStockController = exports.updateItemPriceController = exports.updateItemController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
 const cloudinary_1 = require("../config/cloudinary");
 const filters_1 = require("../dto/item/filters");
 const items_model_1 = require("../models/items.model");
@@ -44,13 +44,41 @@ exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(
 }));
 exports.getItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, sortOptions } = (0, filters_1.getItemsFilter)(req);
+    const page = parseInt(req.query.page, 10) || 1;
+    const pageSize = parseInt(req.query.pageSize, 10) || 10;
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
     const items = yield items_model_1.Item.find(query).sort(sortOptions).populate('category');
-    res.status(200).json(items);
+    const paginatedItems = items.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(items.length / pageSize);
+    res.status(200).json({ items: paginatedItems, totalPages });
 }));
 exports.getItemByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const item = yield items_model_1.Item.findById(id);
     res.status(200).json(item);
+}));
+exports.updateItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { image, name, category, unit, sku, weight, description } = req.body;
+    const id = req.params.id;
+    const existingItem = yield items_model_1.Item.findById(id);
+    if (existingItem !== null) {
+        const buffer = Buffer.from(image !== null && image !== void 0 ? image : '', 'base64');
+        const uploader = (path) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, cloudinary_1.upload)(path, 'Zulu', res); });
+        const cloudImage = yield uploader(buffer);
+        image && (existingItem.image = cloudImage.url);
+        name && (existingItem.name = name);
+        category && (existingItem.category = category);
+        unit && (existingItem.unit = unit);
+        sku && (existingItem.sku = sku);
+        weight && (existingItem.weight = weight);
+        description && (existingItem.description = description);
+        yield existingItem.save();
+        return res.json(existingItem);
+    }
+    else {
+        throw new AppError_1.AppError('Item does not exist', 400);
+    }
 }));
 exports.updateItemPriceController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { costPrice, sellingPrice } = req.body;
@@ -79,4 +107,12 @@ exports.updateItemStockController = (0, tryCatch_1.tryCatch)((req, res) => __awa
     else {
         throw new AppError_1.AppError('Item does not exist', 400);
     }
+}));
+exports.deleteItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const result = yield items_model_1.Item.deleteOne({ _id: id });
+    if (result.deletedCount === 0) {
+        throw new AppError_1.AppError('Item does not exist', 400);
+    }
+    return res.json({ message: 'Item deleted successfully' });
 }));

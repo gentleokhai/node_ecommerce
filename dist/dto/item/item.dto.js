@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateItemValidationSchema = void 0;
+exports.UpdateItemStockValidationSchema = exports.UpdateItemPriceValidationSchema = exports.UpdateItemValidationSchema = exports.CreateItemValidationSchema = void 0;
 const class_validator_1 = require("class-validator");
 const general_1 = require("../general");
 class CreateItemValidationSchema {
@@ -103,3 +103,79 @@ __decorate([
     (0, class_validator_1.IsInt)({ message: 'low stock must be a whole number.' }),
     (0, class_validator_1.IsNotEmpty)()
 ], CreateItemValidationSchema.prototype, "lowStock", void 0);
+class UpdateItemValidationSchema {
+}
+exports.UpdateItemValidationSchema = UpdateItemValidationSchema;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemValidationSchema.prototype, "image", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemValidationSchema.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Validate)(general_1.IsValidMongoId)
+], UpdateItemValidationSchema.prototype, "category", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemValidationSchema.prototype, "unit", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemValidationSchema.prototype, "sku", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 2,
+    }),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemValidationSchema.prototype, "weight", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemValidationSchema.prototype, "description", void 0);
+class UpdateItemPriceValidationSchema {
+}
+exports.UpdateItemPriceValidationSchema = UpdateItemPriceValidationSchema;
+__decorate([
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 2,
+    }),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemPriceValidationSchema.prototype, "costPrice", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 2,
+    }),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemPriceValidationSchema.prototype, "sellingPrice", void 0);
+class UpdateItemStockValidationSchema {
+}
+exports.UpdateItemStockValidationSchema = UpdateItemStockValidationSchema;
+__decorate([
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 0,
+    }),
+    (0, class_validator_1.IsInt)({ message: 'stock must be a whole number.' }),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemStockValidationSchema.prototype, "stock", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)({
+        allowNaN: false,
+        allowInfinity: false,
+        maxDecimalPlaces: 0,
+    }),
+    (0, class_validator_1.IsInt)({ message: 'low stock must be a whole number.' }),
+    (0, class_validator_1.IsOptional)()
+], UpdateItemStockValidationSchema.prototype, "lowStock", void 0);
