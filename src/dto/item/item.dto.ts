@@ -8,7 +8,12 @@ import {
   Min,
 } from 'class-validator';
 import { IsValidMongoId } from '../general';
-import { CreateItem } from './types';
+import {
+  CreateItem,
+  UpdateItem,
+  UpdateItemPrice,
+  UpdateItemStock,
+} from './types';
 
 export class CreateItemValidationSchema implements CreateItem {
   @IsString()
@@ -100,5 +105,78 @@ export class CreateItemValidationSchema implements CreateItem {
   })
   @IsInt({ message: 'low stock must be a whole number.' })
   @IsNotEmpty()
+  lowStock!: number;
+}
+
+export class UpdateItemValidationSchema implements UpdateItem {
+  @IsString()
+  @IsOptional()
+  image!: string;
+
+  @IsString()
+  @IsOptional()
+  name!: string;
+
+  @IsString()
+  @IsOptional()
+  @Validate(IsValidMongoId)
+  category!: string;
+
+  @IsString()
+  @IsOptional()
+  unit!: string;
+
+  @IsString()
+  @IsOptional()
+  sku!: string;
+
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 2,
+  })
+  @IsOptional()
+  weight!: number;
+
+  @IsString()
+  @IsOptional()
+  description!: string;
+}
+
+export class UpdateItemPriceValidationSchema implements UpdateItemPrice {
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 2,
+  })
+  @IsOptional()
+  costPrice!: number;
+
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 2,
+  })
+  @IsOptional()
+  sellingPrice!: number;
+}
+
+export class UpdateItemStockValidationSchema implements UpdateItemStock {
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 0,
+  })
+  @IsInt({ message: 'stock must be a whole number.' })
+  @IsOptional()
+  stock!: number;
+
+  @IsNumber({
+    allowNaN: false,
+    allowInfinity: false,
+    maxDecimalPlaces: 0,
+  })
+  @IsInt({ message: 'low stock must be a whole number.' })
+  @IsOptional()
   lowStock!: number;
 }

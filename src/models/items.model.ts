@@ -6,37 +6,36 @@ interface ItemDoc extends Document {
   category: string;
   unit: string;
   sku: string;
-  weight: string;
+  weight: number;
   currency: string;
   description: string;
-  costPrice: string;
-  sellingPrice: string;
-  wholesalePrice: string;
-  quantityInPack: string;
-  stock: string;
-  lowStock: string;
+  costPrice: number;
+  sellingPrice: number;
+  wholesalePrice: number;
+  quantityInPack: number;
+  stock: number;
+  lowStock: number;
 }
 
 const ItemSchema = new Schema(
   {
     image: { type: String, default: null },
-    name: { type: String, required: true },
+    name: { type: String },
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: 'category',
     },
-    unit: { type: String, required: true },
-    sku: { type: String, required: true },
+    unit: { type: String },
+    sku: { type: String },
     weight: { type: String },
     description: { type: String },
-    costPrice: { type: String, required: true },
-    sellingPrice: { type: String, required: true },
-    currency: { type: String, required: true },
-    wholesalePrice: { type: String, default: null },
-    quantityInPack: { type: String, default: null },
-    stock: { type: String, default: null },
-    lowStock: { type: String, default: null },
+    costPrice: { type: Number },
+    sellingPrice: { type: Number },
+    currency: { type: String },
+    wholesalePrice: { type: Number, default: null },
+    quantityInPack: { type: Number, default: null },
+    stock: { type: Number, default: null },
+    lowStock: { type: Number, default: null },
   },
   {
     toJSON: {

@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { upload } from '../config/cloudinary';
-import { CreateItem, UpdateItemPrice, UpdateItemStock } from '../dto/item';
+import {
+  CreateItem,
+  UpdateItemPrice,
+  UpdateItemStock,
+  UpdateItem,
+} from '../dto/item';
 import { getItemsFilter } from '../dto/item/filters';
 import { Item } from '../models/items.model';
 import { createItem } from '../services/item.service';
@@ -62,9 +67,19 @@ export const getItemsController = tryCatch(
   async (req: Request, res: Response) => {
     const { query, sortOptions } = getItemsFilter(req);
 
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const pageSize = parseInt(req.query.pageSize as string, 10) || 10;
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+
     const items = await Item.find(query).sort(sortOptions).populate('category');
 
-    res.status(200).json(items);
+    const paginatedItems = items.slice(startIndex, endIndex);
+
+    const totalPages = Math.ceil(items.length / pageSize);
+
+    res.status(200).json({ items: paginatedItems, totalPages });
   }
 );
 
@@ -75,6 +90,40 @@ export const getItemByIdController = tryCatch(
     const item = await Item.findById(id);
 
     res.status(200).json(item);
+  }
+);
+
+export const updateItemController = tryCatch(
+  async (req: Request, res: Response) => {
+    const { image, name, category, unit, sku, weight, description } = <
+      UpdateItem
+    >req.body;
+
+    const id = req.params.id;
+
+    const existingItem = await Item.findById(id);
+
+    if (existingItem !== null) {
+      const buffer = Buffer.from(image ?? '', 'base64');
+
+      const uploader = async (path: any) => await upload(path, 'Zulu', res);
+
+      const cloudImage = await uploader(buffer);
+
+      image && (existingItem.image = cloudImage.url as string);
+      name && (existingItem.name = name);
+      category && (existingItem.category = category);
+      unit && (existingItem.unit = unit);
+      sku && (existingItem.sku = sku);
+      weight && (existingItem.weight = weight);
+      description && (existingItem.description = description);
+
+      await existingItem.save();
+
+      return res.json(existingItem);
+    } else {
+      throw new AppError('Item does not exist', 400);
+    }
   }
 );
 
@@ -117,5 +166,19 @@ export const updateItemStockController = tryCatch(
     } else {
       throw new AppError('Item does not exist', 400);
     }
+  }
+);
+
+export const deleteItemController = tryCatch(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+
+    const result = await Item.deleteOne({ _id: id });
+
+    if (result.deletedCount === 0) {
+      throw new AppError('Item does not exist', 400);
+    }
+
+    return res.json({ message: 'Item deleted successfully' });
   }
 );

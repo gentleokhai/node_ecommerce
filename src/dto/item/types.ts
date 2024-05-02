@@ -15,14 +15,24 @@ export type CreateItem = {
   lowStock: number;
 };
 
+export type UpdateItem = {
+  image: string;
+  name: string;
+  category: string;
+  unit: string;
+  sku: string;
+  weight: number;
+  description: string;
+};
+
 export type UpdateItemPrice = {
-  costPrice: string;
-  sellingPrice: string;
+  costPrice: number;
+  sellingPrice: number;
 };
 
 export type UpdateItemStock = {
-  stock: string;
-  lowStock: string;
+  stock: number;
+  lowStock: number;
 };
 
 export interface FilterTypes {
