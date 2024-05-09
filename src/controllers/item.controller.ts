@@ -104,13 +104,18 @@ export const updateItemController = tryCatch(
     const existingItem = await Item.findById(id);
 
     if (existingItem !== null) {
-      const buffer = Buffer.from(image ?? '', 'base64');
+      if (
+        typeof image === 'string' &&
+        image.startsWith('https://res.cloudinary.com')
+      ) {
+        existingItem.image = image;
+      } else {
+        const buffer = Buffer.from(image ?? '', 'base64');
+        const uploader = async (path: any) => await upload(path, 'Zulu', res);
+        const cloudImage = await uploader(buffer);
+        existingItem.image = cloudImage.url as string;
+      }
 
-      const uploader = async (path: any) => await upload(path, 'Zulu', res);
-
-      const cloudImage = await uploader(buffer);
-
-      image && (existingItem.image = cloudImage.url as string);
       name && (existingItem.name = name);
       category && (existingItem.category = category);
       unit && (existingItem.unit = unit);
@@ -180,5 +185,23 @@ export const deleteItemController = tryCatch(
     }
 
     return res.json({ message: 'Item deleted successfully' });
+  }
+);
+
+export const archiveItemController = tryCatch(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+
+    const existingItem = await Item.findById(id);
+
+    if (existingItem !== null) {
+      existingItem.archived = !existingItem.archived;
+
+      await existingItem.save();
+
+      return res.json(existingItem);
+    } else {
+      throw new AppError('Item does not exist', 400);
+    }
   }
 );

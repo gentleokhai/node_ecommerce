@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  archiveItemController,
   createItemController,
   deleteItemController,
   getItemByIdController,
@@ -32,6 +33,7 @@ router.get('/:id', getItemByIdController);
 router.patch('/:id', updateItemValidator, updateItemController);
 router.patch('/:id/price', updateItemPriceValidator, updateItemPriceController);
 router.patch('/:id/stock', updateItemStockValidator, updateItemStockController);
+router.patch('/:id/archive', archiveItemController);
 router.delete('/:id', deleteItemController);
 
 export { router as ItemRoute };

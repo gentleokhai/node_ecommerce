@@ -15,6 +15,7 @@ interface ItemDoc extends Document {
   quantityInPack: number;
   stock: number;
   lowStock: number;
+  archived: boolean;
 }
 
 const ItemSchema = new Schema(
@@ -36,6 +37,7 @@ const ItemSchema = new Schema(
     quantityInPack: { type: Number, default: null },
     stock: { type: Number, default: null },
     lowStock: { type: Number, default: null },
+    archived: { type: Boolean, default: false },
   },
   {
     toJSON: {

@@ -39,4 +39,5 @@ export interface FilterTypes {
   inventory?: { $in: string[] };
   status?: { $in: string[] };
   keyword?: string;
+  archived?: boolean;
 }
