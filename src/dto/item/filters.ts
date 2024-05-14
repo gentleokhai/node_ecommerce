@@ -2,14 +2,14 @@ import { Request } from 'express';
 import { FilterTypes } from './types';
 
 export const getItemsFilter = (req: Request) => {
-  const status = req.query.status as string | string[];
+  const active = req.query.status as string;
   const inventory = req.query.inventory as string | string[];
   const keyword = req.query.keyword as string;
   const sort = req.query.sort as string;
 
   const filter: FilterTypes = {};
-  if (status && status !== '') {
-    const employeesStatus = Array.isArray(status) ? status : [status];
+  if (active) {
+    const employeesStatus = active.split(',').map((s) => s.trim());
     filter.status = { $in: employeesStatus };
   }
 

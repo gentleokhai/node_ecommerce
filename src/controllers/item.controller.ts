@@ -68,18 +68,31 @@ export const getItemsController = tryCatch(
     const { query, sortOptions } = getItemsFilter(req);
 
     const page = parseInt(req.query.page as string, 10) || 1;
-    const pageSize = parseInt(req.query.pageSize as string, 10) || 10;
+    const pagePerLimit = parseInt(req.query.pagePerLimit as string, 10) || 10;
 
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = page * pageSize;
+    const startIndex = (page - 1) * pagePerLimit;
+    const endIndex = page * pagePerLimit;
 
     const items = await Item.find(query).sort(sortOptions).populate('category');
 
     const paginatedItems = items.slice(startIndex, endIndex);
 
-    const totalPages = Math.ceil(items.length / pageSize);
+    const totalPages = Math.ceil(items.length / pagePerLimit);
+    const totalItems = items.length - 1;
 
-    res.status(200).json({ items: paginatedItems, totalPages });
+    const nextPage = page < totalPages ? page + 1 : null;
+    const previousPage = page > 1 ? page - 1 : null;
+    const currentPage = page;
+
+    res.status(200).json({
+      items: paginatedItems,
+      totalPages,
+      pagePerLimit,
+      totalItems,
+      nextPage,
+      previousPage,
+      currentPage,
+    });
   }
 );
 

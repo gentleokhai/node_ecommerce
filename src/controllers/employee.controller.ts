@@ -70,12 +70,35 @@ export const getEmployeesController = tryCatch(
   async (req: Request, res: Response) => {
     const { query, sortOptions } = getEmployeesFilter(req);
 
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const pagePerLimit = parseInt(req.query.pagePerLimit as string, 10) || 10;
+
+    const startIndex = (page - 1) * pagePerLimit;
+    const endIndex = page * pagePerLimit;
+
     const employees = await Employee.find(query)
       .sort(sortOptions)
       .select('-password -salt')
       .populate('jobTitle');
 
-    res.status(200).json(employees);
+    const paginatedEmployees = employees.slice(startIndex, endIndex);
+
+    const totalPages = Math.ceil(employees.length / pagePerLimit);
+    const totalItems = employees.length - 1;
+
+    const nextPage = page < totalPages ? page + 1 : null;
+    const previousPage = page > 1 ? page - 1 : null;
+    const currentPage = page;
+
+    res.status(200).json({
+      result: paginatedEmployees,
+      totalPages,
+      pagePerLimit,
+      totalItems,
+      nextPage,
+      previousPage,
+      currentPage,
+    });
   }
 );
 

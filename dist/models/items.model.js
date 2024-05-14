@@ -43,6 +43,7 @@ const ItemSchema = new mongoose_1.Schema({
     quantityInPack: { type: Number, default: null },
     stock: { type: Number, default: null },
     lowStock: { type: Number, default: null },
+    archived: { type: Boolean, default: false },
 }, {
     toJSON: {
         transform(_, ret) {

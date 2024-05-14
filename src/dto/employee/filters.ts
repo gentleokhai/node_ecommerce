@@ -2,19 +2,19 @@ import { Request } from 'express';
 import { FilterTypes } from './types';
 
 export const getEmployeesFilter = (req: Request) => {
-  const status = req.query.status as string | string[];
-  const accessType = req.query.accessType as string | string[];
+  const status = req.query.status as string;
+  const accessType = req.query.accessType as string;
   const keyword = req.query.keyword as string;
   const sort = req.query.sort as string;
 
   const filter: FilterTypes = {};
   if (status && status !== '') {
-    const employeesStatus = Array.isArray(status) ? status : [status];
+    const employeesStatus = status.split(',').map((s) => s.trim());
     filter.status = { $in: employeesStatus };
   }
 
   if (accessType && accessType !== '') {
-    const accessTypes = Array.isArray(accessType) ? accessType : [accessType];
+    const accessTypes = accessType.split(',').map((s) => s.trim());
     filter.accessType = { $in: accessTypes };
   }
 

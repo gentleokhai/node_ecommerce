@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getItemsFilter = void 0;
 const getItemsFilter = (req) => {
-    const status = req.query.status;
+    const active = req.query.status;
     const inventory = req.query.inventory;
     const keyword = req.query.keyword;
     const sort = req.query.sort;
     const filter = {};
-    if (status && status !== '') {
-        const employeesStatus = Array.isArray(status) ? status : [status];
+    if (active) {
+        const employeesStatus = active.split(',').map((s) => s.trim());
         filter.status = { $in: employeesStatus };
     }
     if (inventory && inventory !== '') {

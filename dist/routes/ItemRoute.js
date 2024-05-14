@@ -21,4 +21,5 @@ router.get('/:id', item_controller_1.getItemByIdController);
 router.patch('/:id', item_validator_1.updateItemValidator, item_controller_1.updateItemController);
 router.patch('/:id/price', item_validator_1.updateItemPriceValidator, item_controller_1.updateItemPriceController);
 router.patch('/:id/stock', item_validator_1.updateItemStockValidator, item_controller_1.updateItemStockController);
+router.patch('/:id/archive', item_controller_1.archiveItemController);
 router.delete('/:id', item_controller_1.deleteItemController);

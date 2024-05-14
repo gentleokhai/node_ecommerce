@@ -8,11 +8,11 @@ const getEmployeesFilter = (req) => {
     const sort = req.query.sort;
     const filter = {};
     if (status && status !== '') {
-        const employeesStatus = Array.isArray(status) ? status : [status];
+        const employeesStatus = status.split(',').map((s) => s.trim());
         filter.status = { $in: employeesStatus };
     }
     if (accessType && accessType !== '') {
-        const accessTypes = Array.isArray(accessType) ? accessType : [accessType];
+        const accessTypes = accessType.split(',').map((s) => s.trim());
         filter.accessType = { $in: accessTypes };
     }
     let sortOptions = {};

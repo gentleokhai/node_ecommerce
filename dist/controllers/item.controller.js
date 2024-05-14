@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteItemController = exports.updateItemStockController = exports.updateItemPriceController = exports.updateItemController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
+exports.archiveItemController = exports.deleteItemController = exports.updateItemStockController = exports.updateItemPriceController = exports.updateItemController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
 const cloudinary_1 = require("../config/cloudinary");
 const filters_1 = require("../dto/item/filters");
 const items_model_1 = require("../models/items.model");
@@ -45,13 +45,25 @@ exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(
 exports.getItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, sortOptions } = (0, filters_1.getItemsFilter)(req);
     const page = parseInt(req.query.page, 10) || 1;
-    const pageSize = parseInt(req.query.pageSize, 10) || 10;
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = page * pageSize;
+    const pagePerLimit = parseInt(req.query.pagePerLimit, 10) || 10;
+    const startIndex = (page - 1) * pagePerLimit;
+    const endIndex = page * pagePerLimit;
     const items = yield items_model_1.Item.find(query).sort(sortOptions).populate('category');
     const paginatedItems = items.slice(startIndex, endIndex);
-    const totalPages = Math.ceil(items.length / pageSize);
-    res.status(200).json({ items: paginatedItems, totalPages });
+    const totalPages = Math.ceil(items.length / pagePerLimit);
+    const totalItems = items.length - 1;
+    const nextPage = page < totalPages ? page + 1 : null;
+    const previousPage = page > 1 ? page - 1 : null;
+    const currentPage = page;
+    res.status(200).json({
+        items: paginatedItems,
+        totalPages,
+        pagePerLimit,
+        totalItems,
+        nextPage,
+        previousPage,
+        currentPage,
+    });
 }));
 exports.getItemByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
@@ -63,10 +75,16 @@ exports.updateItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(
     const id = req.params.id;
     const existingItem = yield items_model_1.Item.findById(id);
     if (existingItem !== null) {
-        const buffer = Buffer.from(image !== null && image !== void 0 ? image : '', 'base64');
-        const uploader = (path) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, cloudinary_1.upload)(path, 'Zulu', res); });
-        const cloudImage = yield uploader(buffer);
-        image && (existingItem.image = cloudImage.url);
+        if (typeof image === 'string' &&
+            image.startsWith('https://res.cloudinary.com')) {
+            existingItem.image = image;
+        }
+        else {
+            const buffer = Buffer.from(image !== null && image !== void 0 ? image : '', 'base64');
+            const uploader = (path) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, cloudinary_1.upload)(path, 'Zulu', res); });
+            const cloudImage = yield uploader(buffer);
+            existingItem.image = cloudImage.url;
+        }
         name && (existingItem.name = name);
         category && (existingItem.category = category);
         unit && (existingItem.unit = unit);
@@ -115,4 +133,16 @@ exports.deleteItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(
         throw new AppError_1.AppError('Item does not exist', 400);
     }
     return res.json({ message: 'Item deleted successfully' });
+}));
+exports.archiveItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const existingItem = yield items_model_1.Item.findById(id);
+    if (existingItem !== null) {
+        existingItem.archived = !existingItem.archived;
+        yield existingItem.save();
+        return res.json(existingItem);
+    }
+    else {
+        throw new AppError_1.AppError('Item does not exist', 400);
+    }
 }));
