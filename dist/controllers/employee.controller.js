@@ -60,7 +60,7 @@ exports.getEmployeesController = (0, tryCatch_1.tryCatch)((req, res) => __awaite
         .populate('jobTitle');
     const paginatedEmployees = employees.slice(startIndex, endIndex);
     const totalPages = Math.ceil(employees.length / pagePerLimit);
-    const totalItems = employees.length - 1;
+    const totalEmployees = employees.length - 1;
     const nextPage = page < totalPages ? page + 1 : null;
     const previousPage = page > 1 ? page - 1 : null;
     const currentPage = page;
@@ -68,7 +68,7 @@ exports.getEmployeesController = (0, tryCatch_1.tryCatch)((req, res) => __awaite
         result: paginatedEmployees,
         totalPages,
         pagePerLimit,
-        totalItems,
+        totalEmployees,
         nextPage,
         previousPage,
         currentPage,
