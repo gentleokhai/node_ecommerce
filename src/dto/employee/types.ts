@@ -11,6 +11,12 @@ export interface CreateEmployeeInput {
   company: string;
 }
 
+export interface UpdateEmployeeOnboardingInput {
+  firstName: string;
+  lastName: string;
+  gender: string;
+}
+
 export interface UpdateEmployeeAccessInput {
   accessType: string;
 }

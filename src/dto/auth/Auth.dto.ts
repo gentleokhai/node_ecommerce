@@ -1,5 +1,5 @@
 import { IsString, IsPhoneNumber, IsNotEmpty } from 'class-validator';
-import { SignupPayload, SignInPayload } from './types';
+import { SignupPayload, SignInPayload, ChangePasswordPayload } from './types';
 
 export class SignupValidationSchema implements SignupPayload {
   @IsString()
@@ -33,5 +33,20 @@ export class LoginValidationSchema implements SignInPayload {
   constructor(email: string, password: string) {
     this.email = email;
     this.password = password;
+  }
+}
+
+export class ChangePasswordValidationSchema implements ChangePasswordPayload {
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+
+  @IsString()
+  @IsNotEmpty()
+  confirmPassword: string;
+
+  constructor(confirmPassword: string, password: string) {
+    this.password = password;
+    this.confirmPassword = confirmPassword;
   }
 }

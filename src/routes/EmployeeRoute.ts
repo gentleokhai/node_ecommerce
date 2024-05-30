@@ -6,6 +6,8 @@ import {
   getEmployeesController,
   updateEmployeeAccessController,
   updateEmployeeController,
+  getMeController,
+  updateEmployeeOnboardingController,
 } from '../controllers/employee.controller';
 import {
   createJobController,
@@ -15,6 +17,7 @@ import { Authenticate } from '../middlewares';
 import {
   createEmployeeValidator,
   updateEmployeeAccessValidator,
+  updateEmployeeOnboardingValidator,
   updateEmployeeStatusValidator,
   updateEmployeeValidator,
 } from '../validators/employee.validator';
@@ -26,6 +29,12 @@ router.use(Authenticate);
 router.get('', getEmployeesController);
 router.post('/jobs', createJobValidator, createJobController);
 router.get('/jobs', getJobsController);
+router.patch(
+  '/onboarding',
+  updateEmployeeOnboardingValidator,
+  updateEmployeeOnboardingController
+);
+router.get('/me', getMeController);
 router.get('/:id', getEmployeeByIdController);
 router.post('', createEmployeeValidator, createEmployeeController);
 router.patch('/:id', updateEmployeeValidator, updateEmployeeController);

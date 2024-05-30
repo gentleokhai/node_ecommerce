@@ -18,6 +18,7 @@ import {
   UpdateEmployeeStatusInput,
   UpdateEmployeeAccessInput,
   UpdateEmployeeInput,
+  UpdateEmployeeOnboardingInput,
 } from './types';
 
 export class CreateEmployeeValidationSchema implements CreateEmployeeInput {
@@ -126,4 +127,23 @@ export class UpdateEmployeeStatusSchema implements UpdateEmployeeStatusInput {
   @IsNotEmpty()
   @IsEnumValue(Status)
   status!: string;
+}
+
+export class UpdateEmployeeOnboardingValidationSchema
+  implements UpdateEmployeeOnboardingInput
+{
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  firstName!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  lastName!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @IsEnumValue(Gender)
+  gender!: string;
 }

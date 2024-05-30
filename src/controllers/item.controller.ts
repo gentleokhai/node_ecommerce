@@ -218,3 +218,15 @@ export const archiveItemController = tryCatch(
     }
   }
 );
+
+export const getPOSItemsController = tryCatch(
+  async (req: Request, res: Response) => {
+    const { query, sortOptions } = getItemsFilter(req);
+
+    const items = await Item.find({ ...query, archived: false })
+      .sort(sortOptions)
+      .populate('category');
+
+    res.status(200).json(items);
+  }
+);

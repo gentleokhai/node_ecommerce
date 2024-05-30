@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import { UpdateEmployerInput } from '../dto/employer/types';
-import { Employer } from '../models';
+import { Employee } from '../models';
 import { tryCatch } from '../utility/tryCatch';
 import { AppError } from '../utility/AppError';
 
-export const FindEmployer = async (id: string | undefined, email?: string) => {
+export const FindEmployee = async (id: string | undefined, email?: string) => {
   if (email) {
-    return await Employer.findOne({ email: email });
+    return await Employee.findOne({ email: email });
   } else {
-    return await Employer.findById(id).select('-password -salt');
+    return await Employee.findById(id).select('-password -salt');
   }
 };
 
@@ -17,7 +17,7 @@ export const getEmployerController = tryCatch(
     const user = req.user;
 
     if (user) {
-      const employer = await FindEmployer(user?.id);
+      const employer = await FindEmployee(user?.id);
 
       if (employer) {
         return res.status(200).json(employer);
@@ -36,7 +36,7 @@ export const updateEmployerController = tryCatch(
 
     const user = req.user;
 
-    const existingUser = await FindEmployer(user?.id);
+    const existingUser = await FindEmployee(user?.id);
 
     if (existingUser !== null) {
       existingUser.firstName = firstName;

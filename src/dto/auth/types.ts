@@ -8,3 +8,8 @@ export interface SignInPayload {
   email: string;
   password: string;
 }
+
+export interface ChangePasswordPayload {
+  password: string;
+  confirmPassword: string;
+}

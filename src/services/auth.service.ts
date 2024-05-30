@@ -1,6 +1,7 @@
 import { SignupPayload, SignInPayload } from '../dto/auth';
 import { ExistingUser } from '../dto/general';
-import { Employer } from '../models';
+import { Employee } from '../models';
+import { Jobs } from '../models/jobs.model';
 import {
   GeneratePassword,
   GenerateSalt,
@@ -14,20 +15,28 @@ export const signup = async (data: SignupPayload) => {
   const salt = await GenerateSalt();
   const accountPassword = await GeneratePassword(password, salt);
 
-  const createdEmployer = await Employer.create({
+  let ownerJob = await Jobs.findOne({ name: 'Owner' });
+  if (!ownerJob) {
+    ownerJob = await Jobs.create({ name: 'Owner' });
+  }
+
+  const createdEmployee = await Employee.create({
     email,
     password: accountPassword,
     phoneNumber,
     salt,
+    accessType: 'EXECUTIVE',
+    status: 'ACTIVE',
+    jobTitle: ownerJob.id,
   });
 
   const signature = GenerateSignature({
-    id: createdEmployer.id,
+    id: createdEmployee.id,
     email: email,
   });
 
   const result = {
-    id: createdEmployer.id,
+    id: createdEmployee.id,
     email: email,
     token: signature,
   };

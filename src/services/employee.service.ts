@@ -36,19 +36,5 @@ export const createEmployee = async (data: CreateEmployeeInput) => {
     status,
   });
 
-  const result = {
-    id: createdUser.id,
-    email,
-    firstName,
-    lastName,
-    status,
-    gender,
-    accessType,
-    phoneNumber,
-    jobTitle,
-    company,
-    dateOfEmployment,
-  };
-
-  return result;
+  return createdUser;
 };

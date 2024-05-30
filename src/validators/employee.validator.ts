@@ -9,6 +9,8 @@ import {
   UpdateEmployeeAccessValidationSchema,
   UpdateEmployeeInput,
   UpdateEmployeeValidationSchema,
+  UpdateEmployeeOnboardingInput,
+  UpdateEmployeeOnboardingValidationSchema,
 } from '../dto/employee';
 import { AppError } from '../utility/AppError';
 
@@ -46,6 +48,37 @@ export const createEmployeeValidator = async (
     employee.status = status;
     employee.gender = gender;
     employee.accessType = accessType;
+
+    await validateOrReject(employee);
+
+    next();
+  } catch (e: any) {
+    console.log(e);
+    const errors = e.map((err: any) => ({
+      field: err.property,
+      message: Object.values(err.constraints)[0],
+    }));
+
+    res.status(400).send(errors);
+  }
+};
+
+export const updateEmployeeOnboardingValidator = async (
+  req: Request<any, any, UpdateEmployeeOnboardingInput>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.body) {
+      throw new AppError('Missing request body!', 400);
+    }
+
+    const { firstName, lastName, gender } = req.body;
+
+    const employee = new UpdateEmployeeOnboardingValidationSchema();
+    employee.firstName = firstName;
+    employee.lastName = lastName;
+    employee.gender = gender;
 
     await validateOrReject(employee);
 

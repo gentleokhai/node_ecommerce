@@ -5,6 +5,7 @@ import {
   deleteItemController,
   getItemByIdController,
   getItemsController,
+  getPOSItemsController,
   updateItemController,
   updateItemPriceController,
   updateItemStockController,
@@ -27,6 +28,7 @@ const router = express.Router();
 router.use(Authenticate);
 router.post('', createItemValidator, createItemController);
 router.get('', getItemsController);
+router.get('/pos', getPOSItemsController);
 router.post('/category', createCategoryValidator, createCategoryController);
 router.get('/category', getCategoryController);
 router.get('/:id', getItemByIdController);

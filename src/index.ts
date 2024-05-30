@@ -13,6 +13,8 @@ import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
 import errorHandler from './middlewares/errorHandler';
+import { CustomerRoute } from './routes/CustomerRoute';
+import { TransactionRoute } from './routes/transactionRoute';
 
 const corsOptions = {
   origin: '*',
@@ -45,6 +47,8 @@ app.use('/employer', EmployerRoute);
 app.use('/employee', EmployeeRoute);
 app.use('/company', CompanyRoute);
 app.use('/item', ItemRoute);
+app.use('/customer', CustomerRoute);
+app.use('/transactions', TransactionRoute);
 
 app.use(errorHandler);
 
