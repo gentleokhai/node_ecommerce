@@ -13,7 +13,9 @@ import {
   createJobController,
   getJobsController,
 } from '../controllers/jobs.controller';
+import { AccessType } from '../dto/general';
 import { Authenticate } from '../middlewares';
+import { checkRole } from '../middlewares/checkRole';
 import {
   createEmployeeValidator,
   updateEmployeeAccessValidator,
@@ -26,6 +28,8 @@ import { createJobValidator } from '../validators/jobs.validator';
 const router = express.Router();
 
 router.use(Authenticate);
+router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
+
 router.get('', getEmployeesController);
 router.post('/jobs', createJobValidator, createJobController);
 router.get('/jobs', getJobsController);

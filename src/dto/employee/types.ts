@@ -1,11 +1,12 @@
+import { AccessType, Gender, Status } from '../general';
+
 export interface CreateEmployeeInput {
   email: string;
   phoneNumber: string;
   firstName: string;
   lastName: string;
-  gender: string;
-  status: string;
-  accessType: string;
+  gender: Gender;
+  accessType: AccessType;
   jobTitle: string;
   dateOfEmployment: string;
   company: string;
@@ -14,15 +15,15 @@ export interface CreateEmployeeInput {
 export interface UpdateEmployeeOnboardingInput {
   firstName: string;
   lastName: string;
-  gender: string;
+  gender: Gender;
 }
 
 export interface UpdateEmployeeAccessInput {
-  accessType: string;
+  accessType: AccessType;
 }
 
 export interface UpdateEmployeeStatusInput {
-  status: string;
+  status: Status;
 }
 
 export interface UpdateEmployeeInput {
@@ -30,7 +31,7 @@ export interface UpdateEmployeeInput {
   phoneNumber: string;
   firstName: string;
   lastName: string;
-  gender: string;
+  gender: Gender;
   jobTitle: string;
   dateOfEmployment: string;
 }

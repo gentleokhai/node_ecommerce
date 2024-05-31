@@ -4,7 +4,6 @@ import mongoose, { Error } from 'mongoose';
 import { MONGO_URI } from './config';
 import {
   CompanyRoute,
-  EmployerRoute,
   AuthRoute,
   EmployeeRoute,
   ItemRoute,
@@ -43,7 +42,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 app.use('/auth', AuthRoute);
-app.use('/employer', EmployerRoute);
 app.use('/employee', EmployeeRoute);
 app.use('/company', CompanyRoute);
 app.use('/item', ItemRoute);

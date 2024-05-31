@@ -14,6 +14,7 @@ import { AppError } from '../utility/AppError';
 import sendEmail from '../utility/mailer';
 import { generateToken } from '../utility/generate-token';
 import dotenv from 'dotenv';
+import { Status } from '../dto/general';
 
 dotenv.config();
 
@@ -45,7 +46,7 @@ export const createEmployeeController = tryCatch(
     const verificationLink = `${process.env.CLIENT_URL}/auth/new-password?token=${token}`;
 
     await sendEmail({
-      to: 'chivoomodu@gmail.com',
+      to: employee.email,
       from: 'Uche from Zulu',
       subject: 'ZULU ACCOUNT ACTIVATION',
       template: 'email',
@@ -58,6 +59,7 @@ export const createEmployeeController = tryCatch(
       );
     });
 
+    employee.status = Status.INVITED;
     res.status(201).json(employee);
   }
 );

@@ -18,7 +18,6 @@ export const createEmployee = async (data: CreateEmployeeInput) => {
     gender,
     accessType,
     jobTitle,
-    status,
     dateOfEmployment,
     company,
   } = data;
@@ -33,7 +32,6 @@ export const createEmployee = async (data: CreateEmployeeInput) => {
     jobTitle,
     dateOfEmployment,
     company,
-    status,
   });
 
   return createdUser;

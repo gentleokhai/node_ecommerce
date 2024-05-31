@@ -49,23 +49,18 @@ export class CreateEmployeeValidationSchema implements CreateEmployeeInput {
 
   @IsString()
   @IsNotEmpty()
-  @IsEnumValue(Status)
-  status!: string;
-
-  @IsString()
-  @IsNotEmpty()
   @Validate(IsValidMongoId)
   company!: string;
 
   @IsString()
   @IsNotEmpty()
   @IsEnumValue(AccessType)
-  accessType!: string;
+  accessType!: AccessType;
 
   @IsString()
   @IsNotEmpty()
   @IsEnumValue(Gender)
-  gender!: string;
+  gender!: Gender;
 }
 
 export class UpdateEmployeeValidationSchema implements UpdateEmployeeInput {
@@ -110,7 +105,7 @@ export class UpdateEmployeeValidationSchema implements UpdateEmployeeInput {
   @IsOptional()
   @IsNotEmpty()
   @IsEnumValue(Gender)
-  gender!: string;
+  gender!: Gender;
 }
 
 export class UpdateEmployeeAccessValidationSchema
@@ -119,14 +114,14 @@ export class UpdateEmployeeAccessValidationSchema
   @IsString()
   @IsNotEmpty()
   @IsEnumValue(AccessType)
-  accessType!: string;
+  accessType!: AccessType;
 }
 
 export class UpdateEmployeeStatusSchema implements UpdateEmployeeStatusInput {
   @IsString()
   @IsNotEmpty()
   @IsEnumValue(Status)
-  status!: string;
+  status!: Status;
 }
 
 export class UpdateEmployeeOnboardingValidationSchema
@@ -145,5 +140,5 @@ export class UpdateEmployeeOnboardingValidationSchema
   @IsString()
   @IsNotEmpty()
   @IsEnumValue(Gender)
-  gender!: string;
+  gender!: Gender;
 }

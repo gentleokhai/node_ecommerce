@@ -9,12 +9,12 @@ interface EmployeeDoc extends Document {
   firstName: string;
   lastName: string;
   gender: string;
-  accessType: string;
+  accessType: AccessType;
   jobTitle: string;
   address: string;
   company: string;
   dateOfEmployment: string;
-  status: string;
+  status: Status;
   verified: boolean;
   verificationToken?: string;
   tokenExpiration?: Date;
@@ -41,7 +41,12 @@ const EmployeeSchema = new Schema(
       index: true,
     },
     dateOfEmployment: { type: String },
-    status: { type: String, enum: Object.values(Status), index: true },
+    status: {
+      type: String,
+      enum: Object.values(Status),
+      index: true,
+      default: Status.DEACTIVATED,
+    },
     company: {
       type: mongoose.Schema.Types.ObjectId,
 

@@ -22,13 +22,18 @@ import {
   updateItemStockValidator,
   updateItemValidator,
 } from '../validators/item.validator';
+import { AccessType } from '../dto/general';
+import { checkRole } from '../middlewares/checkRole';
 
 const router = express.Router();
 
 router.use(Authenticate);
+router.get('/pos', getPOSItemsController);
+
+router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
+
 router.post('', createItemValidator, createItemController);
 router.get('', getItemsController);
-router.get('/pos', getPOSItemsController);
 router.post('/category', createCategoryValidator, createCategoryController);
 router.get('/category', getCategoryController);
 router.get('/:id', getItemByIdController);

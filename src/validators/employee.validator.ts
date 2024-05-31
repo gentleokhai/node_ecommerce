@@ -32,7 +32,6 @@ export const createEmployeeValidator = async (
       company,
       dateOfEmployment,
       jobTitle,
-      status,
       gender,
       accessType,
     } = req.body;
@@ -45,7 +44,6 @@ export const createEmployeeValidator = async (
     employee.company = company;
     employee.dateOfEmployment = dateOfEmployment;
     employee.jobTitle = jobTitle;
-    employee.status = status;
     employee.gender = gender;
     employee.accessType = accessType;
 

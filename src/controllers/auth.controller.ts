@@ -6,6 +6,8 @@ import { AppError } from '../utility/AppError';
 import { tryCatch } from '../utility/tryCatch';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { GeneratePassword, GenerateSalt } from '../utility';
+import { Status } from '../dto/general';
 
 dotenv.config();
 
@@ -82,10 +84,15 @@ export const changePasswordController = tryCatch(
       throw new AppError('Token has expired', 400);
     }
 
+    const salt = await GenerateSalt();
+    const accountPassword = await GeneratePassword(password, salt);
+
     employee.verified = true;
     employee.verificationToken = undefined;
     employee.tokenExpiration = undefined;
-    employee.password = password;
+    employee.password = accountPassword;
+    employee.status = Status.ACTIVE;
+    employee.salt = salt;
     await employee.save();
 
     res.status(200).json({ message: 'Password Created' });
