@@ -43,11 +43,12 @@ const transporter = nodemailer_1.default.createTransport({
 });
 const handlebarOptions = {
     viewEngine: (0, express_handlebars_1.create)({
-        partialsDir: path_1.default.resolve(__dirname, '../views/'),
+        partialsDir: path_1.default.resolve(__dirname, '../../src/views/'),
         defaultLayout: false,
     }),
-    viewPath: path_1.default.resolve(__dirname, '../views/'),
+    viewPath: path_1.default.resolve(__dirname, '../../src/views/'),
 };
+// path.resolve(__dirname, '../../src/uploads'))
 transporter.use('compile', (0, nodemailer_express_handlebars_1.default)(handlebarOptions));
 /**
  * Function to send an email.
@@ -56,17 +57,11 @@ transporter.use('compile', (0, nodemailer_express_handlebars_1.default)(handleba
 function sendEmail(options) {
     return __awaiter(this, void 0, void 0, function* () {
         const { to, from, subject, template, firstName, verificationLink } = options, rest = __rest(options, ["to", "from", "subject", "template", "firstName", "verificationLink"]);
-        // Construct the path to the email template file
-        const emailTemplatePath = path_1.default.resolve(__dirname, `../views/${template}.handlebars`);
-        // Read the email template file
+        const emailTemplatePath = path_1.default.resolve(__dirname, `../../src/views/${template}.handlebars`);
         const emailTemplate = fs_1.default.readFileSync(emailTemplatePath, 'utf-8');
-        // Compile the email template using handlebars
         const compiledTemplate = handlebars_1.default.compile(emailTemplate);
-        // Add 'firstName' and 'verificationCode' to the context for rendering the template
         const context = { firstName, verificationLink };
-        // Render the email template with the provided context
         const html = compiledTemplate(context);
-        // Send the email with the rendered template
         transporter.sendMail(Object.assign({ to,
             from,
             subject,

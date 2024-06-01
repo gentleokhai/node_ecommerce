@@ -21,11 +21,13 @@ const transporter = nodemailer.createTransport({
 
 const handlebarOptions = {
   viewEngine: create({
-    partialsDir: path.resolve(__dirname, '../views/'),
+    partialsDir: path.resolve(__dirname, '../../src/views/'),
     defaultLayout: false,
   }),
-  viewPath: path.resolve(__dirname, '../views/'),
+  viewPath: path.resolve(__dirname, '../../src/views/'),
 };
+
+// path.resolve(__dirname, '../../src/uploads'))
 
 transporter.use('compile', hbs(handlebarOptions));
 
@@ -33,36 +35,31 @@ transporter.use('compile', hbs(handlebarOptions));
  * Function to send an email.
  * @param {Object} options - Email options, including 'to', 'from', 'subject', 'template', and any additional variables.
  */
+
 async function sendEmail(options: any) {
   const { to, from, subject, template, firstName, verificationLink, ...rest } =
     options;
 
-  // Construct the path to the email template file
   const emailTemplatePath = path.resolve(
     __dirname,
-    `../views/${template}.handlebars`
+    `../../src/views/${template}.handlebars`
   );
 
-  // Read the email template file
   const emailTemplate = fs.readFileSync(emailTemplatePath, 'utf-8');
 
-  // Compile the email template using handlebars
   const compiledTemplate = handlebars.compile(emailTemplate);
 
-  // Add 'firstName' and 'verificationCode' to the context for rendering the template
   const context = { firstName, verificationLink };
 
-  // Render the email template with the provided context
   const html = compiledTemplate(context);
 
-  // Send the email with the rendered template
   transporter.sendMail(
     {
       to,
       from,
       subject,
       html,
-      ...rest, // Any additional email options can be included here
+      ...rest,
     },
     (err, info) => {
       if (err) {
