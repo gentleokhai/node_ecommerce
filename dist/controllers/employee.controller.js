@@ -50,7 +50,8 @@ exports.createEmployeeController = (0, tryCatch_1.tryCatch)((req, res) => __awai
         template: 'email',
         firstName: employee.firstName,
         verificationLink,
-    }).catch(() => {
+    }).catch((error) => {
+        console.log(error);
         throw new AppError_1.AppError('Failed to send verification email. Please try again later.', 500);
     });
     employee.status = general_1.Status.INVITED;
