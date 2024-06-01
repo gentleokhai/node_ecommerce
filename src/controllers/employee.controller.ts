@@ -52,7 +52,8 @@ export const createEmployeeController = tryCatch(
       template: 'email',
       firstName: employee.firstName,
       verificationLink,
-    }).catch(() => {
+    }).catch((error) => {
+      console.log(error);
       throw new AppError(
         'Failed to send verification email. Please try again later.',
         500
