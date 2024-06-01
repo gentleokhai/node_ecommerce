@@ -19,14 +19,14 @@ exports.createCompanyController = (0, tryCatch_1.tryCatch)((req, res) => __await
     if (!user) {
         throw new AppError_1.AppError('User information not found', 400);
     }
-    const employer = yield models_1.Employer.findById(user.id);
-    if (!employer) {
-        throw new AppError_1.AppError('Employer not found', 400);
+    const employee = yield models_1.Employee.findById(user.id);
+    if (!employee) {
+        throw new AppError_1.AppError('User not found', 400);
     }
-    if (employer.company) {
-        throw new AppError_1.AppError('Employer already has a company registered', 400);
+    if (employee.company) {
+        throw new AppError_1.AppError('User already has a company registered', 400);
     }
     const companyService = yield (0, company_service_1.createCompany)(req.body);
-    yield models_1.Employer.findByIdAndUpdate(user.id, { company: companyService.id });
+    yield models_1.Employee.findByIdAndUpdate(user.id, { company: companyService.id });
     res.status(201).json(companyService);
 }));

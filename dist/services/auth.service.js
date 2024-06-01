@@ -11,23 +11,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.login = exports.signup = void 0;
 const models_1 = require("../models");
+const jobs_model_1 = require("../models/jobs.model");
 const utility_1 = require("../utility");
 const signup = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, phoneNumber } = data;
     const salt = yield (0, utility_1.GenerateSalt)();
     const accountPassword = yield (0, utility_1.GeneratePassword)(password, salt);
-    const createdEmployer = yield models_1.Employer.create({
+    let ownerJob = yield jobs_model_1.Jobs.findOne({ name: 'Owner' });
+    if (!ownerJob) {
+        ownerJob = yield jobs_model_1.Jobs.create({ name: 'Owner' });
+    }
+    const createdEmployee = yield models_1.Employee.create({
         email,
         password: accountPassword,
         phoneNumber,
         salt,
+        accessType: 'EXECUTIVE',
+        status: 'ACTIVE',
+        jobTitle: ownerJob.id,
     });
     const signature = (0, utility_1.GenerateSignature)({
-        id: createdEmployer.id,
+        id: createdEmployee.id,
         email: email,
     });
     const result = {
-        id: createdEmployer.id,
+        id: createdEmployee.id,
         email: email,
         token: signature,
     };

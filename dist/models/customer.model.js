@@ -23,39 +23,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Employee = void 0;
+exports.Customer = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const general_1 = require("../dto/general");
-const EmployeeSchema = new mongoose_1.Schema({
+const CustomerSchema = new mongoose_1.Schema({
     email: { type: String, unique: true, index: true },
-    password: { type: String },
     phoneNumber: { type: String },
-    salt: { type: String },
     firstName: { type: String, index: true },
     lastName: { type: String, index: true },
     gender: { type: String, enum: Object.values(general_1.Gender), index: true },
-    address: { type: String },
-    verificationToken: { type: String, default: undefined },
-    tokenExpiration: { type: Date, default: undefined },
-    verified: { type: Boolean, default: false },
-    accessType: { type: String, enum: Object.values(general_1.AccessType), index: true },
-    jobTitle: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: 'jobs',
-        index: true,
-    },
-    dateOfEmployment: { type: String },
-    status: {
-        type: String,
-        enum: Object.values(general_1.Status),
-        index: true,
-        default: general_1.Status.DEACTIVATED,
-    },
-    company: {
-        type: mongoose_1.default.Schema.Types.ObjectId,
-        ref: 'company',
-    },
-    branch: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'branch' },
+    group: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'group' },
 }, {
     toJSON: {
         transform(_, ret) {
@@ -67,5 +44,5 @@ const EmployeeSchema = new mongoose_1.Schema({
     },
     timestamps: true,
 });
-const Employee = mongoose_1.default.model('employee', EmployeeSchema);
-exports.Employee = Employee;
+const Customer = mongoose_1.default.model('customer', CustomerSchema);
+exports.Customer = Customer;

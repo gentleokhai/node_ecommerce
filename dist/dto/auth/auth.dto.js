@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoginValidationSchema = exports.SignupValidationSchema = void 0;
+exports.ChangePasswordValidationSchema = exports.LoginValidationSchema = exports.SignupValidationSchema = void 0;
 const class_validator_1 = require("class-validator");
 class SignupValidationSchema {
     constructor(email, phoneNumber, password) {
@@ -43,3 +43,18 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)()
 ], LoginValidationSchema.prototype, "password", void 0);
+class ChangePasswordValidationSchema {
+    constructor(confirmPassword, password) {
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+    }
+}
+exports.ChangePasswordValidationSchema = ChangePasswordValidationSchema;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)()
+], ChangePasswordValidationSchema.prototype, "password", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)()
+], ChangePasswordValidationSchema.prototype, "confirmPassword", void 0);

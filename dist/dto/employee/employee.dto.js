@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateEmployeeStatusSchema = exports.UpdateEmployeeAccessValidationSchema = exports.UpdateEmployeeValidationSchema = exports.CreateEmployeeValidationSchema = void 0;
+exports.UpdateEmployeeOnboardingValidationSchema = exports.UpdateEmployeeStatusSchema = exports.UpdateEmployeeAccessValidationSchema = exports.UpdateEmployeeValidationSchema = exports.CreateEmployeeValidationSchema = void 0;
 const class_validator_1 = require("class-validator");
 const general_1 = require("../general");
 class CreateEmployeeValidationSchema {
@@ -37,11 +37,6 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)()
 ], CreateEmployeeValidationSchema.prototype, "dateOfEmployment", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    (0, general_1.IsEnumValue)(general_1.Status)
-], CreateEmployeeValidationSchema.prototype, "status", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
@@ -119,3 +114,21 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, general_1.IsEnumValue)(general_1.Status)
 ], UpdateEmployeeStatusSchema.prototype, "status", void 0);
+class UpdateEmployeeOnboardingValidationSchema {
+}
+exports.UpdateEmployeeOnboardingValidationSchema = UpdateEmployeeOnboardingValidationSchema;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateEmployeeOnboardingValidationSchema.prototype, "firstName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateEmployeeOnboardingValidationSchema.prototype, "lastName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, general_1.IsEnumValue)(general_1.Gender)
+], UpdateEmployeeOnboardingValidationSchema.prototype, "gender", void 0);

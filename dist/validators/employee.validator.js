@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateEmployeeStatusValidator = exports.updateEmployeeAccessValidator = exports.updateEmployeeValidator = exports.createEmployeeValidator = void 0;
+exports.updateEmployeeStatusValidator = exports.updateEmployeeAccessValidator = exports.updateEmployeeValidator = exports.updateEmployeeOnboardingValidator = exports.createEmployeeValidator = void 0;
 const class_validator_1 = require("class-validator");
 const employee_1 = require("../dto/employee");
 const AppError_1 = require("../utility/AppError");
@@ -18,7 +18,7 @@ const createEmployeeValidator = (req, res, next) => __awaiter(void 0, void 0, vo
         if (!req.body) {
             throw new AppError_1.AppError('Missing request body!', 400);
         }
-        const { firstName, lastName, email, phoneNumber, company, dateOfEmployment, jobTitle, status, gender, accessType, } = req.body;
+        const { firstName, lastName, email, phoneNumber, company, dateOfEmployment, jobTitle, gender, accessType, } = req.body;
         const employee = new employee_1.CreateEmployeeValidationSchema();
         employee.firstName = firstName;
         employee.lastName = lastName;
@@ -27,7 +27,6 @@ const createEmployeeValidator = (req, res, next) => __awaiter(void 0, void 0, vo
         employee.company = company;
         employee.dateOfEmployment = dateOfEmployment;
         employee.jobTitle = jobTitle;
-        employee.status = status;
         employee.gender = gender;
         employee.accessType = accessType;
         yield (0, class_validator_1.validateOrReject)(employee);
@@ -43,6 +42,29 @@ const createEmployeeValidator = (req, res, next) => __awaiter(void 0, void 0, vo
     }
 });
 exports.createEmployeeValidator = createEmployeeValidator;
+const updateEmployeeOnboardingValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!req.body) {
+            throw new AppError_1.AppError('Missing request body!', 400);
+        }
+        const { firstName, lastName, gender } = req.body;
+        const employee = new employee_1.UpdateEmployeeOnboardingValidationSchema();
+        employee.firstName = firstName;
+        employee.lastName = lastName;
+        employee.gender = gender;
+        yield (0, class_validator_1.validateOrReject)(employee);
+        next();
+    }
+    catch (e) {
+        console.log(e);
+        const errors = e.map((err) => ({
+            field: err.property,
+            message: Object.values(err.constraints)[0],
+        }));
+        res.status(400).send(errors);
+    }
+});
+exports.updateEmployeeOnboardingValidator = updateEmployeeOnboardingValidator;
 const updateEmployeeValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.body) {

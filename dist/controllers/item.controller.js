@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.archiveItemController = exports.deleteItemController = exports.updateItemStockController = exports.updateItemPriceController = exports.updateItemController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
+exports.getPOSItemsController = exports.archiveItemController = exports.deleteItemController = exports.updateItemStockController = exports.updateItemPriceController = exports.updateItemController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
 const cloudinary_1 = require("../config/cloudinary");
 const filters_1 = require("../dto/item/filters");
 const items_model_1 = require("../models/items.model");
@@ -145,4 +145,11 @@ exports.archiveItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter
     else {
         throw new AppError_1.AppError('Item does not exist', 400);
     }
+}));
+exports.getPOSItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { query, sortOptions } = (0, filters_1.getItemsFilter)(req);
+    const items = yield items_model_1.Item.find(Object.assign(Object.assign({}, query), { archived: false }))
+        .sort(sortOptions)
+        .populate('category');
+    res.status(200).json(items);
 }));

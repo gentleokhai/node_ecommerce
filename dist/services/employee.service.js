@@ -21,7 +21,7 @@ const FindEmployee = (id, email) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.FindEmployee = FindEmployee;
 const createEmployee = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, phoneNumber, firstName, lastName, gender, accessType, jobTitle, status, dateOfEmployment, company, } = data;
+    const { email, phoneNumber, firstName, lastName, gender, accessType, jobTitle, dateOfEmployment, company, } = data;
     const createdUser = yield models_1.Employee.create({
         email,
         phoneNumber,
@@ -32,21 +32,7 @@ const createEmployee = (data) => __awaiter(void 0, void 0, void 0, function* () 
         jobTitle,
         dateOfEmployment,
         company,
-        status,
     });
-    const result = {
-        id: createdUser.id,
-        email,
-        firstName,
-        lastName,
-        status,
-        gender,
-        accessType,
-        phoneNumber,
-        jobTitle,
-        company,
-        dateOfEmployment,
-    };
-    return result;
+    return createdUser;
 });
 exports.createEmployee = createEmployee;
