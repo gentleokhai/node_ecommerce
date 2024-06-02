@@ -12,3 +12,4 @@ exports.AuthRoute = router;
 router.post('/signup', validators_1.signupValidator, auth_controller_1.signupController);
 router.post('/login', validators_1.loginValidator, auth_controller_1.loginController);
 router.post('/change-password', validators_1.changePasswordValidator, auth_controller_1.changePasswordController);
+router.post('/forgot-password', auth_controller_1.forgotPasswordController);

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ChangePasswordPayload } from '../dto/auth';
+import { ChangePasswordPayload, forgotPasswordPayload } from '../dto/auth';
 import { Employee } from '../models';
 import { login, signup } from '../services';
 import { AppError } from '../utility/AppError';
@@ -8,6 +8,8 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { GeneratePassword, GenerateSalt } from '../utility';
 import { Status } from '../dto/general';
+import { generateToken } from '../utility/generate-token';
+import sendEmail from '../utility/mailer';
 
 dotenv.config();
 
@@ -44,13 +46,12 @@ export const loginController = tryCatch(async (req: Request, res: Response) => {
 
     if (loginService.isValidated) {
       res.status(200).json({ token: loginService.token });
-      return;
+    } else {
+      throw new AppError('Login credentials are not valid', 400);
     }
-
+  } else {
     throw new AppError('Login credentials are not valid', 400);
   }
-
-  throw new AppError('Login credentials are not valid', 400);
 });
 
 export const changePasswordController = tryCatch(
@@ -96,5 +97,40 @@ export const changePasswordController = tryCatch(
     await employee.save();
 
     res.status(200).json({ message: 'Password Created' });
+  }
+);
+
+export const forgotPasswordController = tryCatch(
+  async (req: Request<any, any, forgotPasswordPayload>, res: Response) => {
+    const { email } = req.body;
+
+    const existingEmployee = await Employee.findOne({ email: email });
+
+    const token = generateToken(email);
+
+    const verificationLink = `${process.env.CLIENT_URL}/auth/new-password?token=${token}`;
+
+    if (existingEmployee) {
+      existingEmployee.verificationToken = token;
+      existingEmployee.tokenExpiration = new Date(Date.now() + 3600000);
+
+      await sendEmail({
+        to: existingEmployee.email,
+        from: 'Uche from Zulu',
+        subject: 'ZULU RESET PASSWORD',
+        template: 'forgotPassword',
+        verificationLink,
+      }).catch((error) => {
+        console.log(error);
+        throw new AppError(
+          'Failed to send email. Please try again later.',
+          500
+        );
+      });
+
+      res.status(200).json({ message: 'Email Sent' });
+    } else {
+      res.status(200).json({ message: 'Email Sent' });
+    }
   }
 );

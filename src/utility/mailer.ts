@@ -27,8 +27,6 @@ const handlebarOptions = {
   viewPath: path.resolve(__dirname, '../../src/views/'),
 };
 
-// path.resolve(__dirname, '../../src/uploads'))
-
 transporter.use('compile', hbs(handlebarOptions));
 
 /**

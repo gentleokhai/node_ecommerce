@@ -13,3 +13,7 @@ export interface ChangePasswordPayload {
   password: string;
   confirmPassword: string;
 }
+
+export interface forgotPasswordPayload {
+  email: string;
+}

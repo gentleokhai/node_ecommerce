@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePasswordController = exports.loginController = exports.signupController = void 0;
+exports.forgotPasswordController = exports.changePasswordController = exports.loginController = exports.signupController = void 0;
 const models_1 = require("../models");
 const services_1 = require("../services");
 const AppError_1 = require("../utility/AppError");
@@ -21,6 +21,8 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const utility_1 = require("../utility");
 const general_1 = require("../dto/general");
+const generate_token_1 = require("../utility/generate-token");
+const mailer_1 = __importDefault(require("../utility/mailer"));
 dotenv_1.default.config();
 const findEmployee = (id, email) => __awaiter(void 0, void 0, void 0, function* () {
     if (email) {
@@ -48,11 +50,14 @@ exports.loginController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 
         });
         if (loginService.isValidated) {
             res.status(200).json({ token: loginService.token });
-            return;
         }
+        else {
+            throw new AppError_1.AppError('Login credentials are not valid', 400);
+        }
+    }
+    else {
         throw new AppError_1.AppError('Login credentials are not valid', 400);
     }
-    throw new AppError_1.AppError('Login credentials are not valid', 400);
 }));
 exports.changePasswordController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { token } = req.query;
@@ -87,4 +92,28 @@ exports.changePasswordController = (0, tryCatch_1.tryCatch)((req, res) => __awai
     employee.salt = salt;
     yield employee.save();
     res.status(200).json({ message: 'Password Created' });
+}));
+exports.forgotPasswordController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email } = req.body;
+    const existingEmployee = yield models_1.Employee.findOne({ email: email });
+    const token = (0, generate_token_1.generateToken)(email);
+    const verificationLink = `${process.env.CLIENT_URL}/auth/new-password?token=${token}`;
+    if (existingEmployee) {
+        existingEmployee.verificationToken = token;
+        existingEmployee.tokenExpiration = new Date(Date.now() + 3600000);
+        yield (0, mailer_1.default)({
+            to: existingEmployee.email,
+            from: 'Uche from Zulu',
+            subject: 'ZULU RESET PASSWORD',
+            template: 'forgotPassword',
+            verificationLink,
+        }).catch((error) => {
+            console.log(error);
+            throw new AppError_1.AppError('Failed to send email. Please try again later.', 500);
+        });
+        res.status(200).json({ message: 'Email Sent' });
+    }
+    else {
+        res.status(200).json({ message: 'Email Sent' });
+    }
 }));

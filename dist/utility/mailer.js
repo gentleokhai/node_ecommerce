@@ -48,7 +48,6 @@ const handlebarOptions = {
     }),
     viewPath: path_1.default.resolve(__dirname, '../../src/views/'),
 };
-// path.resolve(__dirname, '../../src/uploads'))
 transporter.use('compile', (0, nodemailer_express_handlebars_1.default)(handlebarOptions));
 /**
  * Function to send an email.

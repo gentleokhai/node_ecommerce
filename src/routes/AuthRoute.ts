@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   changePasswordController,
+  forgotPasswordController,
   loginController,
   signupController,
 } from '../controllers/auth.controller';
@@ -19,5 +20,6 @@ router.post(
   changePasswordValidator,
   changePasswordController
 );
+router.post('/forgot-password', forgotPasswordController);
 
 export { router as AuthRoute };

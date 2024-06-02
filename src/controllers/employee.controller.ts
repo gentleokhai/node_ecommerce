@@ -14,7 +14,7 @@ import { AppError } from '../utility/AppError';
 import sendEmail from '../utility/mailer';
 import { generateToken } from '../utility/generate-token';
 import dotenv from 'dotenv';
-import { Status } from '../dto/general';
+import { AccessType, Status } from '../dto/general';
 
 dotenv.config();
 
@@ -45,22 +45,29 @@ export const createEmployeeController = tryCatch(
 
     const verificationLink = `${process.env.CLIENT_URL}/auth/new-password?token=${token}`;
 
-    await sendEmail({
-      to: employee.email,
-      from: 'Uche from Zulu',
-      subject: 'ZULU ACCOUNT ACTIVATION',
-      template: 'email',
-      firstName: employee.firstName,
-      verificationLink,
-    }).catch((error) => {
-      console.log(error);
-      throw new AppError(
-        'Failed to send verification email. Please try again later.',
-        500
-      );
-    });
+    if (employee.accessType !== AccessType.NOACCESS) {
+      await sendEmail({
+        to: employee.email,
+        from: 'Uche from Zulu',
+        subject: 'ZULU ACCOUNT ACTIVATION',
+        template: 'email',
+        firstName: employee.firstName,
+        verificationLink,
+      }).catch((error) => {
+        console.log(error);
+        throw new AppError(
+          'Failed to send verification email. Please try again later.',
+          500
+        );
+      });
 
-    employee.status = Status.INVITED;
+      employee.status = Status.INVITED;
+      await employee.save();
+    } else {
+      employee.status = Status.ACTIVE;
+      await employee.save();
+    }
+
     res.status(201).json(employee);
   }
 );

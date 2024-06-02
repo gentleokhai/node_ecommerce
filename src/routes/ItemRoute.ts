@@ -29,13 +29,13 @@ const router = express.Router();
 
 router.use(Authenticate);
 router.get('/pos', getPOSItemsController);
+router.get('/category', getCategoryController);
 
 router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
 
 router.post('', createItemValidator, createItemController);
 router.get('', getItemsController);
 router.post('/category', createCategoryValidator, createCategoryController);
-router.get('/category', getCategoryController);
 router.get('/:id', getItemByIdController);
 router.patch('/:id', updateItemValidator, updateItemController);
 router.patch('/:id/price', updateItemPriceValidator, updateItemPriceController);

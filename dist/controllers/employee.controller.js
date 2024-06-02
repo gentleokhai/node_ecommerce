@@ -43,18 +43,25 @@ exports.createEmployeeController = (0, tryCatch_1.tryCatch)((req, res) => __awai
     employee.tokenExpiration = new Date(Date.now() + 3600000); // 1 hour from now
     yield employee.save();
     const verificationLink = `${process.env.CLIENT_URL}/auth/new-password?token=${token}`;
-    yield (0, mailer_1.default)({
-        to: employee.email,
-        from: 'Uche from Zulu',
-        subject: 'ZULU ACCOUNT ACTIVATION',
-        template: 'email',
-        firstName: employee.firstName,
-        verificationLink,
-    }).catch((error) => {
-        console.log(error);
-        throw new AppError_1.AppError('Failed to send verification email. Please try again later.', 500);
-    });
-    employee.status = general_1.Status.INVITED;
+    if (employee.accessType !== general_1.AccessType.NOACCESS) {
+        yield (0, mailer_1.default)({
+            to: employee.email,
+            from: 'Uche from Zulu',
+            subject: 'ZULU ACCOUNT ACTIVATION',
+            template: 'email',
+            firstName: employee.firstName,
+            verificationLink,
+        }).catch((error) => {
+            console.log(error);
+            throw new AppError_1.AppError('Failed to send verification email. Please try again later.', 500);
+        });
+        employee.status = general_1.Status.INVITED;
+        yield employee.save();
+    }
+    else {
+        employee.status = general_1.Status.ACTIVE;
+        yield employee.save();
+    }
     res.status(201).json(employee);
 }));
 exports.getMeController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
