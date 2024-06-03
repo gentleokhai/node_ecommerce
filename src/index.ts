@@ -2,12 +2,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import mongoose, { Error } from 'mongoose';
 import { MONGO_URI } from './config';
-import {
-  CompanyRoute,
-  AuthRoute,
-  EmployeeRoute,
-  ItemRoute,
-} from './routes';
+import { CompanyRoute, AuthRoute, EmployeeRoute, ItemRoute } from './routes';
 import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
@@ -16,9 +11,11 @@ import { CustomerRoute } from './routes/CustomerRoute';
 import { TransactionRoute } from './routes/transactionRoute';
 
 const corsOptions = {
-  origin: '*',
-  optionsSuccessStatus: 200,
+  origin: 'https://zulu-dev.vercel.app',
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
+  optionsSuccessStatus: 200,
 };
 
 const app = express();
