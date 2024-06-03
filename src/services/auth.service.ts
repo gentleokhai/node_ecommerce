@@ -39,6 +39,7 @@ export const signup = async (data: SignupPayload) => {
     id: createdEmployee.id,
     email: email,
     token: signature,
+    accessType: createdEmployee.accessType,
   };
 
   return result;

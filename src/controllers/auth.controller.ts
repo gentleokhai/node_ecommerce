@@ -45,7 +45,12 @@ export const loginController = tryCatch(async (req: Request, res: Response) => {
     });
 
     if (loginService.isValidated) {
-      res.status(200).json({ token: loginService.token });
+      res
+        .status(200)
+        .json({
+          token: loginService.token,
+          accessType: existingEmployee.accessType,
+        });
     } else {
       throw new AppError('Login credentials are not valid', 400);
     }

@@ -38,6 +38,7 @@ const signup = (data) => __awaiter(void 0, void 0, void 0, function* () {
         id: createdEmployee.id,
         email: email,
         token: signature,
+        accessType: createdEmployee.accessType,
     };
     return result;
 });

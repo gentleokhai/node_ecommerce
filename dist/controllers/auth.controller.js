@@ -49,7 +49,12 @@ exports.loginController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 
             salt: existingEmployee.salt,
         });
         if (loginService.isValidated) {
-            res.status(200).json({ token: loginService.token });
+            res
+                .status(200)
+                .json({
+                token: loginService.token,
+                accessType: existingEmployee.accessType,
+            });
         }
         else {
             throw new AppError_1.AppError('Login credentials are not valid', 400);
