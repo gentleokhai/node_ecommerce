@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.login = exports.signup = void 0;
+const general_1 = require("../dto/general");
 const models_1 = require("../models");
 const jobs_model_1 = require("../models/jobs.model");
 const utility_1 = require("../utility");
@@ -26,7 +27,7 @@ const signup = (data) => __awaiter(void 0, void 0, void 0, function* () {
         password: accountPassword,
         phoneNumber,
         salt,
-        accessType: 'EXECUTIVE',
+        accessType: general_1.AccessType.EXECUTIVE,
         status: 'ACTIVE',
         jobTitle: ownerJob.id,
     });

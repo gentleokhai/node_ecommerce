@@ -23,31 +23,20 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Customer = void 0;
+exports.Group = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const general_1 = require("../dto/general");
-const CustomerSchema = new mongoose_1.Schema({
-    email: { type: String, unique: true, index: true },
-    phoneNumber: { type: String },
-    firstName: { type: String, index: true },
-    lastName: { type: String, index: true },
-    gender: { type: String, enum: Object.values(general_1.Gender), index: true },
-    group: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'group' },
-    createdBy: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'employee' },
-    notes: { type: [mongoose_1.default.Schema.Types.ObjectId], ref: 'notes' },
-    firstVisited: { type: Date, default: Date.now },
-    lastVisited: { type: Date, default: Date.now },
-    totalSpend: { type: Number },
+const GroupSchema = new mongoose_1.Schema({
+    name: { type: String },
 }, {
     toJSON: {
         transform(_, ret) {
             ret.id = ret._id.toString();
             delete ret.__v;
             delete ret._id;
-            delete ret.updatedAt;
+            delete ret.createdAt, delete ret.updatedAt;
         },
     },
     timestamps: true,
 });
-const Customer = mongoose_1.default.model('customer', CustomerSchema);
-exports.Customer = Customer;
+const Group = mongoose_1.default.model('group', GroupSchema);
+exports.Group = Group;

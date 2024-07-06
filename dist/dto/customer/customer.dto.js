@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateCustomerValidationSchema = void 0;
+exports.UpdateCustomerValidationSchema = exports.CreateCustomerValidationSchema = void 0;
 const class_validator_1 = require("class-validator");
 const general_1 = require("../general");
 class CreateCustomerValidationSchema {
@@ -34,3 +34,15 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, general_1.IsEnumValue)(general_1.Gender)
 ], CreateCustomerValidationSchema.prototype, "gender", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Validate)(general_1.IsValidMongoId)
+], CreateCustomerValidationSchema.prototype, "group", void 0);
+class UpdateCustomerValidationSchema extends CreateCustomerValidationSchema {
+}
+exports.UpdateCustomerValidationSchema = UpdateCustomerValidationSchema;
+__decorate([
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCustomerValidationSchema.prototype, "email", void 0);

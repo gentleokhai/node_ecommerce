@@ -23,21 +23,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Customer = void 0;
+exports.Notes = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const general_1 = require("../dto/general");
-const CustomerSchema = new mongoose_1.Schema({
-    email: { type: String, unique: true, index: true },
-    phoneNumber: { type: String },
-    firstName: { type: String, index: true },
-    lastName: { type: String, index: true },
-    gender: { type: String, enum: Object.values(general_1.Gender), index: true },
-    group: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'group' },
+const NoteSchema = new mongoose_1.Schema({
+    note: { type: String },
     createdBy: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'employee' },
-    notes: { type: [mongoose_1.default.Schema.Types.ObjectId], ref: 'notes' },
-    firstVisited: { type: Date, default: Date.now },
-    lastVisited: { type: Date, default: Date.now },
-    totalSpend: { type: Number },
 }, {
     toJSON: {
         transform(_, ret) {
@@ -49,5 +39,5 @@ const CustomerSchema = new mongoose_1.Schema({
     },
     timestamps: true,
 });
-const Customer = mongoose_1.default.model('customer', CustomerSchema);
-exports.Customer = Customer;
+const Notes = mongoose_1.default.model('notes', NoteSchema);
+exports.Notes = Notes;
