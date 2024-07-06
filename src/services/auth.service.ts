@@ -1,5 +1,5 @@
 import { SignupPayload, SignInPayload } from '../dto/auth';
-import { ExistingUser } from '../dto/general';
+import { AccessType, ExistingUser } from '../dto/general';
 import { Employee } from '../models';
 import { Jobs } from '../models/jobs.model';
 import {
@@ -25,7 +25,7 @@ export const signup = async (data: SignupPayload) => {
     password: accountPassword,
     phoneNumber,
     salt,
-    accessType: 'EXECUTIVE',
+    accessType: AccessType.EXECUTIVE,
     status: 'ACTIVE',
     jobTitle: ownerJob.id,
   });

@@ -5,9 +5,10 @@ import {
   IsNotEmpty,
   IsOptional,
   ValidateIf,
+  Validate,
 } from 'class-validator';
-import { Gender, IsEnumValue } from '../general';
-import { CreateCustomerInput } from './types';
+import { Gender, IsEnumValue, IsValidMongoId } from '../general';
+import { CreateCustomerInput, UpdateCustomerInput } from './types';
 
 export class CreateCustomerValidationSchema implements CreateCustomerInput {
   @IsEmail()
@@ -31,4 +32,18 @@ export class CreateCustomerValidationSchema implements CreateCustomerInput {
   @IsOptional()
   @IsEnumValue(Gender)
   gender!: string;
+
+  @IsString()
+  @IsOptional()
+  @Validate(IsValidMongoId)
+  group!: string;
+}
+
+export class UpdateCustomerValidationSchema
+  extends CreateCustomerValidationSchema
+  implements UpdateCustomerInput
+{
+  @IsEmail()
+  @IsOptional()
+  email!: string;
 }

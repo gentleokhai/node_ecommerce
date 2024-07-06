@@ -8,6 +8,11 @@ interface CustomerDoc extends Document {
   lastName: string;
   gender: string;
   group: string;
+  createdBy: string;
+  firstVisited: Date;
+  lastVisited: Date;
+  totalSpend: number;
+  notes: string;
 }
 
 const CustomerSchema = new Schema(
@@ -18,6 +23,11 @@ const CustomerSchema = new Schema(
     lastName: { type: String, index: true },
     gender: { type: String, enum: Object.values(Gender), index: true },
     group: { type: mongoose.Schema.Types.ObjectId, ref: 'group' },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'employee' },
+    notes: { type: [mongoose.Schema.Types.ObjectId], ref: 'notes' },
+    firstVisited: { type: Date, default: Date.now },
+    lastVisited: { type: Date, default: Date.now },
+    totalSpend: { type: Number },
   },
   {
     toJSON: {
@@ -25,7 +35,7 @@ const CustomerSchema = new Schema(
         ret.id = ret._id.toString();
         delete ret.__v;
         delete ret._id;
-        delete ret.createdAt, delete ret.updatedAt;
+        delete ret.updatedAt;
       },
     },
     timestamps: true,
