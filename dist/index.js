@@ -16,11 +16,9 @@ const errorHandler_1 = __importDefault(require("./middlewares/errorHandler"));
 const CustomerRoute_1 = require("./routes/CustomerRoute");
 const transactionRoute_1 = require("./routes/transactionRoute");
 const corsOptions = {
-    origin: 'https://zulu-dev.vercel.app',
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
+    origin: '*',
     optionsSuccessStatus: 200,
+    credentials: true,
 };
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)(corsOptions));
