@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createNotesController = exports.deleteCustomerController = exports.getCustomerByIdController = exports.getCustomersController = exports.updateCustomerController = exports.createCustomerController = exports.FindCustomer = void 0;
+exports.deleteNotesController = exports.updateNotesController = exports.createNotesController = exports.deleteCustomerController = exports.getCustomerByIdController = exports.getCustomersController = exports.updateCustomerController = exports.createCustomerController = exports.FindCustomer = void 0;
 const tryCatch_1 = require("../utility/tryCatch");
 const AppError_1 = require("../utility/AppError");
 const customer_model_1 = require("../models/customer.model");
@@ -110,14 +110,32 @@ exports.createNotesController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter
     const { note } = req.body;
     const employeeId = (_b = req.user) === null || _b === void 0 ? void 0 : _b.id;
     const id = req.params.id;
-    const notes = yield notes_model_1.Notes.create({
+    const newNote = yield notes_model_1.Notes.create({
         note: note,
         createdBy: employeeId,
     });
     const existingCustomer = yield (0, exports.FindCustomer)(id);
     if (existingCustomer) {
-        existingCustomer.notes = notes.id;
+        existingCustomer.notes.push(newNote._id);
         existingCustomer.save();
     }
-    res.status(201).json(notes);
+    res.status(201).json(newNote);
+}));
+exports.updateNotesController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { note } = req.body;
+    const id = req.params.id;
+    const existingNote = yield notes_model_1.Notes.findById(id);
+    if (!existingNote)
+        throw new AppError_1.AppError('Note does not exist', 400);
+    existingNote.note = note;
+    const updatedNote = yield existingNote.save();
+    res.status(201).json(updatedNote);
+}));
+exports.deleteNotesController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const result = yield notes_model_1.Notes.deleteOne({ _id: id });
+    if (result.deletedCount === 0) {
+        throw new AppError_1.AppError('Note does not exist', 400);
+    }
+    return res.status(200).json({ message: 'Note deleted successfully' });
 }));

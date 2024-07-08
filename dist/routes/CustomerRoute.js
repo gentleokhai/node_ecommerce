@@ -23,4 +23,6 @@ router.get('/group', group_controller_1.getGroupController);
 router.get('/:id', customer_controller_1.getCustomerByIdController);
 router.patch('/:id', customer_validator_1.updateCustomerValidator, customer_controller_1.updateCustomerController);
 router.delete('/:id', customer_controller_1.deleteCustomerController);
-router.post('/:id', customer_controller_1.createNotesController);
+router.post('/notes/:id', customer_controller_1.createNotesController);
+router.patch('/notes/:id', customer_controller_1.updateNotesController);
+router.delete('/notes/:id', customer_controller_1.deleteNotesController);
