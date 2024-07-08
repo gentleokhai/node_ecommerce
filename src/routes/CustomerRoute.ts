@@ -3,9 +3,11 @@ import {
   createCustomerController,
   createNotesController,
   deleteCustomerController,
+  deleteNotesController,
   getCustomerByIdController,
   getCustomersController,
   updateCustomerController,
+  updateNotesController,
 } from '../controllers/customer.controller';
 import {
   createGroupController,
@@ -33,6 +35,8 @@ router.get('/group', getGroupController);
 router.get('/:id', getCustomerByIdController);
 router.patch('/:id', updateCustomerValidator, updateCustomerController);
 router.delete('/:id', deleteCustomerController);
-router.post('/:id', createNotesController);
+router.post('/notes/:id', createNotesController);
+router.patch('/notes/:id', updateNotesController);
+router.delete('/notes/:id', deleteNotesController);
 
 export { router as CustomerRoute };

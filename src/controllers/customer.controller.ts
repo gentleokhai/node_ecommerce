@@ -136,7 +136,7 @@ export const createNotesController = tryCatch(
 
     const id = req.params.id;
 
-    const notes = await Notes.create({
+    const newNote = await Notes.create({
       note: note,
       createdBy: employeeId,
     });
@@ -144,11 +144,43 @@ export const createNotesController = tryCatch(
     const existingCustomer = await FindCustomer(id);
 
     if (existingCustomer) {
-      existingCustomer.notes = notes.id;
+      existingCustomer.notes.push(newNote._id);
 
       existingCustomer.save();
     }
 
-    res.status(201).json(notes);
+    res.status(201).json(newNote);
+  }
+);
+
+export const updateNotesController = tryCatch(
+  async (req: Request<any, any, { note: string }>, res: Response) => {
+    const { note } = req.body;
+
+    const id = req.params.id;
+
+    const existingNote = await Notes.findById(id);
+
+    if (!existingNote) throw new AppError('Note does not exist', 400);
+
+    existingNote.note = note;
+
+    const updatedNote = await existingNote.save();
+
+    res.status(201).json(updatedNote);
+  }
+);
+
+export const deleteNotesController = tryCatch(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+
+    const result = await Notes.deleteOne({ _id: id });
+
+    if (result.deletedCount === 0) {
+      throw new AppError('Note does not exist', 400);
+    }
+
+    return res.status(200).json({ message: 'Note deleted successfully' });
   }
 );

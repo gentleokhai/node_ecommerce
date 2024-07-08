@@ -12,7 +12,7 @@ interface CustomerDoc extends Document {
   firstVisited: Date;
   lastVisited: Date;
   totalSpend: number;
-  notes: string;
+  notes: string[];
 }
 
 const CustomerSchema = new Schema(
@@ -32,7 +32,9 @@ const CustomerSchema = new Schema(
   {
     toJSON: {
       transform(_, ret) {
-        ret.id = ret._id.toString();
+        if (ret._id) {
+          ret.id = ret._id.toString();
+        }
         delete ret.__v;
         delete ret._id;
         delete ret.updatedAt;
