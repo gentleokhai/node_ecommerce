@@ -109,6 +109,16 @@ export const getCustomerByIdController = tryCatch(
         path: 'group',
         select: 'name id',
       },
+      {
+        path: 'notes',
+        select: 'note createdBy',
+        populate: [
+          {
+            path: 'createdBy',
+            select: 'firstName lastName id',
+          },
+        ],
+      },
     ]);
 
     res.status(200).json(customer);
