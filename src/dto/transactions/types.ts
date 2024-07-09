@@ -1,5 +1,5 @@
 interface Item {
-  itemId: string;
+  item: string;
   numberOfItems: number;
 }
 

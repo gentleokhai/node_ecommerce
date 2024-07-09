@@ -81,7 +81,7 @@ export const getCustomersController = tryCatch(
         },
         {
           path: 'notes',
-          select: 'note createdBy',
+          select: 'note createdBy createdAt',
           populate: [
             {
               path: 'createdBy',
@@ -111,7 +111,7 @@ export const getCustomerByIdController = tryCatch(
       },
       {
         path: 'notes',
-        select: 'note createdBy',
+        select: 'note createdBy createdAt',
         populate: [
           {
             path: 'createdBy',

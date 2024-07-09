@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Transactions = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const ItemSchema = new mongoose_1.Schema({
-    itemId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'item' },
+    item: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'item' },
     numberOfItems: { type: Number, required: true },
 }, {
     toJSON: {
@@ -39,11 +39,11 @@ const ItemSchema = new mongoose_1.Schema({
     timestamps: true,
 });
 const TransactionsSchema = new mongoose_1.Schema({
-    customerId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'customer' },
+    customer: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'customer' },
     items: { type: [ItemSchema], required: true },
     methodOfPayment: { type: String },
     typeOfTransaction: { type: String },
-    cashierId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'employee' },
+    cashier: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'employee' },
     amount: { type: String },
 }, {
     toJSON: {

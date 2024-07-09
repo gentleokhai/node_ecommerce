@@ -1,22 +1,22 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface TransactionsDoc extends Document {
-  customerId: string;
+  customer: string;
   numberOfItems: string;
   methodOfPayment: string;
   typeOfTransaction: string;
-  cashierId: string;
+  cashier: string;
   amount: string;
 }
 
 interface Item {
-  itemId: string;
+  item: string;
   numberOfItems: number;
 }
 
 const ItemSchema: Schema = new Schema(
   {
-    itemId: { type: mongoose.Schema.Types.ObjectId, ref: 'item' },
+    item: { type: mongoose.Schema.Types.ObjectId, ref: 'item' },
     numberOfItems: { type: Number, required: true },
   },
   {
@@ -33,11 +33,11 @@ const ItemSchema: Schema = new Schema(
 
 const TransactionsSchema = new Schema(
   {
-    customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
+    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
     items: { type: [ItemSchema], required: true },
     methodOfPayment: { type: String },
     typeOfTransaction: { type: String },
-    cashierId: { type: mongoose.Schema.Types.ObjectId, ref: 'employee' },
+    cashier: { type: mongoose.Schema.Types.ObjectId, ref: 'employee' },
     amount: { type: String },
   },
   {

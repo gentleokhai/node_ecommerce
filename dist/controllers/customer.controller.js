@@ -71,7 +71,7 @@ exports.getCustomersController = (0, tryCatch_1.tryCatch)((req, res) => __awaite
         },
         {
             path: 'notes',
-            select: 'note createdBy',
+            select: 'note createdBy createdAt',
             populate: [
                 {
                     path: 'createdBy',
@@ -96,7 +96,7 @@ exports.getCustomerByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awa
         },
         {
             path: 'notes',
-            select: 'note createdBy',
+            select: 'note createdBy createdAt',
             populate: [
                 {
                     path: 'createdBy',

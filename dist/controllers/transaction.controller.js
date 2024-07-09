@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTransactionsByCustomerController = exports.getTransactionsController = exports.createTransactionController = void 0;
+exports.getTransactionsByCustomerController = exports.getTransactionsByIdController = exports.getTransactionsController = exports.createTransactionController = void 0;
 const tryCatch_1 = require("../utility/tryCatch");
 const transaction_model_1 = require("../models/transaction.model");
 const AppError_1 = require("../utility/AppError");
@@ -26,11 +26,11 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
     }
     let customer = yield customer_model_1.Customer.findById(customerId);
     const transactions = yield transaction_model_1.Transactions.create({
-        customerId,
+        customer: customerId,
         items,
         methodOfPayment,
         typeOfTransaction,
-        cashierId,
+        cashier: cashierId,
         amount,
     });
     if (customer) {
@@ -49,11 +49,67 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
     res.status(201).json(transactions);
 }));
 exports.getTransactionsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const transactions = yield transaction_model_1.Transactions.find();
+    const transactions = yield transaction_model_1.Transactions.find().populate([
+        {
+            path: 'cashier',
+            select: 'firstName lastName id',
+        },
+        {
+            path: 'customer',
+            select: 'firstName lastName id',
+        },
+        {
+            path: 'items',
+            populate: {
+                path: 'item',
+                select: 'image name sellingPrice',
+            },
+            select: 'firstName lastName id',
+        },
+    ]);
+    res.status(200).json(transactions);
+}));
+exports.getTransactionsByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const transactionId = req.params.id;
+    const transactions = yield transaction_model_1.Transactions.findById(transactionId).populate([
+        {
+            path: 'cashier',
+            select: 'firstName lastName id',
+        },
+        {
+            path: 'customer',
+            select: 'firstName lastName id',
+        },
+        {
+            path: 'items',
+            populate: {
+                path: 'item',
+                select: 'image name sellingPrice',
+            },
+            select: 'firstName lastName id',
+        },
+    ]);
     res.status(200).json(transactions);
 }));
 exports.getTransactionsByCustomerController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const customerId = req.params.id;
-    const transactions = yield transaction_model_1.Transactions.find({ customerId });
+    const customer = req.params.id;
+    const transactions = yield transaction_model_1.Transactions.find({ customer }).populate([
+        {
+            path: 'cashier',
+            select: 'firstName lastName id',
+        },
+        {
+            path: 'customer',
+            select: 'firstName lastName id',
+        },
+        {
+            path: 'items',
+            populate: {
+                path: 'item',
+                select: 'image name sellingPrice',
+            },
+            select: 'firstName lastName id',
+        },
+    ]);
     res.status(200).json(transactions);
 }));

@@ -24,11 +24,11 @@ export const createTransactionController = tryCatch(
     let customer = await Customer.findById(customerId);
 
     const transactions = await Transactions.create({
-      customerId,
+      customer: customerId,
       items,
       methodOfPayment,
       typeOfTransaction,
-      cashierId,
+      cashier: cashierId,
       amount,
     });
 
@@ -56,7 +56,50 @@ export const createTransactionController = tryCatch(
 
 export const getTransactionsController = tryCatch(
   async (req: Request, res: Response) => {
-    const transactions = await Transactions.find();
+    const transactions = await Transactions.find().populate([
+      {
+        path: 'cashier',
+        select: 'firstName lastName id',
+      },
+      {
+        path: 'customer',
+        select: 'firstName lastName id',
+      },
+      {
+        path: 'items',
+        populate: {
+          path: 'item',
+          select: 'image name sellingPrice',
+        },
+        select: 'firstName lastName id',
+      },
+    ]);
+
+    res.status(200).json(transactions);
+  }
+);
+
+export const getTransactionsByIdController = tryCatch(
+  async (req: Request, res: Response) => {
+    const transactionId = req.params.id;
+    const transactions = await Transactions.findById(transactionId).populate([
+      {
+        path: 'cashier',
+        select: 'firstName lastName id',
+      },
+      {
+        path: 'customer',
+        select: 'firstName lastName id',
+      },
+      {
+        path: 'items',
+        populate: {
+          path: 'item',
+          select: 'image name sellingPrice',
+        },
+        select: 'firstName lastName id',
+      },
+    ]);
 
     res.status(200).json(transactions);
   }
@@ -64,8 +107,25 @@ export const getTransactionsController = tryCatch(
 
 export const getTransactionsByCustomerController = tryCatch(
   async (req: Request, res: Response) => {
-    const customerId = req.params.id;
-    const transactions = await Transactions.find({ customerId });
+    const customer = req.params.id;
+    const transactions = await Transactions.find({ customer }).populate([
+      {
+        path: 'cashier',
+        select: 'firstName lastName id',
+      },
+      {
+        path: 'customer',
+        select: 'firstName lastName id',
+      },
+      {
+        path: 'items',
+        populate: {
+          path: 'item',
+          select: 'image name sellingPrice',
+        },
+        select: 'firstName lastName id',
+      },
+    ]);
 
     res.status(200).json(transactions);
   }
