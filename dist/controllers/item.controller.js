@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPOSItemsController = exports.archiveItemController = exports.deleteItemController = exports.updateItemStockController = exports.updateItemPriceController = exports.updateItemController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
+exports.restockItemsController = exports.getPOSItemsController = exports.archiveItemController = exports.deleteItemController = exports.updateItemStockController = exports.updateItemPriceController = exports.updateItemController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
 const cloudinary_1 = require("../config/cloudinary");
 const filters_1 = require("../dto/item/filters");
 const items_model_1 = require("../models/items.model");
@@ -152,4 +152,21 @@ exports.getPOSItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter
         .sort(sortOptions)
         .populate('category');
     res.status(200).json(items);
+}));
+exports.restockItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { items } = req.body;
+    for (const transactionItem of items) {
+        const item = yield items_model_1.Item.findById(transactionItem.item);
+        if (item) {
+            item.stock += Number(transactionItem.numberOfItems);
+            if (item.stock < 0) {
+                throw new AppError_1.AppError(`Insufficient stock for item: ${item.name}`, 400);
+            }
+            yield item.save();
+            res.status(201).json({ message: 'Stock updated' });
+        }
+        else {
+            throw new AppError_1.AppError(`Item with ID ${transactionItem.item} not found`, 400);
+        }
+    }
 }));

@@ -5,6 +5,8 @@ import { Transactions } from '../models/transaction.model';
 import { AppError } from '../utility/AppError';
 import { Customer } from '../models/customer.model';
 import Big from 'big.js';
+import { Item } from '../models/items.model';
+import mongoose from 'mongoose';
 
 export const createTransactionController = tryCatch(
   async (req: Request<any, any, CreateTransaction>, res: Response) => {
@@ -21,61 +23,148 @@ export const createTransactionController = tryCatch(
       throw new AppError('Items array is required and cannot be empty', 400);
     }
 
-    let customer = await Customer.findById(customerId);
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    const transactions = await Transactions.create({
-      customer: customerId,
-      items,
-      methodOfPayment,
-      typeOfTransaction,
-      cashier: cashierId,
-      amount,
-    });
+    try {
+      let customer = await Customer.findById(customerId).session(session);
 
-    if (customer) {
-      if (!customer.firstVisited) {
-        customer.firstVisited = new Date();
-      }
-      customer.lastVisited = new Date();
-
-      const existingTotalSpend = new Big(customer.totalSpend ?? 0);
-      const amountSpent = new Big(amount);
-
-      customer.totalSpend = parseFloat(
-        existingTotalSpend.plus(amountSpent).toFixed(2)
+      const transactions = await Transactions.create(
+        [
+          {
+            customer: customerId,
+            items,
+            methodOfPayment,
+            typeOfTransaction,
+            cashier: cashierId,
+            amount,
+          },
+        ],
+        { session }
       );
 
-      await customer.save();
-    } else {
-      console.log('Customer not found');
-    }
+      if (customer) {
+        if (!customer.firstVisited) {
+          customer.firstVisited = new Date();
+        }
+        customer.lastVisited = new Date();
 
-    res.status(201).json(transactions);
+        const existingTotalSpend = new Big(customer.totalSpend ?? 0);
+        const amountSpent = new Big(amount);
+
+        if (typeOfTransaction === 'REFUND') {
+          customer.totalSpend = parseFloat(
+            existingTotalSpend.minus(amountSpent).toFixed(2)
+          );
+        } else {
+          customer.totalSpend = parseFloat(
+            existingTotalSpend.plus(amountSpent).toFixed(2)
+          );
+        }
+
+        await customer.save({ session });
+      } else {
+        console.log('Customer not found');
+      }
+
+      for (const transactionItem of items) {
+        const item = await Item.findById(transactionItem.item).session(session);
+
+        if (item) {
+          item.stock -= transactionItem.numberOfItems;
+
+          if (item.stock < 0) {
+            throw new AppError(
+              `Insufficient stock for item: ${item.name}`,
+              400
+            );
+          }
+
+          await item.save({ session });
+        } else {
+          throw new AppError(
+            `Item with ID ${transactionItem.item} not found`,
+            400
+          );
+        }
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+
+      res.status(201).json(transactions);
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 );
 
 export const getTransactionsController = tryCatch(
   async (req: Request, res: Response) => {
-    const transactions = await Transactions.find().populate([
-      {
-        path: 'cashier',
-        select: 'firstName lastName id',
-      },
-      {
-        path: 'customer',
-        select: 'firstName lastName id',
-      },
-      {
-        path: 'items',
-        populate: {
-          path: 'item',
-          select: 'image name sellingPrice',
+    const transactions = await Transactions.find()
+      .populate([
+        {
+          path: 'cashier',
+          select: 'firstName lastName id',
         },
-        select: 'firstName lastName id',
-      },
-    ]);
+        {
+          path: 'customer',
+          select: 'firstName lastName id',
+        },
+        {
+          path: 'items',
+          populate: {
+            path: 'item',
+            select: 'image name sellingPrice',
+          },
+          select: 'firstName lastName id',
+        },
+      ])
+      .sort('-createdAt');
 
     res.status(200).json(transactions);
+  }
+);
+
+export const getTransactionsByDateController = tryCatch(
+  async (req: Request, res: Response) => {
+    const transactions = await Transactions.find()
+      .populate([
+        {
+          path: 'cashier',
+          select: 'firstName lastName id',
+        },
+        {
+          path: 'customer',
+          select: 'firstName lastName id',
+        },
+        {
+          path: 'items',
+          populate: {
+            path: 'item',
+            select: 'image name sellingPrice',
+          },
+          select: 'firstName lastName id',
+        },
+      ])
+      .sort('-createdAt');
+
+    const transactionsByDate = transactions.reduce((acc, transaction) => {
+      const transactionDate = new Date(transaction.createdAt);
+      const dateKey = transactionDate.toISOString().split('T')[0];
+
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+
+      acc[dateKey].push(transaction);
+
+      return acc;
+    }, {} as any);
+
+    res.status(200).json(transactionsByDate);
   }
 );
 

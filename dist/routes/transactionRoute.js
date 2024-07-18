@@ -12,5 +12,6 @@ exports.TransactionRoute = router;
 router.use(middlewares_1.Authenticate);
 router.post('', transaction_controller_1.createTransactionController);
 router.get('', transaction_controller_1.getTransactionsController);
+router.get('/date', transaction_controller_1.getTransactionsByDateController);
 router.get('/:id', transaction_controller_1.getTransactionsByIdController);
 router.get('/customer/:id', transaction_controller_1.getTransactionsByCustomerController);

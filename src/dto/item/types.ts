@@ -41,3 +41,10 @@ export interface FilterTypes {
   keyword?: string;
   archived?: boolean;
 }
+
+export interface RestockPayload {
+  items: {
+    item: string;
+    numberOfItems: number;
+  }[];
+}

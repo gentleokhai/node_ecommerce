@@ -5,6 +5,7 @@ import {
   UpdateItemPrice,
   UpdateItemStock,
   UpdateItem,
+  RestockPayload,
 } from '../dto/item';
 import { getItemsFilter } from '../dto/item/filters';
 import { Item } from '../models/items.model';
@@ -228,5 +229,31 @@ export const getPOSItemsController = tryCatch(
       .populate('category');
 
     res.status(200).json(items);
+  }
+);
+
+export const restockItemsController = tryCatch(
+  async (req: Request<any, any, RestockPayload>, res: Response) => {
+    const { items } = req.body;
+
+    for (const transactionItem of items) {
+      const item = await Item.findById(transactionItem.item);
+
+      if (item) {
+        item.stock += Number(transactionItem.numberOfItems);
+
+        if (item.stock < 0) {
+          throw new AppError(`Insufficient stock for item: ${item.name}`, 400);
+        }
+
+        await item.save();
+        res.status(201).json({ message: 'Stock updated' });
+      } else {
+        throw new AppError(
+          `Item with ID ${transactionItem.item} not found`,
+          400
+        );
+      }
+    }
   }
 );

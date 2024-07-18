@@ -7,6 +7,7 @@ interface TransactionsDoc extends Document {
   typeOfTransaction: string;
   cashier: string;
   amount: string;
+  createdAt: string;
 }
 
 interface Item {

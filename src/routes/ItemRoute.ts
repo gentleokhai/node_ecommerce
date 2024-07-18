@@ -6,6 +6,7 @@ import {
   getItemByIdController,
   getItemsController,
   getPOSItemsController,
+  restockItemsController,
   updateItemController,
   updateItemPriceController,
   updateItemStockController,
@@ -35,6 +36,7 @@ router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
 
 router.post('', createItemValidator, createItemController);
 router.get('', getItemsController);
+router.patch('/restock', restockItemsController); //TODO: add validation for this request
 router.post('/category', createCategoryValidator, createCategoryController);
 router.get('/:id', getItemByIdController);
 router.patch('/:id', updateItemValidator, updateItemController);
