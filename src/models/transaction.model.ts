@@ -1,5 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+interface Item {
+  item: string;
+  numberOfItems: number;
+  status: 'COMPLETED' | 'REFUNDED';
+}
 interface TransactionsDoc extends Document {
   customer: string;
   numberOfItems: string;
@@ -8,17 +13,18 @@ interface TransactionsDoc extends Document {
   cashier: string;
   amount: string;
   createdAt: string;
-}
-
-interface Item {
-  item: string;
-  numberOfItems: number;
+  items: Item[];
 }
 
 const ItemSchema: Schema = new Schema(
   {
     item: { type: mongoose.Schema.Types.ObjectId, ref: 'item' },
     numberOfItems: { type: Number, required: true },
+    status: {
+      type: String,
+      enum: ['COMPLETED', 'REFUNDED'],
+      default: 'COMPLETED',
+    },
   },
   {
     toJSON: {

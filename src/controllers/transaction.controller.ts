@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { tryCatch } from '../utility/tryCatch';
-import { CreateTransaction } from '../dto/transactions/types';
+import {
+  CreateTransaction,
+  RefundTransaction,
+} from '../dto/transactions/types';
 import { Transactions } from '../models/transaction.model';
 import { AppError } from '../utility/AppError';
 import { Customer } from '../models/customer.model';
@@ -217,5 +220,69 @@ export const getTransactionsByCustomerController = tryCatch(
     ]);
 
     res.status(200).json(transactions);
+  }
+);
+
+export const refundTransactionController = tryCatch(
+  async (req: Request<any, any, RefundTransaction>, res: Response) => {
+    const { customerId, items, typeOfTransaction, amount } = req.body;
+
+    const transactionId = req.params.id;
+
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new AppError('Items array is required and cannot be empty', 400);
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      let customer = await Customer.findById(customerId).session(session);
+
+      const existingTransaction = await Transactions.findById(transactionId);
+
+      if (customer) {
+        if (!customer.firstVisited) {
+          customer.firstVisited = new Date();
+        }
+        customer.lastVisited = new Date();
+
+        const existingTotalSpend = new Big(customer.totalSpend ?? 0);
+        const amountSpent = new Big(amount);
+
+        if (typeOfTransaction === 'REFUND') {
+          customer.totalSpend = parseFloat(
+            existingTotalSpend.minus(amountSpent).toFixed(2)
+          );
+        }
+
+        await customer.save({ session });
+      } else {
+        console.log('Customer not found');
+      }
+
+      if (existingTransaction?.items) {
+        for (const transactionItem of existingTransaction.items) {
+          const matchingItem = items.find(
+            (i) => i.item === transactionItem.item.toString()
+          );
+
+          if (matchingItem) {
+            transactionItem.status = 'REFUNDED';
+          }
+        }
+
+        existingTransaction.save();
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+
+      res.status(201).json({ message: 'Items Refunded' });
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 );

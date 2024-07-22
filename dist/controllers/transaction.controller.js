@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTransactionsByCustomerController = exports.getTransactionsByIdController = exports.getTransactionsByDateController = exports.getTransactionsController = exports.createTransactionController = void 0;
+exports.refundTransactionController = exports.getTransactionsByCustomerController = exports.getTransactionsByIdController = exports.getTransactionsByDateController = exports.getTransactionsController = exports.createTransactionController = void 0;
 const tryCatch_1 = require("../utility/tryCatch");
 const transaction_model_1 = require("../models/transaction.model");
 const AppError_1 = require("../utility/AppError");
@@ -179,4 +179,50 @@ exports.getTransactionsByCustomerController = (0, tryCatch_1.tryCatch)((req, res
         },
     ]);
     res.status(200).json(transactions);
+}));
+exports.refundTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    const { customerId, items, typeOfTransaction, amount } = req.body;
+    const transactionId = req.params.id;
+    if (!Array.isArray(items) || items.length === 0) {
+        throw new AppError_1.AppError('Items array is required and cannot be empty', 400);
+    }
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        let customer = yield customer_model_1.Customer.findById(customerId).session(session);
+        const existingTransaction = yield transaction_model_1.Transactions.findById(transactionId);
+        if (customer) {
+            if (!customer.firstVisited) {
+                customer.firstVisited = new Date();
+            }
+            customer.lastVisited = new Date();
+            const existingTotalSpend = new big_js_1.default((_b = customer.totalSpend) !== null && _b !== void 0 ? _b : 0);
+            const amountSpent = new big_js_1.default(amount);
+            if (typeOfTransaction === 'REFUND') {
+                customer.totalSpend = parseFloat(existingTotalSpend.minus(amountSpent).toFixed(2));
+            }
+            yield customer.save({ session });
+        }
+        else {
+            console.log('Customer not found');
+        }
+        if (existingTransaction === null || existingTransaction === void 0 ? void 0 : existingTransaction.items) {
+            for (const transactionItem of existingTransaction.items) {
+                const matchingItem = items.find((i) => i.item === transactionItem.item.toString());
+                if (matchingItem) {
+                    transactionItem.status = 'REFUNDED';
+                }
+            }
+            existingTransaction.save();
+        }
+        yield session.commitTransaction();
+        session.endSession();
+        res.status(201).json({ message: 'Items Refunded' });
+    }
+    catch (error) {
+        yield session.abortTransaction();
+        session.endSession();
+        throw error;
+    }
 }));

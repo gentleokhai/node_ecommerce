@@ -28,6 +28,11 @@ const mongoose_1 = __importStar(require("mongoose"));
 const ItemSchema = new mongoose_1.Schema({
     item: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'item' },
     numberOfItems: { type: Number, required: true },
+    status: {
+        type: String,
+        enum: ['COMPLETED', 'REFUNDED'],
+        default: 'COMPLETED',
+    },
 }, {
     toJSON: {
         transform(_, ret) {

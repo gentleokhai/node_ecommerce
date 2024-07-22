@@ -11,3 +11,10 @@ export interface CreateTransaction {
   cashierId: string;
   amount: string;
 }
+
+export interface RefundTransaction {
+  customerId: string;
+  items: Item[];
+  typeOfTransaction: 'SALE' | 'REFUND';
+  amount: string;
+}
