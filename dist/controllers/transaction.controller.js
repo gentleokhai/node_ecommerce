@@ -213,9 +213,25 @@ exports.refundTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
                 if (matchingItem) {
                     transactionItem.status = 'REFUNDED';
                 }
+                if (matchingItem &&
+                    Number(matchingItem.numberOfItems) >
+                        Number(transactionItem.numberOfItems)) {
+                    const itemName = yield items_model_1.Item.findById(transactionItem.item);
+                    throw new AppError_1.AppError(`Number of ${itemName === null || itemName === void 0 ? void 0 : itemName.name} cannot be more than initial purchase`, 400);
+                }
             }
             existingTransaction.save();
         }
+        yield transaction_model_1.Transactions.create([
+            {
+                customer: customerId,
+                items,
+                methodOfPayment: existingTransaction === null || existingTransaction === void 0 ? void 0 : existingTransaction.methodOfPayment,
+                typeOfTransaction,
+                cashier: existingTransaction === null || existingTransaction === void 0 ? void 0 : existingTransaction.cashier,
+                amount,
+            },
+        ], { session });
         yield session.commitTransaction();
         session.endSession();
         res.status(201).json({ message: 'Items Refunded' });

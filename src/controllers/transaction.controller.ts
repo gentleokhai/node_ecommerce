@@ -270,10 +270,36 @@ export const refundTransactionController = tryCatch(
           if (matchingItem) {
             transactionItem.status = 'REFUNDED';
           }
+
+          if (
+            matchingItem &&
+            Number(matchingItem.numberOfItems) >
+              Number(transactionItem.numberOfItems)
+          ) {
+            const itemName = await Item.findById(transactionItem.item);
+            throw new AppError(
+              `Number of ${itemName?.name} cannot be more than initial purchase`,
+              400
+            );
+          }
         }
 
         existingTransaction.save();
       }
+
+      await Transactions.create(
+        [
+          {
+            customer: customerId,
+            items,
+            methodOfPayment: existingTransaction?.methodOfPayment,
+            typeOfTransaction,
+            cashier: existingTransaction?.cashier,
+            amount,
+          },
+        ],
+        { session }
+      );
 
       await session.commitTransaction();
       session.endSession();

@@ -1,6 +1,7 @@
 interface Item {
   item: string;
   numberOfItems: number;
+  status?: 'COMPLETED' | 'REFUNDED';
 }
 
 export interface CreateTransaction {
