@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateItemStockValidator = exports.updateItemPriceValidator = exports.updateItemValidator = exports.createItemValidator = void 0;
+exports.restockItemStockValidator = exports.updateItemStockValidator = exports.updateItemPriceValidator = exports.updateItemValidator = exports.createItemValidator = void 0;
 const class_validator_1 = require("class-validator");
 const item_dto_1 = require("../dto/item/item.dto");
 const AppError_1 = require("../utility/AppError");
@@ -118,3 +118,24 @@ const updateItemStockValidator = (req, res, next) => __awaiter(void 0, void 0, v
     }
 });
 exports.updateItemStockValidator = updateItemStockValidator;
+const restockItemStockValidator = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        if (!req.body) {
+            throw new AppError_1.AppError('Missing request body!', 400);
+        }
+        const { items } = req.body;
+        const restockItem = new item_dto_1.RestockItemStockValidationSchema();
+        restockItem.items = items;
+        yield (0, class_validator_1.validateOrReject)(restockItem);
+        next();
+    }
+    catch (e) {
+        console.log(e);
+        const errors = e.map((err) => ({
+            field: err.property,
+            message: Object.values(err.constraints)[0],
+        }));
+        res.status(400).send(errors);
+    }
+});
+exports.restockItemStockValidator = restockItemStockValidator;

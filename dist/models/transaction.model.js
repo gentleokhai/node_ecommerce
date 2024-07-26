@@ -44,12 +44,16 @@ const ItemSchema = new mongoose_1.Schema({
     timestamps: true,
 });
 const TransactionsSchema = new mongoose_1.Schema({
-    customer: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'customer' },
+    customer: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'customer',
+        default: null,
+    },
     items: { type: [ItemSchema], required: true },
     methodOfPayment: { type: String },
     typeOfTransaction: { type: String },
     cashier: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'employee' },
-    amount: { type: String },
+    amount: { type: Number },
 }, {
     toJSON: {
         transform(_, ret) {

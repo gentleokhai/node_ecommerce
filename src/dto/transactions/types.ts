@@ -1,21 +1,23 @@
-interface Item {
+export enum ItemStatus {
+  COMPLETED = 'COMPLETED',
+  REFUNDED = 'REFUNDED',
+}
+
+export interface Item {
   item: string;
   numberOfItems: number;
-  status?: 'COMPLETED' | 'REFUNDED';
+  status?: ItemStatus;
 }
 
 export interface CreateTransaction {
-  customerId: string;
+  customerId?: string;
   items: Item[];
   methodOfPayment: string;
   typeOfTransaction: 'SALE' | 'REFUND';
   cashierId: string;
-  amount: string;
 }
 
 export interface RefundTransaction {
-  customerId: string;
   items: Item[];
   typeOfTransaction: 'SALE' | 'REFUND';
-  amount: string;
 }

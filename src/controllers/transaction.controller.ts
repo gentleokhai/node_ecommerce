@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { tryCatch } from '../utility/tryCatch';
 import {
   CreateTransaction,
+  ItemStatus,
   RefundTransaction,
 } from '../dto/transactions/types';
 import { Transactions } from '../models/transaction.model';
@@ -10,20 +11,30 @@ import { Customer } from '../models/customer.model';
 import Big from 'big.js';
 import { Item } from '../models/items.model';
 import mongoose from 'mongoose';
+import { getItemsFilter } from '../dto/item/filters';
 
 export const createTransactionController = tryCatch(
   async (req: Request<any, any, CreateTransaction>, res: Response) => {
-    const {
-      customerId,
-      items,
-      methodOfPayment,
-      typeOfTransaction,
-      cashierId,
-      amount,
-    } = req.body;
+    const { customerId, items, methodOfPayment, typeOfTransaction, cashierId } =
+      req.body;
 
     if (!Array.isArray(items) || items.length === 0) {
       throw new AppError('Items array is required and cannot be empty', 400);
+    }
+
+    let totalAmount = new Big(0);
+    for (const transactionItem of items) {
+      const itemDetails = await Item.findById(transactionItem.item);
+      if (!itemDetails) {
+        throw new AppError(
+          `Item with ID ${transactionItem.item} not found`,
+          404
+        );
+      }
+      const itemTotal = new Big(itemDetails.sellingPrice).times(
+        transactionItem.numberOfItems
+      );
+      totalAmount = totalAmount.plus(itemTotal);
     }
 
     const session = await mongoose.startSession();
@@ -35,12 +46,12 @@ export const createTransactionController = tryCatch(
       const transactions = await Transactions.create(
         [
           {
-            customer: customerId,
+            customer: customerId && customerId,
             items,
             methodOfPayment,
             typeOfTransaction,
             cashier: cashierId,
-            amount,
+            amount: Number(totalAmount),
           },
         ],
         { session }
@@ -53,7 +64,7 @@ export const createTransactionController = tryCatch(
         customer.lastVisited = new Date();
 
         const existingTotalSpend = new Big(customer.totalSpend ?? 0);
-        const amountSpent = new Big(amount);
+        const amountSpent = new Big(totalAmount);
 
         if (typeOfTransaction === 'REFUND') {
           customer.totalSpend = parseFloat(
@@ -74,11 +85,12 @@ export const createTransactionController = tryCatch(
         const item = await Item.findById(transactionItem.item).session(session);
 
         if (item) {
+          const remainingStock = item.stock;
           item.stock -= transactionItem.numberOfItems;
 
           if (item.stock < 0) {
             throw new AppError(
-              `Insufficient stock for item: ${item.name}`,
+              `Insufficient stock for item: ${item.name}, remaining stock ${remainingStock}`,
               400
             );
           }
@@ -87,7 +99,7 @@ export const createTransactionController = tryCatch(
         } else {
           throw new AppError(
             `Item with ID ${transactionItem.item} not found`,
-            400
+            404
           );
         }
       }
@@ -225,21 +237,37 @@ export const getTransactionsByCustomerController = tryCatch(
 
 export const refundTransactionController = tryCatch(
   async (req: Request<any, any, RefundTransaction>, res: Response) => {
-    const { customerId, items, typeOfTransaction, amount } = req.body;
+    const { items, typeOfTransaction } = req.body;
 
     const transactionId = req.params.id;
+    const existingTransaction = await Transactions.findById(transactionId);
 
     if (!Array.isArray(items) || items.length === 0) {
       throw new AppError('Items array is required and cannot be empty', 400);
+    }
+
+    let totalRefundAmount = new Big(0);
+    for (const transactionItem of items) {
+      const itemDetails = await Item.findById(transactionItem.item);
+      if (!itemDetails) {
+        throw new AppError(
+          `Item with ID ${transactionItem.item} not found`,
+          404
+        );
+      }
+      const itemTotal = new Big(itemDetails.sellingPrice).times(
+        transactionItem.numberOfItems
+      );
+      totalRefundAmount = totalRefundAmount.plus(itemTotal);
     }
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      let customer = await Customer.findById(customerId).session(session);
-
-      const existingTransaction = await Transactions.findById(transactionId);
+      let customer = await Customer.findById(
+        existingTransaction?.customer
+      ).session(session);
 
       if (customer) {
         if (!customer.firstVisited) {
@@ -248,7 +276,7 @@ export const refundTransactionController = tryCatch(
         customer.lastVisited = new Date();
 
         const existingTotalSpend = new Big(customer.totalSpend ?? 0);
-        const amountSpent = new Big(amount);
+        const amountSpent = new Big(totalRefundAmount);
 
         if (typeOfTransaction === 'REFUND') {
           customer.totalSpend = parseFloat(
@@ -262,14 +290,12 @@ export const refundTransactionController = tryCatch(
       }
 
       if (existingTransaction?.items) {
+        const newRefundItems = [];
+
         for (const transactionItem of existingTransaction.items) {
           const matchingItem = items.find(
             (i) => i.item === transactionItem.item.toString()
           );
-
-          if (matchingItem) {
-            transactionItem.status = 'REFUNDED';
-          }
 
           if (
             matchingItem &&
@@ -282,7 +308,19 @@ export const refundTransactionController = tryCatch(
               400
             );
           }
+
+          if (matchingItem) {
+            transactionItem.numberOfItems -= matchingItem.numberOfItems;
+
+            newRefundItems.push({
+              item: matchingItem.item,
+              numberOfItems: matchingItem.numberOfItems,
+              status: 'REFUNDED' as ItemStatus,
+            });
+          }
         }
+
+        existingTransaction.items.push(...newRefundItems);
 
         existingTransaction.save();
       }
@@ -290,12 +328,12 @@ export const refundTransactionController = tryCatch(
       await Transactions.create(
         [
           {
-            customer: customerId,
+            customer: existingTransaction?.customer,
             items,
             methodOfPayment: existingTransaction?.methodOfPayment,
             typeOfTransaction,
             cashier: existingTransaction?.cashier,
-            amount,
+            amount: Number(totalRefundAmount),
           },
         ],
         { session }

@@ -6,10 +6,13 @@ import {
   IsOptional,
   IsInt,
   Min,
+  IsArray,
 } from 'class-validator';
 import { IsValidMongoId } from '../general';
+import { Item } from '../transactions';
 import {
   CreateItem,
+  RestockPayload,
   UpdateItem,
   UpdateItemPrice,
   UpdateItemStock,
@@ -179,4 +182,10 @@ export class UpdateItemStockValidationSchema implements UpdateItemStock {
   @IsInt({ message: 'low stock must be a whole number.' })
   @IsOptional()
   lowStock!: number;
+}
+
+export class RestockItemStockValidationSchema implements RestockPayload {
+  @IsArray()
+  @IsNotEmpty()
+  items!: Item[];
 }

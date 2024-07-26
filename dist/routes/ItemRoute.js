@@ -17,10 +17,10 @@ exports.ItemRoute = router;
 router.use(middlewares_1.Authenticate);
 router.get('/pos', item_controller_1.getPOSItemsController);
 router.get('/category', category_controller_1.getCategoryController);
+router.patch('/restock', item_validator_1.restockItemStockValidator, item_controller_1.restockItemsController);
 router.use((0, checkRole_1.checkRole)([general_1.AccessType.EXECUTIVE, general_1.AccessType.MANAGER]));
 router.post('', item_validator_1.createItemValidator, item_controller_1.createItemController);
 router.get('', item_controller_1.getItemsController);
-router.patch('/restock', item_controller_1.restockItemsController); //TODO: add validation for this request
 router.post('/category', category_validator_1.createCategoryValidator, category_controller_1.createCategoryController);
 router.get('/:id', item_controller_1.getItemByIdController);
 router.patch('/:id', item_validator_1.updateItemValidator, item_controller_1.updateItemController);

@@ -19,6 +19,7 @@ import {
 import { createCategoryValidator } from '../validators/category.validator';
 import {
   createItemValidator,
+  restockItemStockValidator,
   updateItemPriceValidator,
   updateItemStockValidator,
   updateItemValidator,
@@ -31,12 +32,12 @@ const router = express.Router();
 router.use(Authenticate);
 router.get('/pos', getPOSItemsController);
 router.get('/category', getCategoryController);
+router.patch('/restock', restockItemStockValidator, restockItemsController);
 
 router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
 
 router.post('', createItemValidator, createItemController);
 router.get('', getItemsController);
-router.patch('/restock', restockItemsController); //TODO: add validation for this request
 router.post('/category', createCategoryValidator, createCategoryController);
 router.get('/:id', getItemByIdController);
 router.patch('/:id', updateItemValidator, updateItemController);

@@ -22,9 +22,18 @@ const items_model_1 = require("../models/items.model");
 const mongoose_1 = __importDefault(require("mongoose"));
 exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { customerId, items, methodOfPayment, typeOfTransaction, cashierId, amount, } = req.body;
+    const { customerId, items, methodOfPayment, typeOfTransaction, cashierId } = req.body;
     if (!Array.isArray(items) || items.length === 0) {
         throw new AppError_1.AppError('Items array is required and cannot be empty', 400);
+    }
+    let totalAmount = new big_js_1.default(0);
+    for (const transactionItem of items) {
+        const itemDetails = yield items_model_1.Item.findById(transactionItem.item);
+        if (!itemDetails) {
+            throw new AppError_1.AppError(`Item with ID ${transactionItem.item} not found`, 404);
+        }
+        const itemTotal = new big_js_1.default(itemDetails.sellingPrice).times(transactionItem.numberOfItems);
+        totalAmount = totalAmount.plus(itemTotal);
     }
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
@@ -32,12 +41,12 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
         let customer = yield customer_model_1.Customer.findById(customerId).session(session);
         const transactions = yield transaction_model_1.Transactions.create([
             {
-                customer: customerId,
+                customer: customerId && customerId,
                 items,
                 methodOfPayment,
                 typeOfTransaction,
                 cashier: cashierId,
-                amount,
+                amount: Number(totalAmount),
             },
         ], { session });
         if (customer) {
@@ -46,7 +55,7 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
             }
             customer.lastVisited = new Date();
             const existingTotalSpend = new big_js_1.default((_a = customer.totalSpend) !== null && _a !== void 0 ? _a : 0);
-            const amountSpent = new big_js_1.default(amount);
+            const amountSpent = new big_js_1.default(totalAmount);
             if (typeOfTransaction === 'REFUND') {
                 customer.totalSpend = parseFloat(existingTotalSpend.minus(amountSpent).toFixed(2));
             }
@@ -61,14 +70,15 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
         for (const transactionItem of items) {
             const item = yield items_model_1.Item.findById(transactionItem.item).session(session);
             if (item) {
+                const remainingStock = item.stock;
                 item.stock -= transactionItem.numberOfItems;
                 if (item.stock < 0) {
-                    throw new AppError_1.AppError(`Insufficient stock for item: ${item.name}`, 400);
+                    throw new AppError_1.AppError(`Insufficient stock for item: ${item.name}, remaining stock ${remainingStock}`, 400);
                 }
                 yield item.save({ session });
             }
             else {
-                throw new AppError_1.AppError(`Item with ID ${transactionItem.item} not found`, 400);
+                throw new AppError_1.AppError(`Item with ID ${transactionItem.item} not found`, 404);
             }
         }
         yield session.commitTransaction();
@@ -182,23 +192,32 @@ exports.getTransactionsByCustomerController = (0, tryCatch_1.tryCatch)((req, res
 }));
 exports.refundTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
-    const { customerId, items, typeOfTransaction, amount } = req.body;
+    const { items, typeOfTransaction } = req.body;
     const transactionId = req.params.id;
+    const existingTransaction = yield transaction_model_1.Transactions.findById(transactionId);
     if (!Array.isArray(items) || items.length === 0) {
         throw new AppError_1.AppError('Items array is required and cannot be empty', 400);
+    }
+    let totalRefundAmount = new big_js_1.default(0);
+    for (const transactionItem of items) {
+        const itemDetails = yield items_model_1.Item.findById(transactionItem.item);
+        if (!itemDetails) {
+            throw new AppError_1.AppError(`Item with ID ${transactionItem.item} not found`, 404);
+        }
+        const itemTotal = new big_js_1.default(itemDetails.sellingPrice).times(transactionItem.numberOfItems);
+        totalRefundAmount = totalRefundAmount.plus(itemTotal);
     }
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
-        let customer = yield customer_model_1.Customer.findById(customerId).session(session);
-        const existingTransaction = yield transaction_model_1.Transactions.findById(transactionId);
+        let customer = yield customer_model_1.Customer.findById(existingTransaction === null || existingTransaction === void 0 ? void 0 : existingTransaction.customer).session(session);
         if (customer) {
             if (!customer.firstVisited) {
                 customer.firstVisited = new Date();
             }
             customer.lastVisited = new Date();
             const existingTotalSpend = new big_js_1.default((_b = customer.totalSpend) !== null && _b !== void 0 ? _b : 0);
-            const amountSpent = new big_js_1.default(amount);
+            const amountSpent = new big_js_1.default(totalRefundAmount);
             if (typeOfTransaction === 'REFUND') {
                 customer.totalSpend = parseFloat(existingTotalSpend.minus(amountSpent).toFixed(2));
             }
@@ -208,28 +227,35 @@ exports.refundTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
             console.log('Customer not found');
         }
         if (existingTransaction === null || existingTransaction === void 0 ? void 0 : existingTransaction.items) {
+            const newRefundItems = [];
             for (const transactionItem of existingTransaction.items) {
                 const matchingItem = items.find((i) => i.item === transactionItem.item.toString());
-                if (matchingItem) {
-                    transactionItem.status = 'REFUNDED';
-                }
                 if (matchingItem &&
                     Number(matchingItem.numberOfItems) >
                         Number(transactionItem.numberOfItems)) {
                     const itemName = yield items_model_1.Item.findById(transactionItem.item);
                     throw new AppError_1.AppError(`Number of ${itemName === null || itemName === void 0 ? void 0 : itemName.name} cannot be more than initial purchase`, 400);
                 }
+                if (matchingItem) {
+                    transactionItem.numberOfItems -= matchingItem.numberOfItems;
+                    newRefundItems.push({
+                        item: matchingItem.item,
+                        numberOfItems: matchingItem.numberOfItems,
+                        status: 'REFUNDED',
+                    });
+                }
             }
+            existingTransaction.items.push(...newRefundItems);
             existingTransaction.save();
         }
         yield transaction_model_1.Transactions.create([
             {
-                customer: customerId,
+                customer: existingTransaction === null || existingTransaction === void 0 ? void 0 : existingTransaction.customer,
                 items,
                 methodOfPayment: existingTransaction === null || existingTransaction === void 0 ? void 0 : existingTransaction.methodOfPayment,
                 typeOfTransaction,
                 cashier: existingTransaction === null || existingTransaction === void 0 ? void 0 : existingTransaction.cashier,
-                amount,
+                amount: Number(totalRefundAmount),
             },
         ], { session });
         yield session.commitTransaction();

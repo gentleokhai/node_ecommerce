@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateItemStockValidationSchema = exports.UpdateItemPriceValidationSchema = exports.UpdateItemValidationSchema = exports.CreateItemValidationSchema = void 0;
+exports.RestockItemStockValidationSchema = exports.UpdateItemStockValidationSchema = exports.UpdateItemPriceValidationSchema = exports.UpdateItemValidationSchema = exports.CreateItemValidationSchema = void 0;
 const class_validator_1 = require("class-validator");
 const general_1 = require("../general");
 class CreateItemValidationSchema {
@@ -179,3 +179,10 @@ __decorate([
     (0, class_validator_1.IsInt)({ message: 'low stock must be a whole number.' }),
     (0, class_validator_1.IsOptional)()
 ], UpdateItemStockValidationSchema.prototype, "lowStock", void 0);
+class RestockItemStockValidationSchema {
+}
+exports.RestockItemStockValidationSchema = RestockItemStockValidationSchema;
+__decorate([
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNotEmpty)()
+], RestockItemStockValidationSchema.prototype, "items", void 0);

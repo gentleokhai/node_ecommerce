@@ -2,12 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import { validateOrReject } from 'class-validator';
 import {
   CreateItemValidationSchema,
+  RestockItemStockValidationSchema,
   UpdateItemPriceValidationSchema,
   UpdateItemStockValidationSchema,
   UpdateItemValidationSchema,
 } from '../dto/item/item.dto';
 import {
   CreateItem,
+  RestockPayload,
   UpdateItem,
   UpdateItemPrice,
   UpdateItemStock,
@@ -153,6 +155,35 @@ export const updateItemStockValidator = async (
     item.lowStock = lowStock;
 
     await validateOrReject(item);
+
+    next();
+  } catch (e: any) {
+    console.log(e);
+    const errors = e.map((err: any) => ({
+      field: err.property,
+      message: Object.values(err.constraints)[0],
+    }));
+
+    res.status(400).send(errors);
+  }
+};
+
+export const restockItemStockValidator = async (
+  req: Request<any, any, RestockPayload>,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.body) {
+      throw new AppError('Missing request body!', 400);
+    }
+
+    const { items } = req.body;
+
+    const restockItem = new RestockItemStockValidationSchema();
+    restockItem.items = items;
+
+    await validateOrReject(restockItem);
 
     next();
   } catch (e: any) {

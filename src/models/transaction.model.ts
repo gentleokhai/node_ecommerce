@@ -1,3 +1,4 @@
+import { IsPhoneNumber } from 'class-validator';
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface Item {
@@ -40,12 +41,16 @@ const ItemSchema: Schema = new Schema(
 
 const TransactionsSchema = new Schema(
   {
-    customer: { type: mongoose.Schema.Types.ObjectId, ref: 'customer' },
+    customer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'customer',
+      default: null,
+    },
     items: { type: [ItemSchema], required: true },
     methodOfPayment: { type: String },
     typeOfTransaction: { type: String },
     cashier: { type: mongoose.Schema.Types.ObjectId, ref: 'employee' },
-    amount: { type: String },
+    amount: { type: Number },
   },
   {
     toJSON: {
