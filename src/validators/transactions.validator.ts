@@ -5,7 +5,10 @@ import {
   CreateTransaction,
   RefundTransaction,
 } from '../dto/transactions/types';
-import { CreateTransactionValidationSchema } from '../dto/transactions';
+import {
+  CreateRefundTransactionValidationSchema,
+  CreateTransactionValidationSchema,
+} from '../dto/transactions';
 
 export const createTransactionValidator = async (
   req: Request<any, any, CreateTransaction>,
@@ -53,7 +56,7 @@ export const createRefundTransactionValidator = async (
 
     const { items, typeOfTransaction } = req.body;
 
-    const transaction = new CreateTransactionValidationSchema();
+    const transaction = new CreateRefundTransactionValidationSchema();
     transaction.typeOfTransaction = typeOfTransaction;
     transaction.items = items;
 

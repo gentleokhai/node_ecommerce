@@ -44,7 +44,7 @@ const createRefundTransactionValidator = (req, res, next) => __awaiter(void 0, v
             throw new AppError_1.AppError('Missing request body!', 400);
         }
         const { items, typeOfTransaction } = req.body;
-        const transaction = new transactions_1.CreateTransactionValidationSchema();
+        const transaction = new transactions_1.CreateRefundTransactionValidationSchema();
         transaction.typeOfTransaction = typeOfTransaction;
         transaction.items = items;
         yield (0, class_validator_1.validateOrReject)(transaction);
