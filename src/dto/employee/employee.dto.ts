@@ -66,44 +66,36 @@ export class CreateEmployeeValidationSchema implements CreateEmployeeInput {
 export class UpdateEmployeeValidationSchema implements UpdateEmployeeInput {
   @IsEmail()
   @IsOptional()
-  @IsNotEmpty()
   email!: string;
 
   @IsPhoneNumber()
   @IsOptional()
-  @IsNotEmpty()
   phoneNumber!: string;
 
   @IsString()
   @IsOptional()
-  @IsNotEmpty()
   firstName!: string;
 
   @IsString()
   @IsOptional()
-  @IsNotEmpty()
   lastName!: string;
 
   @IsString()
   @IsOptional()
-  @IsNotEmpty()
   @Validate(IsValidMongoId)
   jobTitle!: string;
 
   @IsString()
   @IsOptional()
-  @IsNotEmpty()
   dateOfEmployment!: string;
 
   @IsString()
   @IsOptional()
-  @IsNotEmpty()
   @Validate(IsValidMongoId)
   company!: string;
 
   @IsString()
   @IsOptional()
-  @IsNotEmpty()
   @IsEnumValue(Gender)
   gender!: Gender;
 }

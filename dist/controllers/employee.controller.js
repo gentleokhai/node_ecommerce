@@ -84,14 +84,14 @@ exports.updateEmployeeController = (0, tryCatch_1.tryCatch)((req, res) => __awai
     if (!existingEmployee) {
         throw new AppError_1.AppError('Employee does not exist', 400);
     }
-    existingEmployee.firstName = firstName;
-    existingEmployee.lastName = lastName;
-    existingEmployee.gender = gender;
-    existingEmployee.jobTitle = jobTitle;
-    existingEmployee.dateOfEmployment = dateOfEmployment;
-    existingEmployee.phoneNumber = phoneNumber;
-    const updatedEmployee = yield existingEmployee.save();
-    res.json(updatedEmployee);
+    firstName && (existingEmployee.firstName = firstName);
+    lastName && (existingEmployee.lastName = lastName);
+    gender && (existingEmployee.gender = gender);
+    jobTitle && (existingEmployee.jobTitle = jobTitle);
+    dateOfEmployment && (existingEmployee.dateOfEmployment = dateOfEmployment);
+    phoneNumber && (existingEmployee.phoneNumber = phoneNumber);
+    yield existingEmployee.save();
+    res.json({ message: 'Employee updated' });
 }));
 exports.updateEmployeeOnboardingController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { firstName, lastName, gender } = (req.body);
@@ -114,7 +114,7 @@ exports.getEmployeesController = (0, tryCatch_1.tryCatch)((req, res) => __awaite
     const endIndex = page * pagePerLimit;
     const employees = yield models_1.Employee.find(query)
         .sort(sortOptions)
-        .select('-password -salt')
+        .select('-password -salt -tokenExpiration -verificationToken')
         .populate('jobTitle');
     const paginatedEmployees = employees.slice(startIndex, endIndex);
     const totalPages = Math.ceil(employees.length / pagePerLimit);
@@ -135,7 +135,7 @@ exports.getEmployeesController = (0, tryCatch_1.tryCatch)((req, res) => __awaite
 exports.getEmployeeByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const employee = yield models_1.Employee.findById(id)
-        .select('-password -salt')
+        .select('-password -salt -tokenExpiration -verificationToken')
         .populate('jobTitle')
         .populate({
         path: 'company',

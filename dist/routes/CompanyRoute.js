@@ -15,3 +15,5 @@ exports.CompanyRoute = router;
 router.use(middlewares_1.Authenticate);
 router.use((0, checkRole_1.checkRole)([general_1.AccessType.EXECUTIVE, general_1.AccessType.MANAGER]));
 router.post('', company_validator_1.createCompanyValidator, company_controller_1.createCompanyController);
+router.patch('/:id', company_validator_1.updateCompanyValidator, company_controller_1.updateCompanyController);
+router.get('/:id', company_controller_1.getCompanyByIdController);

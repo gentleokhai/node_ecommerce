@@ -57,45 +57,37 @@ class UpdateEmployeeValidationSchema {
 exports.UpdateEmployeeValidationSchema = UpdateEmployeeValidationSchema;
 __decorate([
     (0, class_validator_1.IsEmail)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsOptional)()
 ], UpdateEmployeeValidationSchema.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsPhoneNumber)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsOptional)()
 ], UpdateEmployeeValidationSchema.prototype, "phoneNumber", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsOptional)()
 ], UpdateEmployeeValidationSchema.prototype, "firstName", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsOptional)()
 ], UpdateEmployeeValidationSchema.prototype, "lastName", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.Validate)(general_1.IsValidMongoId)
 ], UpdateEmployeeValidationSchema.prototype, "jobTitle", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)()
+    (0, class_validator_1.IsOptional)()
 ], UpdateEmployeeValidationSchema.prototype, "dateOfEmployment", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.Validate)(general_1.IsValidMongoId)
 ], UpdateEmployeeValidationSchema.prototype, "company", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNotEmpty)(),
     (0, general_1.IsEnumValue)(general_1.Gender)
 ], UpdateEmployeeValidationSchema.prototype, "gender", void 0);
 class UpdateEmployeeAccessValidationSchema {

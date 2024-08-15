@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateCompanyValidationSchema = void 0;
+exports.UpdateCompanyValidationSchema = exports.CreateCompanyValidationSchema = void 0;
 const class_validator_1 = require("class-validator");
 class CreateCompanyValidationSchema {
 }
@@ -55,3 +55,50 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)()
 ], CreateCompanyValidationSchema.prototype, "zipCode", void 0);
+class UpdateCompanyValidationSchema {
+}
+exports.UpdateCompanyValidationSchema = UpdateCompanyValidationSchema;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "businessName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "businessType", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "industry", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "companySize", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "addressNumber", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "buyingCurrency", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "sellingCurrency", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "street", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "city", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "state", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)()
+], UpdateCompanyValidationSchema.prototype, "zipCode", void 0);

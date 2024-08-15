@@ -46,3 +46,49 @@ export class CreateCompanyValidationSchema implements CreateCompanyInput {
   @IsNotEmpty()
   zipCode!: string;
 }
+
+export class UpdateCompanyValidationSchema implements CreateCompanyInput {
+  @IsString()
+  @IsOptional()
+  businessName!: string;
+
+  @IsString()
+  @IsOptional()
+  businessType!: string;
+
+  @IsString()
+  @IsOptional()
+  industry!: string;
+
+  @IsString()
+  @IsOptional()
+  companySize!: string;
+
+  @IsString()
+  @IsOptional()
+  addressNumber!: string;
+
+  @IsString()
+  @IsOptional()
+  buyingCurrency!: string;
+
+  @IsString()
+  @IsOptional()
+  sellingCurrency!: string;
+
+  @IsString()
+  @IsOptional()
+  street!: string;
+
+  @IsString()
+  @IsOptional()
+  city!: string;
+
+  @IsString()
+  @IsOptional()
+  state!: string;
+
+  @IsString()
+  @IsOptional()
+  zipCode!: string;
+}

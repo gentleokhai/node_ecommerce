@@ -107,16 +107,16 @@ export const updateEmployeeController = tryCatch(
       throw new AppError('Employee does not exist', 400);
     }
 
-    existingEmployee.firstName = firstName;
-    existingEmployee.lastName = lastName;
-    existingEmployee.gender = gender;
-    existingEmployee.jobTitle = jobTitle;
-    existingEmployee.dateOfEmployment = dateOfEmployment;
-    existingEmployee.phoneNumber = phoneNumber;
+    firstName && (existingEmployee.firstName = firstName);
+    lastName && (existingEmployee.lastName = lastName);
+    gender && (existingEmployee.gender = gender);
+    jobTitle && (existingEmployee.jobTitle = jobTitle);
+    dateOfEmployment && (existingEmployee.dateOfEmployment = dateOfEmployment);
+    phoneNumber && (existingEmployee.phoneNumber = phoneNumber);
 
-    const updatedEmployee = await existingEmployee.save();
+    await existingEmployee.save();
 
-    res.json(updatedEmployee);
+    res.json({ message: 'Employee updated' });
   }
 );
 
@@ -156,7 +156,7 @@ export const getEmployeesController = tryCatch(
 
     const employees = await Employee.find(query)
       .sort(sortOptions)
-      .select('-password -salt')
+      .select('-password -salt -tokenExpiration -verificationToken')
       .populate('jobTitle');
 
     const paginatedEmployees = employees.slice(startIndex, endIndex);
@@ -185,7 +185,7 @@ export const getEmployeeByIdController = tryCatch(
     const id = req.params.id;
 
     const employee = await Employee.findById(id)
-      .select('-password -salt')
+      .select('-password -salt -tokenExpiration -verificationToken')
       .populate('jobTitle')
       .populate({
         path: 'company',
