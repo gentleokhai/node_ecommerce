@@ -11,3 +11,7 @@ export interface CreateCompanyInput {
   state: string;
   zipCode: string;
 }
+
+export interface UpdateViewingCurrencyInput {
+  viewingCurrency: string;
+}

@@ -7,6 +7,7 @@ interface CompanyDoc extends Document {
   companySize: string;
   buyingCurrency: string;
   sellingCurrency: string;
+  viewingCurrency?: string;
   addressNumber: string;
   street: string;
   city: string;
@@ -22,6 +23,9 @@ const CompanySchema = new Schema(
     gender: { type: String },
     companySize: { type: String },
     addressNumber: { type: String },
+    sellingCurrency: { type: String },
+    buyingCurrency: { type: String },
+    viewingCurrency: { type: String },
     street: { type: String },
     city: { type: String },
     state: { type: String },
@@ -43,6 +47,13 @@ const CompanySchema = new Schema(
     timestamps: true,
   }
 );
+
+CompanySchema.pre('save', function (next) {
+  if (!this.viewingCurrency && this.sellingCurrency) {
+    this.viewingCurrency = this.sellingCurrency;
+  }
+  next();
+});
 
 const Company = mongoose.model<CompanyDoc>('company', CompanySchema);
 

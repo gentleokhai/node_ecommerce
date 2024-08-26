@@ -3,7 +3,7 @@ import { Company, Employee } from '../models';
 import { createCompany } from '../services/company.service';
 import { tryCatch } from '../utility/tryCatch';
 import { AppError } from '../utility/AppError';
-import { CreateCompanyInput } from '../dto/company';
+import { CreateCompanyInput, UpdateViewingCurrencyInput } from '../dto/company';
 
 export const createCompanyController = tryCatch(
   async (req: Request, res: Response) => {
@@ -33,7 +33,12 @@ export const createCompanyController = tryCatch(
 
 export const updateCompanyController = tryCatch(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.headers['companyid'] as string;
+
+    if (!id) {
+      throw new AppError('Company ID is required in headers', 400);
+    }
+
     const {
       businessName,
       businessType,
@@ -74,10 +79,54 @@ export const updateCompanyController = tryCatch(
 
 export const getCompanyByIdController = tryCatch(
   async (req: Request, res: Response) => {
-    const id = req.params.id;
+    const id = req.headers['companyid'] as string;
+
+    if (!id) {
+      throw new AppError('Company ID is required in headers', 400);
+    }
 
     const company = await Company.findById(id).select('-users');
 
     res.status(200).json(company);
+  }
+);
+
+export const getCompanyCurrenciesController = tryCatch(
+  async (req: Request, res: Response) => {
+    const id = req.headers['companyid'] as string;
+
+    if (!id) {
+      throw new AppError('Company ID is required in headers', 400);
+    }
+
+    const currencies = await Company.findById(id).select(
+      'buyingCurrency sellingCurrency'
+    );
+
+    res.status(200).json(currencies);
+  }
+);
+
+export const updateViewingCurrencyController = tryCatch(
+  async (req: Request, res: Response) => {
+    const id = req.headers['companyid'] as string;
+
+    if (!id) {
+      throw new AppError('Company ID is required in headers', 400);
+    }
+
+    const { viewingCurrency } = <UpdateViewingCurrencyInput>req.body;
+
+    const existingCompany = await Company.findById(id);
+
+    if (existingCompany !== null) {
+      existingCompany.viewingCurrency = viewingCurrency;
+
+      await existingCompany.save();
+
+      return res.json({ message: 'Viewing currency updated!' });
+    }
+
+    throw new AppError('Company not found', 400);
   }
 );

@@ -2,7 +2,9 @@ import express from 'express';
 import {
   createCompanyController,
   getCompanyByIdController,
+  getCompanyCurrenciesController,
   updateCompanyController,
+  updateViewingCurrencyController,
 } from '../controllers/company.controller';
 import { AccessType } from '../dto/general';
 import { Authenticate } from '../middlewares';
@@ -18,7 +20,9 @@ router.use(Authenticate);
 router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
 
 router.post('', createCompanyValidator, createCompanyController);
-router.patch('/:id', updateCompanyValidator, updateCompanyController);
-router.get('/:id', getCompanyByIdController);
+router.patch('/viewingCurrency', updateViewingCurrencyController);
+router.patch('', updateCompanyValidator, updateCompanyController);
+router.get('/currencies', getCompanyCurrenciesController);
+router.get('', getCompanyByIdController);
 
 export { router as CompanyRoute };

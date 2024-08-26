@@ -32,6 +32,9 @@ const CompanySchema = new mongoose_1.Schema({
     gender: { type: String },
     companySize: { type: String },
     addressNumber: { type: String },
+    sellingCurrency: { type: String },
+    buyingCurrency: { type: String },
+    viewingCurrency: { type: String },
     street: { type: String },
     city: { type: String },
     state: { type: String },
@@ -50,6 +53,12 @@ const CompanySchema = new mongoose_1.Schema({
         },
     },
     timestamps: true,
+});
+CompanySchema.pre('save', function (next) {
+    if (!this.viewingCurrency && this.sellingCurrency) {
+        this.viewingCurrency = this.sellingCurrency;
+    }
+    next();
 });
 const Company = mongoose_1.default.model('company', CompanySchema);
 exports.Company = Company;
