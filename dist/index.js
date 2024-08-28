@@ -15,6 +15,7 @@ const path_1 = __importDefault(require("path"));
 const errorHandler_1 = __importDefault(require("./middlewares/errorHandler"));
 const CustomerRoute_1 = require("./routes/CustomerRoute");
 const transactionRoute_1 = require("./routes/transactionRoute");
+require("./jobs/cron");
 const corsOptions = {
     origin: '*',
     optionsSuccessStatus: 200,

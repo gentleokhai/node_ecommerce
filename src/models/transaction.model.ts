@@ -12,7 +12,7 @@ interface TransactionsDoc extends Document {
   methodOfPayment: string;
   typeOfTransaction: string;
   cashier: string;
-  amount: string;
+  amount: number;
   createdAt: string;
   items: Item[];
 }

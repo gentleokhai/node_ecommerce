@@ -14,6 +14,7 @@ const models_1 = require("../models");
 const company_service_1 = require("../services/company.service");
 const tryCatch_1 = require("../utility/tryCatch");
 const AppError_1 = require("../utility/AppError");
+const exchangeRates_model_1 = require("../models/exchangeRates.model");
 exports.createCompanyController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
     if (!user) {
@@ -77,6 +78,12 @@ exports.updateViewingCurrencyController = (0, tryCatch_1.tryCatch)((req, res) =>
     }
     const { viewingCurrency } = req.body;
     const existingCompany = yield models_1.Company.findById(id);
+    const exchangeRate = yield exchangeRates_model_1.ExchangeRates.findOne({
+        currencyCode: viewingCurrency,
+    });
+    if (!exchangeRate) {
+        throw new AppError_1.AppError(`Exchange rate for ${viewingCurrency} not found`, 400);
+    }
     if (existingCompany !== null) {
         existingCompany.viewingCurrency = viewingCurrency;
         yield existingCompany.save();

@@ -9,6 +9,7 @@ import path from 'path';
 import errorHandler from './middlewares/errorHandler';
 import { CustomerRoute } from './routes/CustomerRoute';
 import { TransactionRoute } from './routes/transactionRoute';
+import './jobs/cron';
 
 const corsOptions = {
   origin: '*',

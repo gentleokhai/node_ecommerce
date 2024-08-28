@@ -4,6 +4,7 @@ import { createCompany } from '../services/company.service';
 import { tryCatch } from '../utility/tryCatch';
 import { AppError } from '../utility/AppError';
 import { CreateCompanyInput, UpdateViewingCurrencyInput } from '../dto/company';
+import { ExchangeRates } from '../models/exchangeRates.model';
 
 export const createCompanyController = tryCatch(
   async (req: Request, res: Response) => {
@@ -118,6 +119,14 @@ export const updateViewingCurrencyController = tryCatch(
     const { viewingCurrency } = <UpdateViewingCurrencyInput>req.body;
 
     const existingCompany = await Company.findById(id);
+
+    const exchangeRate = await ExchangeRates.findOne({
+      currencyCode: viewingCurrency,
+    });
+
+    if (!exchangeRate) {
+      throw new AppError(`Exchange rate for ${viewingCurrency} not found`, 400);
+    }
 
     if (existingCompany !== null) {
       existingCompany.viewingCurrency = viewingCurrency;

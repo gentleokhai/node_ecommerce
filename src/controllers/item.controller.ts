@@ -12,6 +12,9 @@ import { Item } from '../models/items.model';
 import { createItem } from '../services/item.service';
 import { tryCatch } from '../utility/tryCatch';
 import { AppError } from '../utility/AppError';
+import { convertToCurrency } from '../services/exchangeRate.service';
+import { Company } from '../models';
+import { roundUp } from '../utility/helpers';
 
 export const createItemController = tryCatch(
   async (req: Request<any, any, CreateItem>, res: Response) => {
@@ -43,6 +46,14 @@ export const createItemController = tryCatch(
 
     const cloudImage = await uploader(buffer);
 
+    const convertedCostPrice = await convertToCurrency(costPrice, 'USD');
+    const convertedSellingPrice = await convertToCurrency(sellingPrice, 'USD');
+
+    const convertedWholesalePrice = await convertToCurrency(
+      wholesalePrice as number,
+      'USD'
+    );
+
     const createItemService = await createItem({
       image: cloudImage.url,
       name,
@@ -52,9 +63,9 @@ export const createItemController = tryCatch(
       weight,
       description,
       currency,
-      costPrice,
-      sellingPrice,
-      wholesalePrice,
+      costPrice: convertedCostPrice,
+      sellingPrice: convertedSellingPrice,
+      wholesalePrice: wholesalePrice ? convertedWholesalePrice : null,
       quantityInPack,
       stock,
       lowStock,
@@ -68,6 +79,20 @@ export const getItemsController = tryCatch(
   async (req: Request, res: Response) => {
     const { query, sortOptions } = getItemsFilter(req);
 
+    const companyId = req.headers['companyid'] as string;
+
+    if (!companyId) {
+      throw new AppError('Company ID is required in headers', 400);
+    }
+
+    const company = await Company.findById(companyId);
+
+    if (!company) {
+      throw new AppError('Company not found', 400);
+    }
+
+    const viewingCurrency = company.viewingCurrency || 'USD';
+
     const page = parseInt(req.query.page as string, 10) || 1;
     const pagePerLimit = parseInt(req.query.pagePerLimit as string, 10) || 10;
 
@@ -78,6 +103,22 @@ export const getItemsController = tryCatch(
 
     const paginatedItems = items.slice(startIndex, endIndex);
 
+    const convertedItems = await Promise.all(
+      paginatedItems.map(async (item) => {
+        item.costPrice = roundUp(
+          await convertToCurrency(item.costPrice, viewingCurrency)
+        );
+        item.sellingPrice = roundUp(
+          await convertToCurrency(item.sellingPrice, viewingCurrency)
+        );
+        item.wholesalePrice = roundUp(
+          await convertToCurrency(item.wholesalePrice, viewingCurrency)
+        );
+        item.currency = viewingCurrency;
+        return item;
+      })
+    );
+
     const totalPages = Math.ceil(items.length / pagePerLimit);
     const totalItems = items.length - 1;
 
@@ -86,7 +127,7 @@ export const getItemsController = tryCatch(
     const currentPage = page;
 
     res.status(200).json({
-      items: paginatedItems,
+      items: convertedItems,
       totalPages,
       pagePerLimit,
       totalItems,
@@ -100,10 +141,37 @@ export const getItemsController = tryCatch(
 export const getItemByIdController = tryCatch(
   async (req: Request, res: Response) => {
     const id = req.params.id;
+    const companyId = req.headers['companyid'] as string;
+
+    if (!companyId) {
+      throw new AppError('Company ID is required in headers', 400);
+    }
+
+    const company = await Company.findById(companyId);
+
+    if (!company) {
+      throw new AppError('Company not found', 400);
+    }
+
+    const viewingCurrency = company.viewingCurrency || 'USD';
 
     const item = await Item.findById(id);
 
-    res.status(200).json(item);
+    const convertedItem = {
+      ...item?.toObject(),
+      costPrice: roundUp(
+        await convertToCurrency(item?.costPrice as number, viewingCurrency)
+      ),
+      sellingPrice: roundUp(
+        await convertToCurrency(item?.sellingPrice as number, viewingCurrency)
+      ),
+      wholesalePrice: roundUp(
+        await convertToCurrency(item?.wholesalePrice as number, viewingCurrency)
+      ),
+      currency: viewingCurrency,
+    };
+
+    res.status(200).json(convertedItem);
   }
 );
 
@@ -154,9 +222,12 @@ export const updateItemPriceController = tryCatch(
 
     const existingItem = await Item.findById(id);
 
+    const convertedCostPrice = await convertToCurrency(costPrice, 'USD');
+    const convertedSellingPrice = await convertToCurrency(sellingPrice, 'USD');
+
     if (existingItem !== null) {
-      existingItem.costPrice = costPrice;
-      existingItem.sellingPrice = sellingPrice;
+      existingItem.costPrice = convertedCostPrice;
+      existingItem.sellingPrice = convertedSellingPrice;
 
       await existingItem.save();
 
@@ -224,11 +295,41 @@ export const getPOSItemsController = tryCatch(
   async (req: Request, res: Response) => {
     const { query, sortOptions } = getItemsFilter(req);
 
+    const companyId = req.headers['companyid'] as string;
+
+    if (!companyId) {
+      throw new AppError('Company ID is required in headers', 400);
+    }
+
+    const company = await Company.findById(companyId);
+
+    if (!company) {
+      throw new AppError('Company not found', 400);
+    }
+
+    const viewingCurrency = 'NGN';
+
     const items = await Item.find({ ...query, archived: false })
       .sort(sortOptions)
       .populate('category');
 
-    res.status(200).json(items);
+    const convertedItems = await Promise.all(
+      items.map(async (item) => {
+        item.costPrice = roundUp(
+          await convertToCurrency(item.costPrice, viewingCurrency)
+        );
+        item.sellingPrice = roundUp(
+          await convertToCurrency(item.sellingPrice, viewingCurrency)
+        );
+        item.wholesalePrice = roundUp(
+          await convertToCurrency(item.wholesalePrice, viewingCurrency)
+        );
+        item.currency = viewingCurrency;
+        return item;
+      })
+    );
+
+    res.status(200).json(convertedItems);
   }
 );
 

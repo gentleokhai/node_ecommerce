@@ -16,6 +16,9 @@ const items_model_1 = require("../models/items.model");
 const item_service_1 = require("../services/item.service");
 const tryCatch_1 = require("../utility/tryCatch");
 const AppError_1 = require("../utility/AppError");
+const exchangeRate_service_1 = require("../services/exchangeRate.service");
+const models_1 = require("../models");
+const helpers_1 = require("../utility/helpers");
 exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { image, name, category, unit, sku, weight, description, currency, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
     const existingItem = yield items_model_1.Item.findOne({ name: name });
@@ -24,6 +27,9 @@ exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(
     const buffer = Buffer.from(image !== null && image !== void 0 ? image : '', 'base64');
     const uploader = (path) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, cloudinary_1.upload)(path, 'Zulu', res); });
     const cloudImage = yield uploader(buffer);
+    const convertedCostPrice = yield (0, exchangeRate_service_1.convertToCurrency)(costPrice, 'USD');
+    const convertedSellingPrice = yield (0, exchangeRate_service_1.convertToCurrency)(sellingPrice, 'USD');
+    const convertedWholesalePrice = yield (0, exchangeRate_service_1.convertToCurrency)(wholesalePrice, 'USD');
     const createItemService = yield (0, item_service_1.createItem)({
         image: cloudImage.url,
         name,
@@ -33,9 +39,9 @@ exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(
         weight,
         description,
         currency,
-        costPrice,
-        sellingPrice,
-        wholesalePrice,
+        costPrice: convertedCostPrice,
+        sellingPrice: convertedSellingPrice,
+        wholesalePrice: wholesalePrice ? convertedWholesalePrice : null,
         quantityInPack,
         stock,
         lowStock,
@@ -44,19 +50,35 @@ exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(
 }));
 exports.getItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, sortOptions } = (0, filters_1.getItemsFilter)(req);
+    const companyId = req.headers['companyid'];
+    if (!companyId) {
+        throw new AppError_1.AppError('Company ID is required in headers', 400);
+    }
+    const company = yield models_1.Company.findById(companyId);
+    if (!company) {
+        throw new AppError_1.AppError('Company not found', 400);
+    }
+    const viewingCurrency = company.viewingCurrency || 'USD';
     const page = parseInt(req.query.page, 10) || 1;
     const pagePerLimit = parseInt(req.query.pagePerLimit, 10) || 10;
     const startIndex = (page - 1) * pagePerLimit;
     const endIndex = page * pagePerLimit;
     const items = yield items_model_1.Item.find(query).sort(sortOptions).populate('category');
     const paginatedItems = items.slice(startIndex, endIndex);
+    const convertedItems = yield Promise.all(paginatedItems.map((item) => __awaiter(void 0, void 0, void 0, function* () {
+        item.costPrice = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item.costPrice, viewingCurrency));
+        item.sellingPrice = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item.sellingPrice, viewingCurrency));
+        item.wholesalePrice = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item.wholesalePrice, viewingCurrency));
+        item.currency = viewingCurrency;
+        return item;
+    })));
     const totalPages = Math.ceil(items.length / pagePerLimit);
     const totalItems = items.length - 1;
     const nextPage = page < totalPages ? page + 1 : null;
     const previousPage = page > 1 ? page - 1 : null;
     const currentPage = page;
     res.status(200).json({
-        items: paginatedItems,
+        items: convertedItems,
         totalPages,
         pagePerLimit,
         totalItems,
@@ -67,8 +89,18 @@ exports.getItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(vo
 }));
 exports.getItemByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
+    const companyId = req.headers['companyid'];
+    if (!companyId) {
+        throw new AppError_1.AppError('Company ID is required in headers', 400);
+    }
+    const company = yield models_1.Company.findById(companyId);
+    if (!company) {
+        throw new AppError_1.AppError('Company not found', 400);
+    }
+    const viewingCurrency = company.viewingCurrency || 'USD';
     const item = yield items_model_1.Item.findById(id);
-    res.status(200).json(item);
+    const convertedItem = Object.assign(Object.assign({}, item === null || item === void 0 ? void 0 : item.toObject()), { costPrice: (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item === null || item === void 0 ? void 0 : item.costPrice, viewingCurrency)), sellingPrice: (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item === null || item === void 0 ? void 0 : item.sellingPrice, viewingCurrency)), wholesalePrice: (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item === null || item === void 0 ? void 0 : item.wholesalePrice, viewingCurrency)), currency: viewingCurrency });
+    res.status(200).json(convertedItem);
 }));
 exports.updateItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { image, name, category, unit, sku, weight, description } = req.body;
@@ -102,9 +134,11 @@ exports.updateItemPriceController = (0, tryCatch_1.tryCatch)((req, res) => __awa
     const { costPrice, sellingPrice } = req.body;
     const id = req.params.id;
     const existingItem = yield items_model_1.Item.findById(id);
+    const convertedCostPrice = yield (0, exchangeRate_service_1.convertToCurrency)(costPrice, 'USD');
+    const convertedSellingPrice = yield (0, exchangeRate_service_1.convertToCurrency)(sellingPrice, 'USD');
     if (existingItem !== null) {
-        existingItem.costPrice = costPrice;
-        existingItem.sellingPrice = sellingPrice;
+        existingItem.costPrice = convertedCostPrice;
+        existingItem.sellingPrice = convertedSellingPrice;
         yield existingItem.save();
         return res.json(existingItem);
     }
@@ -148,10 +182,26 @@ exports.archiveItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter
 }));
 exports.getPOSItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, sortOptions } = (0, filters_1.getItemsFilter)(req);
+    const companyId = req.headers['companyid'];
+    if (!companyId) {
+        throw new AppError_1.AppError('Company ID is required in headers', 400);
+    }
+    const company = yield models_1.Company.findById(companyId);
+    if (!company) {
+        throw new AppError_1.AppError('Company not found', 400);
+    }
+    const viewingCurrency = 'NGN';
     const items = yield items_model_1.Item.find(Object.assign(Object.assign({}, query), { archived: false }))
         .sort(sortOptions)
         .populate('category');
-    res.status(200).json(items);
+    const convertedItems = yield Promise.all(items.map((item) => __awaiter(void 0, void 0, void 0, function* () {
+        item.costPrice = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item.costPrice, viewingCurrency));
+        item.sellingPrice = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item.sellingPrice, viewingCurrency));
+        item.wholesalePrice = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item.wholesalePrice, viewingCurrency));
+        item.currency = viewingCurrency;
+        return item;
+    })));
+    res.status(200).json(convertedItems);
 }));
 exports.restockItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { items } = req.body;
