@@ -15,3 +15,7 @@ export interface CreateCompanyInput {
 export interface UpdateViewingCurrencyInput {
   viewingCurrency: string;
 }
+
+export interface UpdateSellingCurrencyInput {
+  sellingCurrency: string;
+}

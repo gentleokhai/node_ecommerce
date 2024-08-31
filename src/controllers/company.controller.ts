@@ -3,7 +3,11 @@ import { Company, Employee } from '../models';
 import { createCompany } from '../services/company.service';
 import { tryCatch } from '../utility/tryCatch';
 import { AppError } from '../utility/AppError';
-import { CreateCompanyInput, UpdateViewingCurrencyInput } from '../dto/company';
+import {
+  CreateCompanyInput,
+  UpdateSellingCurrencyInput,
+  UpdateViewingCurrencyInput,
+} from '../dto/company';
 import { ExchangeRates } from '../models/exchangeRates.model';
 
 export const createCompanyController = tryCatch(
@@ -134,6 +138,38 @@ export const updateViewingCurrencyController = tryCatch(
       await existingCompany.save();
 
       return res.json({ message: 'Viewing currency updated!' });
+    }
+
+    throw new AppError('Company not found', 400);
+  }
+);
+
+export const updateSellingCurrencyController = tryCatch(
+  async (req: Request, res: Response) => {
+    const id = req.headers['companyid'] as string;
+
+    if (!id) {
+      throw new AppError('Company ID is required in headers', 400);
+    }
+
+    const { sellingCurrency } = <UpdateSellingCurrencyInput>req.body;
+
+    const existingCompany = await Company.findById(id);
+
+    const exchangeRate = await ExchangeRates.findOne({
+      currencyCode: sellingCurrency,
+    });
+
+    if (!exchangeRate) {
+      throw new AppError(`${sellingCurrency} not valid`, 400);
+    }
+
+    if (existingCompany !== null) {
+      existingCompany.sellingCurrency = sellingCurrency;
+
+      await existingCompany.save();
+
+      return res.json({ message: 'Selling currency updated!' });
     }
 
     throw new AppError('Company not found', 400);

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ChangePasswordPayload, forgotPasswordPayload } from '../dto/auth';
-import { Employee } from '../models';
+import { Company, Employee } from '../models';
 import { login, signup } from '../services';
 import { AppError } from '../utility/AppError';
 import { tryCatch } from '../utility/tryCatch';
@@ -36,6 +36,11 @@ export const signupController = tryCatch(
 export const loginController = tryCatch(async (req: Request, res: Response) => {
   const existingEmployee = await findEmployee('', req.body.email);
 
+  const existingCompany = await Company.findById(existingEmployee?.company);
+
+  console.log(existingEmployee?.company);
+  console.log(existingCompany);
+
   if (existingEmployee !== null) {
     const loginService = await login(req.body, {
       id: existingEmployee.id,
@@ -49,6 +54,7 @@ export const loginController = tryCatch(async (req: Request, res: Response) => {
         token: loginService.token,
         accessType: existingEmployee.accessType,
         companyId: existingEmployee.company,
+        viewingCurrency: existingCompany?.viewingCurrency,
       });
     } else {
       throw new AppError('Login credentials are not valid', 400);

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateViewingCurrencyController = exports.getCompanyCurrenciesController = exports.getCompanyByIdController = exports.updateCompanyController = exports.createCompanyController = void 0;
+exports.updateSellingCurrencyController = exports.updateViewingCurrencyController = exports.getCompanyCurrenciesController = exports.getCompanyByIdController = exports.updateCompanyController = exports.createCompanyController = void 0;
 const models_1 = require("../models");
 const company_service_1 = require("../services/company.service");
 const tryCatch_1 = require("../utility/tryCatch");
@@ -88,6 +88,26 @@ exports.updateViewingCurrencyController = (0, tryCatch_1.tryCatch)((req, res) =>
         existingCompany.viewingCurrency = viewingCurrency;
         yield existingCompany.save();
         return res.json({ message: 'Viewing currency updated!' });
+    }
+    throw new AppError_1.AppError('Company not found', 400);
+}));
+exports.updateSellingCurrencyController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.headers['companyid'];
+    if (!id) {
+        throw new AppError_1.AppError('Company ID is required in headers', 400);
+    }
+    const { sellingCurrency } = req.body;
+    const existingCompany = yield models_1.Company.findById(id);
+    const exchangeRate = yield exchangeRates_model_1.ExchangeRates.findOne({
+        currencyCode: sellingCurrency,
+    });
+    if (!exchangeRate) {
+        throw new AppError_1.AppError(`${sellingCurrency} not valid`, 400);
+    }
+    if (existingCompany !== null) {
+        existingCompany.sellingCurrency = sellingCurrency;
+        yield existingCompany.save();
+        return res.json({ message: 'Selling currency updated!' });
     }
     throw new AppError_1.AppError('Company not found', 400);
 }));
