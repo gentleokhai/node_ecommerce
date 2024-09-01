@@ -63,6 +63,13 @@ const TransactionsSchema = new mongoose_1.Schema({
             delete ret.updatedAt;
         },
     },
+    toObject: {
+        transform(_, ret) {
+            ret.id = ret._id.toString();
+            delete ret._id;
+            delete ret.__v;
+        },
+    },
     timestamps: true,
 });
 const Transactions = mongoose_1.default.model('transactions', TransactionsSchema);
