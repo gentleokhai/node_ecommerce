@@ -49,6 +49,16 @@ const CustomerSchema = new mongoose_1.Schema({
             delete ret.updatedAt;
         },
     },
+    toObject: {
+        transform(_, ret) {
+            if (ret._id) {
+                ret.id = ret._id.toString();
+            }
+            delete ret.__v;
+            delete ret._id;
+            delete ret.updatedAt;
+        },
+    },
     timestamps: true,
 });
 const Customer = mongoose_1.default.model('customer', CustomerSchema);

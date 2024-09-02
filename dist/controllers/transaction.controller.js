@@ -171,9 +171,9 @@ exports.getTransactionsByDateController = (0, tryCatch_1.tryCatch)((req, res) =>
         const convertedItems = yield Promise.all(transaction.items.map((item) => __awaiter(void 0, void 0, void 0, function* () {
             if (item === null || item === void 0 ? void 0 : item.item) {
                 const convertedPrice = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item.item.sellingPrice, viewingCurrency));
-                return Object.assign(Object.assign({}, item.toObject()), { item: Object.assign(Object.assign({}, item.item.toObject()), { sellingPrice: convertedPrice }) });
+                return Object.assign(Object.assign({}, item.toObject()), { item: Object.assign(Object.assign({}, item.item.toObject()), { sellingPrice: convertedPrice }), id: item._id.toString() });
             }
-            return Object.assign(Object.assign({}, item.toObject()), { item: null });
+            return Object.assign(Object.assign({}, item.toObject()), { item: null, id: item._id.toString() });
         })));
         return Object.assign(Object.assign({}, transaction.toObject()), { items: convertedItems, amount: (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(Number(transaction.amount), viewingCurrency)) });
     })));
@@ -263,9 +263,9 @@ exports.getTransactionsByCustomerController = (0, tryCatch_1.tryCatch)((req, res
         const convertedItems = yield Promise.all(transaction.items.map((item) => __awaiter(void 0, void 0, void 0, function* () {
             if (item === null || item === void 0 ? void 0 : item.item) {
                 const convertedPrice = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(item.item.sellingPrice, viewingCurrency));
-                return Object.assign(Object.assign({}, item.toObject()), { item: Object.assign(Object.assign({}, item.item.toObject()), { sellingPrice: convertedPrice }) });
+                return Object.assign(Object.assign({}, item.toObject()), { item: Object.assign(Object.assign({}, item.item.toObject()), { sellingPrice: convertedPrice }), id: item._id.toString() });
             }
-            return Object.assign(Object.assign({}, item.toObject()), { item: null });
+            return Object.assign(Object.assign({}, item.toObject()), { item: null, id: item._id.toString() });
         })));
         return Object.assign(Object.assign({}, transaction.toObject()), { items: convertedItems, amount: (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(Number(transaction.amount), viewingCurrency)) });
     })));

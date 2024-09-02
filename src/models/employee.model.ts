@@ -65,6 +65,16 @@ const EmployeeSchema = new Schema(
         delete ret.createdAt, delete ret.updatedAt;
       },
     },
+    toObject: {
+      transform(_, ret) {
+        if (ret._id) {
+          ret.id = ret._id.toString();
+        }
+        delete ret.__v;
+        delete ret._id;
+        delete ret.createdAt, delete ret.updatedAt;
+      },
+    },
     timestamps: true,
   }
 );

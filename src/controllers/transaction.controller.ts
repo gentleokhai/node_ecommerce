@@ -260,18 +260,21 @@ export const getTransactionsByDateController = tryCatch(
                   viewingCurrency
                 )
               );
+
               return {
                 ...item.toObject(),
                 item: {
                   ...item.item.toObject(),
                   sellingPrice: convertedPrice,
                 },
+                id: item._id.toString(),
               };
             }
 
             return {
               ...item.toObject(),
               item: null,
+              id: item._id.toString(),
             };
           })
         );
@@ -438,12 +441,14 @@ export const getTransactionsByCustomerController = tryCatch(
                   ...item.item.toObject(),
                   sellingPrice: convertedPrice,
                 },
+                id: item._id.toString(),
               };
             }
 
             return {
               ...item.toObject(),
               item: null,
+              id: item._id.toString(),
             };
           })
         );
