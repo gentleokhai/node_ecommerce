@@ -20,3 +20,4 @@ router.patch('/sellingCurrency', company_controller_1.updateSellingCurrencyContr
 router.patch('', company_validator_1.updateCompanyValidator, company_controller_1.updateCompanyController);
 router.get('/currencies', company_controller_1.getCompanyCurrenciesController);
 router.get('', company_controller_1.getCompanyByIdController);
+router.get('/rate', company_controller_1.getExchangeRateController);

@@ -9,6 +9,13 @@ import {
   UpdateViewingCurrencyInput,
 } from '../dto/company';
 import { ExchangeRates } from '../models/exchangeRates.model';
+import axios from 'axios';
+import dotenv from 'dotenv';
+
+const API_URL = process.env.EXCHANGE_RATES_URL as string;
+const API_KEY = process.env.EXCHANGE_RATES_KEY as string;
+
+dotenv.config();
 
 export const createCompanyController = tryCatch(
   async (req: Request, res: Response) => {
@@ -173,5 +180,47 @@ export const updateSellingCurrencyController = tryCatch(
     }
 
     throw new AppError('Company not found', 400);
+  }
+);
+
+export const getExchangeRateController = tryCatch(
+  async (req: Request, res: Response) => {
+    const id = req.headers['companyid'] as string;
+
+    if (!id) {
+      throw new AppError('Company ID is required in headers', 400);
+    }
+
+    const currencies = await Company.findById(id).select(
+      'buyingCurrency sellingCurrency'
+    );
+
+    try {
+      const response = await axios.get(API_URL, {
+        params: {
+          base_currency: currencies?.buyingCurrency,
+        },
+        headers: {
+          apikey: API_KEY,
+        },
+      });
+
+      if (response.status === 200) {
+        const exchangeData = response.data.data;
+
+        const exchangeRate = {
+          baseCurrency: currencies?.buyingCurrency,
+          currencyCode:
+            exchangeData[currencies?.sellingCurrency as string].code,
+          value: exchangeData[currencies?.sellingCurrency as string].value,
+        };
+
+        res.status(200).json(exchangeRate);
+      } else {
+        throw new AppError('Failed to fetch exchange rates', 400);
+      }
+    } catch (err) {
+      throw new AppError('Failed to fetch exchange rates', 400);
+    }
   }
 );

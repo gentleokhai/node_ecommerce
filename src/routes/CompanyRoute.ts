@@ -3,6 +3,7 @@ import {
   createCompanyController,
   getCompanyByIdController,
   getCompanyCurrenciesController,
+  getExchangeRateController,
   updateCompanyController,
   updateSellingCurrencyController,
   updateViewingCurrencyController,
@@ -26,5 +27,6 @@ router.patch('/sellingCurrency', updateSellingCurrencyController);
 router.patch('', updateCompanyValidator, updateCompanyController);
 router.get('/currencies', getCompanyCurrenciesController);
 router.get('', getCompanyByIdController);
+router.get('/rate', getExchangeRateController);
 
 export { router as CompanyRoute };

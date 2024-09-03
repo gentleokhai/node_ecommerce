@@ -8,13 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateSellingCurrencyController = exports.updateViewingCurrencyController = exports.getCompanyCurrenciesController = exports.getCompanyByIdController = exports.updateCompanyController = exports.createCompanyController = void 0;
+exports.getExchangeRateController = exports.updateSellingCurrencyController = exports.updateViewingCurrencyController = exports.getCompanyCurrenciesController = exports.getCompanyByIdController = exports.updateCompanyController = exports.createCompanyController = void 0;
 const models_1 = require("../models");
 const company_service_1 = require("../services/company.service");
 const tryCatch_1 = require("../utility/tryCatch");
 const AppError_1 = require("../utility/AppError");
 const exchangeRates_model_1 = require("../models/exchangeRates.model");
+const axios_1 = __importDefault(require("axios"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const API_URL = process.env.EXCHANGE_RATES_URL;
+const API_KEY = process.env.EXCHANGE_RATES_KEY;
+dotenv_1.default.config();
 exports.createCompanyController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
     if (!user) {
@@ -110,4 +118,36 @@ exports.updateSellingCurrencyController = (0, tryCatch_1.tryCatch)((req, res) =>
         return res.json({ message: 'Selling currency updated!' });
     }
     throw new AppError_1.AppError('Company not found', 400);
+}));
+exports.getExchangeRateController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.headers['companyid'];
+    if (!id) {
+        throw new AppError_1.AppError('Company ID is required in headers', 400);
+    }
+    const currencies = yield models_1.Company.findById(id).select('buyingCurrency sellingCurrency');
+    try {
+        const response = yield axios_1.default.get(API_URL, {
+            params: {
+                base_currency: currencies === null || currencies === void 0 ? void 0 : currencies.buyingCurrency,
+            },
+            headers: {
+                apikey: API_KEY,
+            },
+        });
+        if (response.status === 200) {
+            const exchangeData = response.data.data;
+            const exchangeRate = {
+                baseCurrency: currencies === null || currencies === void 0 ? void 0 : currencies.buyingCurrency,
+                currencyCode: exchangeData[currencies === null || currencies === void 0 ? void 0 : currencies.sellingCurrency].code,
+                value: exchangeData[currencies === null || currencies === void 0 ? void 0 : currencies.sellingCurrency].value,
+            };
+            res.status(200).json(exchangeRate);
+        }
+        else {
+            throw new AppError_1.AppError('Failed to fetch exchange rates', 400);
+        }
+    }
+    catch (err) {
+        throw new AppError_1.AppError('Failed to fetch exchange rates', 400);
+    }
 }));
