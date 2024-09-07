@@ -28,6 +28,7 @@ const CustomerSchema = new Schema(
     firstVisited: { type: Date, default: Date.now },
     lastVisited: { type: Date, default: Date.now },
     totalSpend: { type: Number },
+    company: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
   },
   {
     toJSON: {

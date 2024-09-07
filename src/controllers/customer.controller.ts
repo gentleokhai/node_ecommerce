@@ -8,6 +8,7 @@ import {
 } from '../dto/customer/types';
 import { getCustomersFilter } from '../dto/customer/filters';
 import { Notes } from '../models/notes.model';
+import { Company } from '../models';
 
 export const FindCustomer = async (id: string | undefined, email?: string) => {
   if (email) {
@@ -20,6 +21,8 @@ export const FindCustomer = async (id: string | undefined, email?: string) => {
 export const createCustomerController = tryCatch(
   async (req: Request<any, any, CreateCustomerInput>, res: Response) => {
     const { email, phoneNumber, firstName, lastName, gender, group } = req.body;
+
+    const company = req.company;
 
     const employeeId = req.user?.id;
 
@@ -36,6 +39,7 @@ export const createCustomerController = tryCatch(
       gender,
       createdBy: employeeId,
       group,
+      company: company?._id,
     });
 
     res.status(201).json(createdCustomer);
@@ -69,7 +73,9 @@ export const getCustomersController = tryCatch(
   async (req: Request, res: Response) => {
     const { query } = getCustomersFilter(req);
 
-    const customers = await Customer.find(query)
+    const company = req.company;
+
+    const customers = await Customer.find({ ...query, company: company?._id })
       .populate([
         {
           path: 'createdBy',
@@ -100,7 +106,12 @@ export const getCustomerByIdController = tryCatch(
   async (req: Request, res: Response) => {
     const id = req.params.id;
 
-    const customer = await Customer.findById(id).populate([
+    const company = req.company;
+
+    const customer = await Customer.findOne({
+      _id: id,
+      company: company?._id,
+    }).populate([
       {
         path: 'createdBy',
         select: 'firstName lastName id',
@@ -146,9 +157,12 @@ export const createNotesController = tryCatch(
 
     const id = req.params.id;
 
+    const company = req.company;
+
     const newNote = await Notes.create({
       note: note,
       createdBy: employeeId,
+      company: company?._id,
     });
 
     const existingCustomer = await FindCustomer(id);

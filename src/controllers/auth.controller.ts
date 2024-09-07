@@ -38,9 +38,6 @@ export const loginController = tryCatch(async (req: Request, res: Response) => {
 
   const existingCompany = await Company.findById(existingEmployee?.company);
 
-  console.log(existingEmployee?.company);
-  console.log(existingCompany);
-
   if (existingEmployee !== null) {
     const loginService = await login(req.body, {
       id: existingEmployee.id,

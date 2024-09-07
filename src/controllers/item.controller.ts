@@ -12,8 +12,10 @@ import { Item } from '../models/items.model';
 import { createItem } from '../services/item.service';
 import { tryCatch } from '../utility/tryCatch';
 import { AppError } from '../utility/AppError';
-import { convertToCurrency } from '../services/exchangeRate.service';
-import { Company } from '../models';
+import {
+  convertNGNToUSD,
+  convertToCurrency,
+} from '../services/exchangeRate.service';
 import { roundUp } from '../utility/helpers';
 
 export const createItemController = tryCatch(
@@ -35,6 +37,8 @@ export const createItemController = tryCatch(
       lowStock,
     } = req.body;
 
+    const company = req.company;
+
     const existingItem = await Item.findOne({ name: name });
 
     if (existingItem !== null)
@@ -46,12 +50,11 @@ export const createItemController = tryCatch(
 
     const cloudImage = await uploader(buffer);
 
-    const convertedCostPrice = await convertToCurrency(costPrice, 'USD');
-    const convertedSellingPrice = await convertToCurrency(sellingPrice, 'USD');
+    const convertedCostPrice = await convertNGNToUSD(costPrice);
+    const convertedSellingPrice = await convertNGNToUSD(sellingPrice);
 
-    const convertedWholesalePrice = await convertToCurrency(
-      wholesalePrice as number,
-      'USD'
+    const convertedWholesalePrice = await convertNGNToUSD(
+      wholesalePrice as number
     );
 
     const createItemService = await createItem({
@@ -69,6 +72,7 @@ export const createItemController = tryCatch(
       quantityInPack,
       stock,
       lowStock,
+      company: company?._id,
     });
 
     res.status(201).json(createItemService);
@@ -79,25 +83,17 @@ export const getItemsController = tryCatch(
   async (req: Request, res: Response) => {
     const { query, sortOptions } = getItemsFilter(req);
 
-    const companyId = req.headers['companyid'] as string;
+    const company = req.company;
 
-    if (!companyId) {
-      throw new AppError('Company ID is required in headers', 400);
-    }
-
-    const company = await Company.findById(companyId);
-
-    if (!company) {
-      throw new AppError('Company not found', 400);
-    }
-
-    const viewingCurrency = company.viewingCurrency || 'USD';
+    const viewingCurrency = company?.viewingCurrency || 'USD';
 
     const page = parseInt(req.query.page as string, 10) || 1;
     const pagePerLimit = parseInt(req.query.pagePerLimit as string, 10) || 10;
 
     const startIndex = (page - 1) * pagePerLimit;
     const endIndex = page * pagePerLimit;
+
+    query.company = company?._id;
 
     const items = await Item.find(query).sort(sortOptions).populate('category');
 
@@ -141,21 +137,14 @@ export const getItemsController = tryCatch(
 export const getItemByIdController = tryCatch(
   async (req: Request, res: Response) => {
     const id = req.params.id;
-    const companyId = req.headers['companyid'] as string;
+    const company = req.company;
 
-    if (!companyId) {
-      throw new AppError('Company ID is required in headers', 400);
-    }
+    const viewingCurrency = company?.viewingCurrency || 'USD';
 
-    const company = await Company.findById(companyId);
-
-    if (!company) {
-      throw new AppError('Company not found', 400);
-    }
-
-    const viewingCurrency = company.viewingCurrency || 'USD';
-
-    const item = await Item.findById(id);
+    const item = await Item.findOne({
+      _id: id,
+      company: company?._id,
+    });
 
     const convertedItem = {
       ...item?.toObject(),
@@ -222,8 +211,8 @@ export const updateItemPriceController = tryCatch(
 
     const existingItem = await Item.findById(id);
 
-    const convertedCostPrice = await convertToCurrency(costPrice, 'USD');
-    const convertedSellingPrice = await convertToCurrency(sellingPrice, 'USD');
+    const convertedCostPrice = await convertNGNToUSD(costPrice);
+    const convertedSellingPrice = await convertNGNToUSD(sellingPrice);
 
     if (existingItem !== null) {
       existingItem.costPrice = convertedCostPrice;
@@ -295,21 +284,15 @@ export const getPOSItemsController = tryCatch(
   async (req: Request, res: Response) => {
     const { query, sortOptions } = getItemsFilter(req);
 
-    const companyId = req.headers['companyid'] as string;
-
-    if (!companyId) {
-      throw new AppError('Company ID is required in headers', 400);
-    }
-
-    const company = await Company.findById(companyId);
-
-    if (!company) {
-      throw new AppError('Company not found', 400);
-    }
+    const company = req.company;
 
     const viewingCurrency = 'NGN';
 
-    const items = await Item.find({ ...query, archived: false })
+    const items = await Item.find({
+      ...query,
+      archived: false,
+      company: company?._id,
+    })
       .sort(sortOptions)
       .populate('category');
 

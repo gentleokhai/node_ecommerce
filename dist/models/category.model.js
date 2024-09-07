@@ -27,6 +27,10 @@ exports.Category = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const CategorySchema = new mongoose_1.Schema({
     name: { type: String },
+    company: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'company',
+    },
 }, {
     toJSON: {
         transform(_, ret) {

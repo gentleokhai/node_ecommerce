@@ -15,13 +15,18 @@ const tryCatch_1 = require("../utility/tryCatch");
 const AppError_1 = require("../utility/AppError");
 exports.createJobController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = req.body;
+    const company = req.company;
     const existingJob = yield jobs_model_1.Jobs.findOne({ name: name });
     if (existingJob !== null)
         throw new AppError_1.AppError('A job already exists with this title', 400);
-    const createJobService = yield jobs_model_1.Jobs.create({ name: name });
+    const createJobService = yield jobs_model_1.Jobs.create({
+        name: name,
+        company: company === null || company === void 0 ? void 0 : company._id,
+    });
     res.status(201).json(createJobService);
 }));
 exports.getJobsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const jobs = yield jobs_model_1.Jobs.find();
+    const company = req.company;
+    const jobs = yield jobs_model_1.Jobs.find({ company: company === null || company === void 0 ? void 0 : company._id });
     res.status(200).json(jobs);
 }));

@@ -15,6 +15,24 @@ export type CreateItem = {
   lowStock: number;
 };
 
+export type CreateItemService = {
+  image?: string;
+  name: string;
+  category: string;
+  unit: string;
+  sku: string;
+  weight: number | null;
+  currency: string;
+  description: string;
+  costPrice: number;
+  sellingPrice: number;
+  wholesalePrice: number | null;
+  quantityInPack: number | null;
+  stock: number;
+  lowStock: number;
+  company: string;
+};
+
 export type UpdateItem = {
   image: string;
   name: string;
@@ -40,6 +58,7 @@ export interface FilterTypes {
   status?: { $in: string[] };
   keyword?: string;
   archived?: boolean;
+  company?: string;
 }
 
 export interface RestockPayload {

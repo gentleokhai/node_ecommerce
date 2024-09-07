@@ -7,8 +7,12 @@ import { Group } from '../models/group.model';
 export const createGroupController = tryCatch(
   async (req: Request<any, any, CreateGroup>, res: Response) => {
     const { name } = req.body;
+    const company = req.company;
 
-    const existingGroup = await Group.findOne({ name: name });
+    const existingGroup = await Group.findOne({
+      name: name,
+      company: company?._id,
+    });
 
     if (existingGroup !== null)
       throw new AppError('A group already exists with this title', 400);
@@ -21,7 +25,9 @@ export const createGroupController = tryCatch(
 
 export const getGroupController = tryCatch(
   async (req: Request, res: Response) => {
-    const groups = await Group.find();
+    const company = req.company;
+
+    const groups = await Group.find({ company: company?._id });
 
     res.status(200).json(groups);
   }

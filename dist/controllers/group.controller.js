@@ -15,13 +15,18 @@ const AppError_1 = require("../utility/AppError");
 const group_model_1 = require("../models/group.model");
 exports.createGroupController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = req.body;
-    const existingGroup = yield group_model_1.Group.findOne({ name: name });
+    const company = req.company;
+    const existingGroup = yield group_model_1.Group.findOne({
+        name: name,
+        company: company === null || company === void 0 ? void 0 : company._id,
+    });
     if (existingGroup !== null)
         throw new AppError_1.AppError('A group already exists with this title', 400);
     const createGroupService = yield group_model_1.Group.create({ name: name });
     res.status(201).json(createGroupService);
 }));
 exports.getGroupController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const groups = yield group_model_1.Group.find();
+    const company = req.company;
+    const groups = yield group_model_1.Group.find({ company: company === null || company === void 0 ? void 0 : company._id });
     res.status(200).json(groups);
 }));

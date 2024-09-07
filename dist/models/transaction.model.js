@@ -54,6 +54,7 @@ const TransactionsSchema = new mongoose_1.Schema({
     typeOfTransaction: { type: String },
     cashier: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'employee' },
     amount: { type: Number },
+    company: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'company' },
 }, {
     toJSON: {
         transform(_, ret) {

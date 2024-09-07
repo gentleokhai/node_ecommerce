@@ -28,6 +28,7 @@ const mongoose_1 = __importStar(require("mongoose"));
 const NoteSchema = new mongoose_1.Schema({
     note: { type: String },
     createdBy: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'employee' },
+    company: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'company' },
 }, {
     toJSON: {
         transform(_, ret) {

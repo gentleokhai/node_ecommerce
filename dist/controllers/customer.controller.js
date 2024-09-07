@@ -27,6 +27,7 @@ exports.FindCustomer = FindCustomer;
 exports.createCustomerController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { email, phoneNumber, firstName, lastName, gender, group } = req.body;
+    const company = req.company;
     const employeeId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
     const existingUser = yield (0, exports.FindCustomer)('', email);
     if (existingUser !== null)
@@ -39,6 +40,7 @@ exports.createCustomerController = (0, tryCatch_1.tryCatch)((req, res) => __awai
         gender,
         createdBy: employeeId,
         group,
+        company: company === null || company === void 0 ? void 0 : company._id,
     });
     res.status(201).json(createdCustomer);
 }));
@@ -59,7 +61,8 @@ exports.updateCustomerController = (0, tryCatch_1.tryCatch)((req, res) => __awai
 }));
 exports.getCustomersController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query } = (0, filters_1.getCustomersFilter)(req);
-    const customers = yield customer_model_1.Customer.find(query)
+    const company = req.company;
+    const customers = yield customer_model_1.Customer.find(Object.assign(Object.assign({}, query), { company: company === null || company === void 0 ? void 0 : company._id }))
         .populate([
         {
             path: 'createdBy',
@@ -85,7 +88,11 @@ exports.getCustomersController = (0, tryCatch_1.tryCatch)((req, res) => __awaite
 }));
 exports.getCustomerByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const customer = yield customer_model_1.Customer.findById(id).populate([
+    const company = req.company;
+    const customer = yield customer_model_1.Customer.findOne({
+        _id: id,
+        company: company === null || company === void 0 ? void 0 : company._id,
+    }).populate([
         {
             path: 'createdBy',
             select: 'firstName lastName id',
@@ -120,9 +127,11 @@ exports.createNotesController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter
     const { note } = req.body;
     const employeeId = (_b = req.user) === null || _b === void 0 ? void 0 : _b.id;
     const id = req.params.id;
+    const company = req.company;
     const newNote = yield notes_model_1.Notes.create({
         note: note,
         createdBy: employeeId,
+        company: company === null || company === void 0 ? void 0 : company._id,
     });
     const existingCustomer = yield (0, exports.FindCustomer)(id);
     if (existingCustomer) {

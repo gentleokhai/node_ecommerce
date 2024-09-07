@@ -15,14 +15,23 @@ const tryCatch_1 = require("../utility/tryCatch");
 const AppError_1 = require("../utility/AppError");
 exports.createCategoryController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name } = req.body;
-    const existingCategory = yield category_model_1.Category.findOne({ name });
+    const company = req.company;
+    const existingCategory = yield category_model_1.Category.findOne({
+        name,
+    });
     if (existingCategory) {
         throw new AppError_1.AppError('A category already exists with this name', 400);
     }
-    const createCategoryService = yield category_model_1.Category.create({ name });
+    const createCategoryService = yield category_model_1.Category.create({
+        name,
+        company: company === null || company === void 0 ? void 0 : company._id,
+    });
     res.status(201).json(createCategoryService);
 }));
 exports.getCategoryController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const category = yield category_model_1.Category.find();
+    const company = req.company;
+    const category = yield category_model_1.Category.find({
+        company: company === null || company === void 0 ? void 0 : company._id,
+    });
     res.status(200).json(category);
 }));

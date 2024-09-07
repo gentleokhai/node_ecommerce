@@ -34,10 +34,11 @@ const FindEmployee = (id, email) => __awaiter(void 0, void 0, void 0, function* 
 exports.FindEmployee = FindEmployee;
 exports.createEmployeeController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
+    const company = req.company;
     const existingUser = yield (0, exports.FindEmployee)('', email);
     if (existingUser !== null)
         throw new AppError_1.AppError('An account already exists with this email', 400);
-    const employee = yield (0, services_1.createEmployee)(req.body);
+    const employee = yield (0, services_1.createEmployee)(Object.assign(Object.assign({}, req.body), { company: company === null || company === void 0 ? void 0 : company._id }));
     const token = (0, generate_token_1.generateToken)(email);
     employee.verificationToken = token;
     employee.tokenExpiration = new Date(Date.now() + 3600000); // 1 hour from now
@@ -108,11 +109,12 @@ exports.updateEmployeeOnboardingController = (0, tryCatch_1.tryCatch)((req, res)
 }));
 exports.getEmployeesController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { query, sortOptions } = (0, filters_1.getEmployeesFilter)(req);
+    const company = req.company;
     const page = parseInt(req.query.page, 10) || 1;
     const pagePerLimit = parseInt(req.query.pagePerLimit, 10) || 10;
     const startIndex = (page - 1) * pagePerLimit;
     const endIndex = page * pagePerLimit;
-    const employees = yield models_1.Employee.find(query)
+    const employees = yield models_1.Employee.find(Object.assign(Object.assign({}, query), { company: company === null || company === void 0 ? void 0 : company._id }))
         .sort(sortOptions)
         .select('-password -salt -tokenExpiration -verificationToken')
         .populate('jobTitle');
@@ -134,7 +136,11 @@ exports.getEmployeesController = (0, tryCatch_1.tryCatch)((req, res) => __awaite
 }));
 exports.getEmployeeByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const employee = yield models_1.Employee.findById(id)
+    const company = req.company;
+    const employee = yield models_1.Employee.findOne({
+        _id: id,
+        company: company === null || company === void 0 ? void 0 : company._id,
+    })
         .select('-password -salt -tokenExpiration -verificationToken')
         .populate('jobTitle')
         .populate({

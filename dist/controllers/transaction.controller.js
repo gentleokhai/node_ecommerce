@@ -22,18 +22,10 @@ const items_model_1 = require("../models/items.model");
 const mongoose_1 = __importDefault(require("mongoose"));
 const helpers_1 = require("../utility/helpers");
 const exchangeRate_service_1 = require("../services/exchangeRate.service");
-const models_1 = require("../models");
 exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { customerId, items, methodOfPayment, typeOfTransaction, cashierId } = req.body;
-    const companyId = req.headers['companyid'];
-    if (!companyId) {
-        throw new AppError_1.AppError('Company ID is required in headers', 400);
-    }
-    const company = yield models_1.Company.findById(companyId);
-    if (!company) {
-        throw new AppError_1.AppError('Company not found', 400);
-    }
+    const company = req.company;
     if (!Array.isArray(items) || items.length === 0) {
         throw new AppError_1.AppError('Items array is required and cannot be empty', 400);
     }
@@ -59,6 +51,7 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
                 typeOfTransaction,
                 cashier: cashierId,
                 amount: (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(Number(totalAmount), viewingCurrency)),
+                company: company === null || company === void 0 ? void 0 : company._id,
             },
         ], { session });
         if (customer) {
@@ -104,16 +97,11 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
     }
 }));
 exports.getTransactionsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const companyId = req.headers['companyid'];
-    if (!companyId) {
-        throw new AppError_1.AppError('Company ID is required in headers', 400);
-    }
-    const company = yield models_1.Company.findById(companyId);
-    if (!company) {
-        throw new AppError_1.AppError('Company not found', 400);
-    }
-    const viewingCurrency = company.viewingCurrency || 'USD';
-    const transactions = yield transaction_model_1.Transactions.find()
+    const company = req.company;
+    const viewingCurrency = (company === null || company === void 0 ? void 0 : company.viewingCurrency) || 'USD';
+    const transactions = yield transaction_model_1.Transactions.find({
+        company: company === null || company === void 0 ? void 0 : company._id,
+    })
         .populate([
         {
             path: 'cashier',
@@ -142,16 +130,11 @@ exports.getTransactionsController = (0, tryCatch_1.tryCatch)((req, res) => __awa
     res.status(200).json(convertedTransactions);
 }));
 exports.getTransactionsByDateController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const companyId = req.headers['companyid'];
-    if (!companyId) {
-        throw new AppError_1.AppError('Company ID is required in headers', 400);
-    }
-    const company = yield models_1.Company.findById(companyId);
-    if (!company) {
-        throw new AppError_1.AppError('Company not found', 400);
-    }
-    const viewingCurrency = company.viewingCurrency || 'USD';
-    const transactions = yield transaction_model_1.Transactions.find()
+    const company = req.company;
+    const viewingCurrency = (company === null || company === void 0 ? void 0 : company.viewingCurrency) || 'USD';
+    const transactions = yield transaction_model_1.Transactions.find({
+        company: company === null || company === void 0 ? void 0 : company._id,
+    })
         .populate([
         {
             path: 'cashier',
@@ -190,16 +173,13 @@ exports.getTransactionsByDateController = (0, tryCatch_1.tryCatch)((req, res) =>
 }));
 exports.getTransactionsByIdController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const transactionId = req.params.id;
-    const companyId = req.headers['companyid'];
-    if (!companyId) {
-        throw new AppError_1.AppError('Company ID is required in headers', 400);
-    }
-    const company = yield models_1.Company.findById(companyId);
-    if (!company) {
-        throw new AppError_1.AppError('Company not found', 400);
-    }
-    const viewingCurrency = company.viewingCurrency || 'USD';
-    const transaction = yield transaction_model_1.Transactions.findById(transactionId).populate([
+    const company = req.company;
+    const viewingCurrency = (company === null || company === void 0 ? void 0 : company.viewingCurrency) || 'USD';
+    const transaction = yield transaction_model_1.Transactions.find({
+        company: company === null || company === void 0 ? void 0 : company._id,
+    })
+        .findById(transactionId)
+        .populate([
         {
             path: 'cashier',
             select: 'firstName lastName id',
@@ -232,16 +212,12 @@ exports.getTransactionsByIdController = (0, tryCatch_1.tryCatch)((req, res) => _
 }));
 exports.getTransactionsByCustomerController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const customer = req.params.id;
-    const companyId = req.headers['companyid'];
-    if (!companyId) {
-        throw new AppError_1.AppError('Company ID is required in headers', 400);
-    }
-    const company = yield models_1.Company.findById(companyId);
-    if (!company) {
-        throw new AppError_1.AppError('Company not found', 400);
-    }
-    const viewingCurrency = company.viewingCurrency || 'USD';
-    const transactions = yield transaction_model_1.Transactions.find({ customer }).populate([
+    const company = req.company;
+    const viewingCurrency = (company === null || company === void 0 ? void 0 : company.viewingCurrency) || 'USD';
+    const transactions = yield transaction_model_1.Transactions.find({
+        customer,
+        company: company === null || company === void 0 ? void 0 : company._id,
+    }).populate([
         {
             path: 'cashier',
             select: 'firstName lastName id',
@@ -274,6 +250,7 @@ exports.getTransactionsByCustomerController = (0, tryCatch_1.tryCatch)((req, res
 exports.refundTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
     const { items, typeOfTransaction } = req.body;
+    const company = req.company;
     const transactionId = req.params.id;
     const existingTransaction = yield transaction_model_1.Transactions.findById(transactionId);
     if (!Array.isArray(items) || items.length === 0) {
@@ -337,6 +314,7 @@ exports.refundTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
                 typeOfTransaction,
                 cashier: existingTransaction === null || existingTransaction === void 0 ? void 0 : existingTransaction.cashier,
                 amount: Number(totalRefundAmount),
+                company: company === null || company === void 0 ? void 0 : company._id,
             },
         ], { session });
         yield session.commitTransaction();

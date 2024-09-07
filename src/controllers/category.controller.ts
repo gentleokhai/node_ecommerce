@@ -7,14 +7,20 @@ import { AppError } from '../utility/AppError';
 export const createCategoryController = tryCatch(
   async (req: Request<any, any, CreateCategory>, res: Response) => {
     const { name } = req.body;
+    const company = req.company;
 
-    const existingCategory = await Category.findOne({ name });
+    const existingCategory = await Category.findOne({
+      name,
+    });
 
     if (existingCategory) {
       throw new AppError('A category already exists with this name', 400);
     }
 
-    const createCategoryService = await Category.create({ name });
+    const createCategoryService = await Category.create({
+      name,
+      company: company?._id,
+    });
 
     res.status(201).json(createCategoryService);
   }
@@ -22,7 +28,11 @@ export const createCategoryController = tryCatch(
 
 export const getCategoryController = tryCatch(
   async (req: Request, res: Response) => {
-    const category = await Category.find();
+    const company = req.company;
+
+    const category = await Category.find({
+      company: company?._id,
+    });
 
     res.status(200).json(category);
   }

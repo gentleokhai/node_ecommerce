@@ -7,7 +7,7 @@ import {
   UpdateEmployeeOnboardingInput,
 } from '../dto/employee';
 import { getEmployeesFilter } from '../dto/employee/filters';
-import { Employee } from '../models';
+import { Company, Employee } from '../models';
 import { createEmployee } from '../services';
 import { tryCatch } from '../utility/tryCatch';
 import { AppError } from '../utility/AppError';
@@ -30,12 +30,17 @@ export const createEmployeeController = tryCatch(
   async (req: Request<any, any, CreateEmployeeInput>, res: Response) => {
     const { email } = req.body;
 
+    const company = req.company;
+
     const existingUser = await FindEmployee('', email);
 
     if (existingUser !== null)
       throw new AppError('An account already exists with this email', 400);
 
-    const employee = await createEmployee(req.body);
+    const employee = await createEmployee({
+      ...req.body,
+      company: company?._id,
+    });
 
     const token = generateToken(email);
 
@@ -148,13 +153,15 @@ export const getEmployeesController = tryCatch(
   async (req: Request, res: Response) => {
     const { query, sortOptions } = getEmployeesFilter(req);
 
+    const company = req.company;
+
     const page = parseInt(req.query.page as string, 10) || 1;
     const pagePerLimit = parseInt(req.query.pagePerLimit as string, 10) || 10;
 
     const startIndex = (page - 1) * pagePerLimit;
     const endIndex = page * pagePerLimit;
 
-    const employees = await Employee.find(query)
+    const employees = await Employee.find({ ...query, company: company?._id })
       .sort(sortOptions)
       .select('-password -salt -tokenExpiration -verificationToken')
       .populate('jobTitle');
@@ -184,7 +191,12 @@ export const getEmployeeByIdController = tryCatch(
   async (req: Request, res: Response) => {
     const id = req.params.id;
 
-    const employee = await Employee.findById(id)
+    const company = req.company;
+
+    const employee = await Employee.findOne({
+      _id: id,
+      company: company?._id,
+    })
       .select('-password -salt -tokenExpiration -verificationToken')
       .populate('jobTitle')
       .populate({

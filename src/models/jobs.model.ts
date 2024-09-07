@@ -7,6 +7,10 @@ interface JobsDoc extends Document {
 const JobsSchema = new Schema(
   {
     name: { type: String },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'company',
+    },
   },
   {
     toJSON: {

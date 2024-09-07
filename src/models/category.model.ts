@@ -7,6 +7,10 @@ interface CategoryDoc extends Document {
 const CategorySchema = new Schema(
   {
     name: { type: String },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'company',
+    },
   },
   {
     toJSON: {

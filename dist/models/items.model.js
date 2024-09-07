@@ -44,6 +44,10 @@ const ItemSchema = new mongoose_1.Schema({
     stock: { type: Number, default: null },
     lowStock: { type: Number, default: null },
     archived: { type: Boolean, default: false },
+    company: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'company',
+    },
 }, {
     toJSON: {
         transform(_, ret) {

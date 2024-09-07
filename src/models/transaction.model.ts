@@ -15,6 +15,7 @@ interface TransactionsDoc extends Document {
   amount: number;
   createdAt: string;
   items: Item[];
+  company: string;
 }
 
 const ItemSchema: Schema = new Schema(
@@ -51,6 +52,7 @@ const TransactionsSchema = new Schema(
     typeOfTransaction: { type: String },
     cashier: { type: mongoose.Schema.Types.ObjectId, ref: 'employee' },
     amount: { type: Number },
+    company: { type: mongoose.Schema.Types.ObjectId, ref: 'company' },
   },
   {
     toJSON: {

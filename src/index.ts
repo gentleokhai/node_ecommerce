@@ -10,6 +10,7 @@ import errorHandler from './middlewares/errorHandler';
 import { CustomerRoute } from './routes/CustomerRoute';
 import { TransactionRoute } from './routes/transactionRoute';
 import './jobs/cron';
+import { validateCompany } from './middlewares/validateCompany';
 
 const corsOptions = {
   origin: '*',
@@ -38,8 +39,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 app.use('/auth', AuthRoute);
-app.use('/employee', EmployeeRoute);
 app.use('/company', CompanyRoute);
+
+app.use(validateCompany);
+app.use('/employee', EmployeeRoute);
 app.use('/item', ItemRoute);
 app.use('/customer', CustomerRoute);
 app.use('/transactions', TransactionRoute);

@@ -21,17 +21,7 @@ export const createTransactionController = tryCatch(
     const { customerId, items, methodOfPayment, typeOfTransaction, cashierId } =
       req.body;
 
-    const companyId = req.headers['companyid'] as string;
-
-    if (!companyId) {
-      throw new AppError('Company ID is required in headers', 400);
-    }
-
-    const company = await Company.findById(companyId);
-
-    if (!company) {
-      throw new AppError('Company not found', 400);
-    }
+    const company = req.company;
 
     if (!Array.isArray(items) || items.length === 0) {
       throw new AppError('Items array is required and cannot be empty', 400);
@@ -71,6 +61,7 @@ export const createTransactionController = tryCatch(
             amount: roundUp(
               await convertToCurrency(Number(totalAmount), viewingCurrency)
             ),
+            company: company?._id,
           },
         ],
         { session }
@@ -143,21 +134,13 @@ export const createTransactionController = tryCatch(
 
 export const getTransactionsController = tryCatch(
   async (req: Request, res: Response) => {
-    const companyId = req.headers['companyid'] as string;
+    const company = req.company;
 
-    if (!companyId) {
-      throw new AppError('Company ID is required in headers', 400);
-    }
+    const viewingCurrency = company?.viewingCurrency || 'USD';
 
-    const company = await Company.findById(companyId);
-
-    if (!company) {
-      throw new AppError('Company not found', 400);
-    }
-
-    const viewingCurrency = company.viewingCurrency || 'USD';
-
-    const transactions = await Transactions.find()
+    const transactions = await Transactions.find({
+      company: company?._id,
+    })
       .populate([
         {
           path: 'cashier',
@@ -218,21 +201,13 @@ export const getTransactionsController = tryCatch(
 
 export const getTransactionsByDateController = tryCatch(
   async (req: Request, res: Response) => {
-    const companyId = req.headers['companyid'] as string;
+    const company = req.company;
 
-    if (!companyId) {
-      throw new AppError('Company ID is required in headers', 400);
-    }
+    const viewingCurrency = company?.viewingCurrency || 'USD';
 
-    const company = await Company.findById(companyId);
-
-    if (!company) {
-      throw new AppError('Company not found', 400);
-    }
-
-    const viewingCurrency = company.viewingCurrency || 'USD';
-
-    const transactions = await Transactions.find()
+    const transactions = await Transactions.find({
+      company: company?._id,
+    })
       .populate([
         {
           path: 'cashier',
@@ -312,38 +287,32 @@ export const getTransactionsByDateController = tryCatch(
 export const getTransactionsByIdController = tryCatch(
   async (req: Request, res: Response) => {
     const transactionId = req.params.id;
-    const companyId = req.headers['companyid'] as string;
+    const company = req.company;
 
-    if (!companyId) {
-      throw new AppError('Company ID is required in headers', 400);
-    }
+    const viewingCurrency = company?.viewingCurrency || 'USD';
 
-    const company = await Company.findById(companyId);
-
-    if (!company) {
-      throw new AppError('Company not found', 400);
-    }
-
-    const viewingCurrency = company.viewingCurrency || 'USD';
-
-    const transaction = await Transactions.findById(transactionId).populate([
-      {
-        path: 'cashier',
-        select: 'firstName lastName id',
-      },
-      {
-        path: 'customer',
-        select: 'firstName lastName id',
-      },
-      {
-        path: 'items',
-        populate: {
-          path: 'item',
-          select: 'image name sellingPrice',
+    const transaction = await Transactions.find({
+      company: company?._id,
+    })
+      .findById(transactionId)
+      .populate([
+        {
+          path: 'cashier',
+          select: 'firstName lastName id',
         },
-        select: 'firstName lastName id',
-      },
-    ]);
+        {
+          path: 'customer',
+          select: 'firstName lastName id',
+        },
+        {
+          path: 'items',
+          populate: {
+            path: 'item',
+            select: 'image name sellingPrice',
+          },
+          select: 'firstName lastName id',
+        },
+      ]);
 
     if (!transaction) {
       throw new AppError('Transaction not found', 404);
@@ -390,21 +359,14 @@ export const getTransactionsByIdController = tryCatch(
 export const getTransactionsByCustomerController = tryCatch(
   async (req: Request, res: Response) => {
     const customer = req.params.id;
-    const companyId = req.headers['companyid'] as string;
+    const company = req.company;
 
-    if (!companyId) {
-      throw new AppError('Company ID is required in headers', 400);
-    }
+    const viewingCurrency = company?.viewingCurrency || 'USD';
 
-    const company = await Company.findById(companyId);
-
-    if (!company) {
-      throw new AppError('Company not found', 400);
-    }
-
-    const viewingCurrency = company.viewingCurrency || 'USD';
-
-    const transactions = await Transactions.find({ customer }).populate([
+    const transactions = await Transactions.find({
+      customer,
+      company: company?._id,
+    }).populate([
       {
         path: 'cashier',
         select: 'firstName lastName id',
@@ -470,6 +432,8 @@ export const getTransactionsByCustomerController = tryCatch(
 export const refundTransactionController = tryCatch(
   async (req: Request<any, any, RefundTransaction>, res: Response) => {
     const { items, typeOfTransaction } = req.body;
+
+    const company = req.company;
 
     const transactionId = req.params.id;
     const existingTransaction = await Transactions.findById(transactionId);
@@ -566,6 +530,7 @@ export const refundTransactionController = tryCatch(
             typeOfTransaction,
             cashier: existingTransaction?.cashier,
             amount: Number(totalRefundAmount),
+            company: company?._id,
           },
         ],
         { session }

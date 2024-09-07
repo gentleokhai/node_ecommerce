@@ -16,6 +16,7 @@ interface ItemDoc extends Document {
   stock: number;
   lowStock: number;
   archived: boolean;
+  company: string;
 }
 
 const ItemSchema = new Schema(
@@ -38,6 +39,10 @@ const ItemSchema = new Schema(
     stock: { type: Number, default: null },
     lowStock: { type: Number, default: null },
     archived: { type: Boolean, default: false },
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'company',
+    },
   },
   {
     toJSON: {

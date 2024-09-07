@@ -42,8 +42,6 @@ exports.signupController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void
 exports.loginController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingEmployee = yield findEmployee('', req.body.email);
     const existingCompany = yield models_1.Company.findById(existingEmployee === null || existingEmployee === void 0 ? void 0 : existingEmployee.company);
-    console.log(existingEmployee === null || existingEmployee === void 0 ? void 0 : existingEmployee.company);
-    console.log(existingCompany);
     if (existingEmployee !== null) {
         const loginService = yield (0, services_1.login)(req.body, {
             id: existingEmployee.id,
