@@ -16,7 +16,6 @@ const errorHandler_1 = __importDefault(require("./middlewares/errorHandler"));
 const CustomerRoute_1 = require("./routes/CustomerRoute");
 const transactionRoute_1 = require("./routes/transactionRoute");
 require("./jobs/cron");
-const validateCompany_1 = require("./middlewares/validateCompany");
 const corsOptions = {
     origin: '*',
     optionsSuccessStatus: 200,
@@ -39,7 +38,6 @@ app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.static(__dirname));
 app.use('/auth', routes_1.AuthRoute);
 app.use('/company', routes_1.CompanyRoute);
-app.use(validateCompany_1.validateCompany);
 app.use('/employee', routes_1.EmployeeRoute);
 app.use('/item', routes_1.ItemRoute);
 app.use('/customer', CustomerRoute_1.CustomerRoute);

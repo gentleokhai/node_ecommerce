@@ -11,6 +11,7 @@ import {
 import { AccessType } from '../dto/general';
 import { Authenticate } from '../middlewares';
 import { checkRole } from '../middlewares/checkRole';
+import { validateCompany } from '../middlewares/validateCompany';
 import {
   createCompanyValidator,
   updateCompanyValidator,
@@ -22,6 +23,8 @@ router.use(Authenticate);
 router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
 
 router.post('', createCompanyValidator, createCompanyController);
+router.use(validateCompany);
+
 router.patch('/viewingCurrency', updateViewingCurrencyController);
 router.patch('/sellingCurrency', updateSellingCurrencyController);
 router.patch('', updateCompanyValidator, updateCompanyController);

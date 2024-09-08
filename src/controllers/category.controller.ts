@@ -11,6 +11,7 @@ export const createCategoryController = tryCatch(
 
     const existingCategory = await Category.findOne({
       name,
+      company: company?._id,
     });
 
     if (existingCategory) {

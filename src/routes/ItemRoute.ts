@@ -26,10 +26,13 @@ import {
 } from '../validators/item.validator';
 import { AccessType } from '../dto/general';
 import { checkRole } from '../middlewares/checkRole';
+import { validateCompany } from '../middlewares/validateCompany';
 
 const router = express.Router();
 
 router.use(Authenticate);
+router.use(validateCompany);
+
 router.get('/pos', getPOSItemsController);
 router.get('/category', getCategoryController);
 router.patch('/restock', restockItemStockValidator, restockItemsController);

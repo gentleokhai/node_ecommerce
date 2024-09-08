@@ -35,7 +35,10 @@ exports.FindEmployee = FindEmployee;
 exports.createEmployeeController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     const company = req.company;
-    const existingUser = yield (0, exports.FindEmployee)('', email);
+    const existingUser = yield models_1.Employee.findOne({
+        email: email,
+        company: company === null || company === void 0 ? void 0 : company._id,
+    });
     if (existingUser !== null)
         throw new AppError_1.AppError('An account already exists with this email', 400);
     const employee = yield (0, services_1.createEmployee)(Object.assign(Object.assign({}, req.body), { company: company === null || company === void 0 ? void 0 : company._id }));

@@ -8,6 +8,7 @@ import {
   refundTransactionController,
 } from '../controllers/transaction.controller';
 import { Authenticate } from '../middlewares';
+import { validateCompany } from '../middlewares/validateCompany';
 import {
   createRefundTransactionValidator,
   createTransactionValidator,
@@ -16,6 +17,7 @@ import {
 const router = express.Router();
 
 router.use(Authenticate);
+router.use(validateCompany);
 router.post('', createTransactionValidator, createTransactionController);
 router.get('', getTransactionsController);
 router.patch(

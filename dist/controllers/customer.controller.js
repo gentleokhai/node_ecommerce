@@ -29,7 +29,10 @@ exports.createCustomerController = (0, tryCatch_1.tryCatch)((req, res) => __awai
     const { email, phoneNumber, firstName, lastName, gender, group } = req.body;
     const company = req.company;
     const employeeId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
-    const existingUser = yield (0, exports.FindCustomer)('', email);
+    const existingUser = yield customer_model_1.Customer.findOne({
+        email: email,
+        company: company === null || company === void 0 ? void 0 : company._id,
+    });
     if (existingUser !== null)
         throw new AppError_1.AppError('A customer already exists with this email', 400);
     const createdCustomer = yield customer_model_1.Customer.create({

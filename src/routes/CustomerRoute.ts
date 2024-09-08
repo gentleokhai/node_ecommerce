@@ -16,6 +16,7 @@ import {
 import { AccessType } from '../dto/general';
 import { Authenticate } from '../middlewares';
 import { checkRole } from '../middlewares/checkRole';
+import { validateCompany } from '../middlewares/validateCompany';
 import {
   createCustomerValidator,
   updateCustomerValidator,
@@ -25,6 +26,7 @@ import { createGroupValidator } from '../validators/group.validator';
 const router = express.Router();
 
 router.use(Authenticate);
+router.use(validateCompany);
 router.use(
   checkRole([AccessType.EXECUTIVE, AccessType.MANAGER, AccessType.CASHIER])
 );

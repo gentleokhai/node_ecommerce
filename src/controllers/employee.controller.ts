@@ -32,7 +32,10 @@ export const createEmployeeController = tryCatch(
 
     const company = req.company;
 
-    const existingUser = await FindEmployee('', email);
+    const existingUser = await Employee.findOne({
+      email: email,
+      company: company?._id,
+    });
 
     if (existingUser !== null)
       throw new AppError('An account already exists with this email', 400);

@@ -10,7 +10,10 @@ export const createJobController = tryCatch(
 
     const company = req.company;
 
-    const existingJob = await Jobs.findOne({ name: name });
+    const existingJob = await Jobs.findOne({
+      name: name,
+      company: company?._id,
+    });
 
     if (existingJob !== null)
       throw new AppError('A job already exists with this title', 400);

@@ -18,6 +18,7 @@ exports.createCategoryController = (0, tryCatch_1.tryCatch)((req, res) => __awai
     const company = req.company;
     const existingCategory = yield category_model_1.Category.findOne({
         name,
+        company: company === null || company === void 0 ? void 0 : company._id,
     });
     if (existingCategory) {
         throw new AppError_1.AppError('A category already exists with this name', 400);

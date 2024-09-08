@@ -8,7 +8,6 @@ import {
 } from '../dto/customer/types';
 import { getCustomersFilter } from '../dto/customer/filters';
 import { Notes } from '../models/notes.model';
-import { Company } from '../models';
 
 export const FindCustomer = async (id: string | undefined, email?: string) => {
   if (email) {
@@ -26,7 +25,10 @@ export const createCustomerController = tryCatch(
 
     const employeeId = req.user?.id;
 
-    const existingUser = await FindCustomer('', email);
+    const existingUser = await Customer.findOne({
+      email: email,
+      company: company?._id,
+    });
 
     if (existingUser !== null)
       throw new AppError('A customer already exists with this email', 400);
