@@ -286,7 +286,7 @@ export const getPOSItemsController = tryCatch(
 
     const company = req.company;
 
-    const viewingCurrency = 'NGN';
+    const viewingCurrency = company?.viewingCurrency ?? '';
 
     const items = await Item.find({
       ...query,

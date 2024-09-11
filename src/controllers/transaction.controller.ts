@@ -11,10 +11,11 @@ import { Customer } from '../models/customer.model';
 import Big from 'big.js';
 import { Item } from '../models/items.model';
 import mongoose from 'mongoose';
-import { getItemsFilter } from '../dto/item/filters';
 import { roundUp } from '../utility/helpers';
-import { convertToCurrency } from '../services/exchangeRate.service';
-import { Company } from '../models';
+import {
+  convertToCurrency,
+  convertToUSD,
+} from '../services/exchangeRate.service';
 
 export const createTransactionController = tryCatch(
   async (req: Request<any, any, CreateTransaction>, res: Response) => {
@@ -42,7 +43,7 @@ export const createTransactionController = tryCatch(
       totalAmount = totalAmount.plus(itemTotal);
     }
 
-    const viewingCurrency = 'USD';
+    const viewingCurrency = company?.viewingCurrency ?? '';
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -59,7 +60,7 @@ export const createTransactionController = tryCatch(
             typeOfTransaction,
             cashier: cashierId,
             amount: roundUp(
-              await convertToCurrency(Number(totalAmount), viewingCurrency)
+              await convertToUSD(Number(totalAmount), viewingCurrency)
             ),
             company: company?._id,
           },
@@ -78,14 +79,14 @@ export const createTransactionController = tryCatch(
 
         if (typeOfTransaction === 'REFUND') {
           customer.totalSpend = roundUp(
-            await convertToCurrency(
+            await convertToUSD(
               parseFloat(existingTotalSpend.minus(amountSpent).toString()),
               viewingCurrency
             )
           );
         } else {
           customer.totalSpend = roundUp(
-            await convertToCurrency(
+            await convertToUSD(
               parseFloat(existingTotalSpend.plus(amountSpent).toString()),
               viewingCurrency
             )

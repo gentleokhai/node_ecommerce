@@ -58,6 +58,15 @@ export async function convertToCurrency(
   return amount * exchangeRate;
 }
 
+export async function convertToUSD(
+  amount: number,
+  currencyCode: string
+): Promise<number> {
+  const exchangeRate = await getExchangeRate(currencyCode);
+
+  return amount / exchangeRate;
+}
+
 export async function convertNGNToUSD(amount: number): Promise<number> {
   const exchangeRate = await getExchangeRate('NGN');
 

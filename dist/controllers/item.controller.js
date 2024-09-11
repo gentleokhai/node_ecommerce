@@ -172,9 +172,10 @@ exports.archiveItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter
     }
 }));
 exports.getPOSItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { query, sortOptions } = (0, filters_1.getItemsFilter)(req);
     const company = req.company;
-    const viewingCurrency = 'NGN';
+    const viewingCurrency = (_a = company === null || company === void 0 ? void 0 : company.viewingCurrency) !== null && _a !== void 0 ? _a : '';
     const items = yield items_model_1.Item.find(Object.assign(Object.assign({}, query), { archived: false, company: company === null || company === void 0 ? void 0 : company._id }))
         .sort(sortOptions)
         .populate('category');

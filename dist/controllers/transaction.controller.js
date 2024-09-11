@@ -23,7 +23,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const helpers_1 = require("../utility/helpers");
 const exchangeRate_service_1 = require("../services/exchangeRate.service");
 exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     const { customerId, items, methodOfPayment, typeOfTransaction, cashierId } = req.body;
     const company = req.company;
     if (!Array.isArray(items) || items.length === 0) {
@@ -38,7 +38,7 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
         const itemTotal = new big_js_1.default(itemDetails.sellingPrice).times(transactionItem.numberOfItems);
         totalAmount = totalAmount.plus(itemTotal);
     }
-    const viewingCurrency = 'USD';
+    const viewingCurrency = (_a = company === null || company === void 0 ? void 0 : company.viewingCurrency) !== null && _a !== void 0 ? _a : '';
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
@@ -50,7 +50,7 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
                 methodOfPayment,
                 typeOfTransaction,
                 cashier: cashierId,
-                amount: (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(Number(totalAmount), viewingCurrency)),
+                amount: (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToUSD)(Number(totalAmount), viewingCurrency)),
                 company: company === null || company === void 0 ? void 0 : company._id,
             },
         ], { session });
@@ -59,13 +59,13 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
                 customer.firstVisited = new Date();
             }
             customer.lastVisited = new Date();
-            const existingTotalSpend = new big_js_1.default((_a = customer.totalSpend) !== null && _a !== void 0 ? _a : 0);
+            const existingTotalSpend = new big_js_1.default((_b = customer.totalSpend) !== null && _b !== void 0 ? _b : 0);
             const amountSpent = new big_js_1.default(totalAmount);
             if (typeOfTransaction === 'REFUND') {
-                customer.totalSpend = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(parseFloat(existingTotalSpend.minus(amountSpent).toString()), viewingCurrency));
+                customer.totalSpend = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToUSD)(parseFloat(existingTotalSpend.minus(amountSpent).toString()), viewingCurrency));
             }
             else {
-                customer.totalSpend = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToCurrency)(parseFloat(existingTotalSpend.plus(amountSpent).toString()), viewingCurrency));
+                customer.totalSpend = (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToUSD)(parseFloat(existingTotalSpend.plus(amountSpent).toString()), viewingCurrency));
             }
             yield customer.save({ session });
         }
@@ -248,7 +248,7 @@ exports.getTransactionsByCustomerController = (0, tryCatch_1.tryCatch)((req, res
     res.status(200).json(convertedTransactions);
 }));
 exports.refundTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
+    var _c;
     const { items, typeOfTransaction } = req.body;
     const company = req.company;
     const transactionId = req.params.id;
@@ -274,7 +274,7 @@ exports.refundTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
                 customer.firstVisited = new Date();
             }
             customer.lastVisited = new Date();
-            const existingTotalSpend = new big_js_1.default((_b = customer.totalSpend) !== null && _b !== void 0 ? _b : 0);
+            const existingTotalSpend = new big_js_1.default((_c = customer.totalSpend) !== null && _c !== void 0 ? _c : 0);
             const amountSpent = new big_js_1.default(totalRefundAmount);
             if (typeOfTransaction === 'REFUND') {
                 customer.totalSpend = (0, helpers_1.roundUp)(parseFloat(existingTotalSpend.minus(amountSpent).toString()));
