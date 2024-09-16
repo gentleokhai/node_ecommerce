@@ -18,14 +18,13 @@ const createItemValidator = (req, res, next) => __awaiter(void 0, void 0, void 0
         if (!req.body) {
             throw new AppError_1.AppError('Missing request body!', 400);
         }
-        const { image, name, category, unit, sku, weight, currency, description, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
+        const { image, name, category, unit, sku, weight, description, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
         const item = new item_dto_1.CreateItemValidationSchema();
         item.image = image !== null && image !== void 0 ? image : '';
         item.name = name;
         item.category = category;
         item.sku = sku;
         item.weight = weight;
-        item.currency = currency;
         item.unit = unit;
         item.description = description;
         item.costPrice = costPrice;

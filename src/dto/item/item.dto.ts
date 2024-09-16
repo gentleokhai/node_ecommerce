@@ -49,10 +49,6 @@ export class CreateItemValidationSchema implements CreateItem {
   weight!: number | null;
 
   @IsString()
-  @IsNotEmpty()
-  currency!: string;
-
-  @IsString()
   @IsOptional()
   description!: string;
 

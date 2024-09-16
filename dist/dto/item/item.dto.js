@@ -43,10 +43,6 @@ __decorate([
 ], CreateItemValidationSchema.prototype, "weight", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)()
-], CreateItemValidationSchema.prototype, "currency", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)()
 ], CreateItemValidationSchema.prototype, "description", void 0);
 __decorate([

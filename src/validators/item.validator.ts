@@ -33,7 +33,6 @@ export const createItemValidator = async (
       unit,
       sku,
       weight,
-      currency,
       description,
       costPrice,
       sellingPrice,
@@ -49,7 +48,6 @@ export const createItemValidator = async (
     item.category = category;
     item.sku = sku;
     item.weight = weight;
-    item.currency = currency;
     item.unit = unit;
     item.description = description;
     item.costPrice = costPrice;

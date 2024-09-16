@@ -19,7 +19,7 @@ const AppError_1 = require("../utility/AppError");
 const exchangeRate_service_1 = require("../services/exchangeRate.service");
 const helpers_1 = require("../utility/helpers");
 exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { image, name, category, unit, sku, weight, description, currency, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
+    const { image, name, category, unit, sku, weight, description, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
     const company = req.company;
     const existingItem = yield items_model_1.Item.findOne({ name: name });
     if (existingItem !== null)
@@ -38,7 +38,6 @@ exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(
         sku,
         weight,
         description,
-        currency,
         costPrice: convertedCostPrice,
         sellingPrice: convertedSellingPrice,
         wholesalePrice: wholesalePrice ? convertedWholesalePrice : null,

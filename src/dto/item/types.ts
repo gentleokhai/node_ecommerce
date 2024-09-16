@@ -5,7 +5,6 @@ export type CreateItem = {
   unit: string;
   sku: string;
   weight: number | null;
-  currency: string;
   description: string;
   costPrice: number;
   sellingPrice: number;
@@ -22,7 +21,6 @@ export type CreateItemService = {
   unit: string;
   sku: string;
   weight: number | null;
-  currency: string;
   description: string;
   costPrice: number;
   sellingPrice: number;
