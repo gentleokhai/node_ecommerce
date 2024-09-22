@@ -6,7 +6,7 @@ interface Item {
   numberOfItems: number;
   status: 'COMPLETED' | 'REFUNDED';
 }
-interface TransactionsDoc extends Document {
+export interface TransactionsDoc extends Document {
   customer: string;
   numberOfItems: string;
   methodOfPayment: string;

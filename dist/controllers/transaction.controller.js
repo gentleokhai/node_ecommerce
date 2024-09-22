@@ -41,6 +41,7 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
     const viewingCurrency = (_a = company === null || company === void 0 ? void 0 : company.viewingCurrency) !== null && _a !== void 0 ? _a : '';
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
+    console.log('NGN Price', Number(totalAmount));
     try {
         let customer = yield customer_model_1.Customer.findById(customerId).session(session);
         const transactions = yield transaction_model_1.Transactions.create([
@@ -50,7 +51,7 @@ exports.createTransactionController = (0, tryCatch_1.tryCatch)((req, res) => __a
                 methodOfPayment,
                 typeOfTransaction,
                 cashier: cashierId,
-                amount: (0, helpers_1.roundUp)(yield (0, exchangeRate_service_1.convertToUSD)(Number(totalAmount), viewingCurrency)),
+                amount: (0, helpers_1.roundUp)(Number(totalAmount)),
                 company: company === null || company === void 0 ? void 0 : company._id,
             },
         ], { session });
@@ -175,11 +176,10 @@ exports.getTransactionsByIdController = (0, tryCatch_1.tryCatch)((req, res) => _
     const transactionId = req.params.id;
     const company = req.company;
     const viewingCurrency = (company === null || company === void 0 ? void 0 : company.viewingCurrency) || 'USD';
-    const transaction = yield transaction_model_1.Transactions.find({
+    const transaction = yield transaction_model_1.Transactions.findOne({
         company: company === null || company === void 0 ? void 0 : company._id,
-    })
-        .findById(transactionId)
-        .populate([
+        _id: transactionId,
+    }).populate([
         {
             path: 'cashier',
             select: 'firstName lastName id',

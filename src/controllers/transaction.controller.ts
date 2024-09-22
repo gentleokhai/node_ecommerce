@@ -5,7 +5,7 @@ import {
   ItemStatus,
   RefundTransaction,
 } from '../dto/transactions/types';
-import { Transactions } from '../models/transaction.model';
+import { Transactions, TransactionsDoc } from '../models/transaction.model';
 import { AppError } from '../utility/AppError';
 import { Customer } from '../models/customer.model';
 import Big from 'big.js';
@@ -48,6 +48,8 @@ export const createTransactionController = tryCatch(
     const session = await mongoose.startSession();
     session.startTransaction();
 
+    console.log('NGN Price', Number(totalAmount));
+
     try {
       let customer = await Customer.findById(customerId).session(session);
 
@@ -59,9 +61,7 @@ export const createTransactionController = tryCatch(
             methodOfPayment,
             typeOfTransaction,
             cashier: cashierId,
-            amount: roundUp(
-              await convertToUSD(Number(totalAmount), viewingCurrency)
-            ),
+            amount: roundUp(Number(totalAmount)),
             company: company?._id,
           },
         ],
@@ -292,28 +292,27 @@ export const getTransactionsByIdController = tryCatch(
 
     const viewingCurrency = company?.viewingCurrency || 'USD';
 
-    const transaction = await Transactions.find({
+    const transaction = await Transactions.findOne({
       company: company?._id,
-    })
-      .findById(transactionId)
-      .populate([
-        {
-          path: 'cashier',
-          select: 'firstName lastName id',
+      _id: transactionId,
+    }).populate([
+      {
+        path: 'cashier',
+        select: 'firstName lastName id',
+      },
+      {
+        path: 'customer',
+        select: 'firstName lastName id',
+      },
+      {
+        path: 'items',
+        populate: {
+          path: 'item',
+          select: 'image name sellingPrice',
         },
-        {
-          path: 'customer',
-          select: 'firstName lastName id',
-        },
-        {
-          path: 'items',
-          populate: {
-            path: 'item',
-            select: 'image name sellingPrice',
-          },
-          select: 'firstName lastName id',
-        },
-      ]);
+        select: 'firstName lastName id',
+      },
+    ]);
 
     if (!transaction) {
       throw new AppError('Transaction not found', 404);
