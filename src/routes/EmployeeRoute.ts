@@ -29,16 +29,16 @@ import { createJobValidator } from '../validators/jobs.validator';
 const router = express.Router();
 
 router.use(Authenticate);
-router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
 
-
-router.post('', createEmployeeValidator, createEmployeeController);
-router.patch('/:id', updateEmployeeValidator, updateEmployeeController);
 router.patch(
   '/onboarding',
   updateEmployeeOnboardingValidator,
   updateEmployeeOnboardingController
 );
+router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
+
+router.post('', createEmployeeValidator, createEmployeeController);
+router.patch('/:id', updateEmployeeValidator, updateEmployeeController);
 
 router.use(validateCompany);
 
