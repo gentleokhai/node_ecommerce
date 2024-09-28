@@ -21,15 +21,18 @@ const helpers_1 = require("../utility/helpers");
 exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { image, name, category, unit, sku, weight, description, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
     const company = req.company;
-    const existingItem = yield items_model_1.Item.findOne({ name: name });
+    const existingItem = yield items_model_1.Item.findOne({
+        name: name,
+        company: company === null || company === void 0 ? void 0 : company._id,
+    });
     if (existingItem !== null)
         throw new AppError_1.AppError('An item already exists with this name', 400);
     const buffer = Buffer.from(image !== null && image !== void 0 ? image : '', 'base64');
     const uploader = (path) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, cloudinary_1.upload)(path, 'Zulu', res); });
     const cloudImage = yield uploader(buffer);
-    const convertedCostPrice = yield (0, exchangeRate_service_1.convertNGNToUSD)(costPrice);
-    const convertedSellingPrice = yield (0, exchangeRate_service_1.convertNGNToUSD)(sellingPrice);
-    const convertedWholesalePrice = yield (0, exchangeRate_service_1.convertNGNToUSD)(wholesalePrice);
+    const convertedCostPrice = yield (0, exchangeRate_service_1.convertToUSD)(costPrice, company === null || company === void 0 ? void 0 : company.buyingCurrency);
+    const convertedSellingPrice = yield (0, exchangeRate_service_1.convertToUSD)(sellingPrice, company === null || company === void 0 ? void 0 : company.buyingCurrency);
+    const convertedWholesalePrice = yield (0, exchangeRate_service_1.convertToUSD)(wholesalePrice, company === null || company === void 0 ? void 0 : company.buyingCurrency);
     const createItemService = yield (0, item_service_1.createItem)({
         image: cloudImage.url,
         name,

@@ -34,7 +34,6 @@ export const createEmployeeController = tryCatch(
 
     const existingUser = await Employee.findOne({
       email: email,
-      company: company?._id,
     });
 
     if (existingUser !== null)

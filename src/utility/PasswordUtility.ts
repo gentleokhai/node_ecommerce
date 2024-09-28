@@ -38,6 +38,6 @@ export const ValidateSignature = async (req: Request, res: Response) => {
     });
     return true;
   } else {
-    throw new AppError('Unauthorized! Access Token was expired!', 401);
+    throw new AppError('Unauthorized! Access Token was missing!', 401);
   }
 };

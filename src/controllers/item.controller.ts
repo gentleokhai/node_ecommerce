@@ -15,6 +15,7 @@ import { AppError } from '../utility/AppError';
 import {
   convertNGNToUSD,
   convertToCurrency,
+  convertToUSD,
 } from '../services/exchangeRate.service';
 import { roundUp } from '../utility/helpers';
 
@@ -38,7 +39,10 @@ export const createItemController = tryCatch(
 
     const company = req.company;
 
-    const existingItem = await Item.findOne({ name: name });
+    const existingItem = await Item.findOne({
+      name: name,
+      company: company?._id,
+    });
 
     if (existingItem !== null)
       throw new AppError('An item already exists with this name', 400);
@@ -49,11 +53,18 @@ export const createItemController = tryCatch(
 
     const cloudImage = await uploader(buffer);
 
-    const convertedCostPrice = await convertNGNToUSD(costPrice);
-    const convertedSellingPrice = await convertNGNToUSD(sellingPrice);
+    const convertedCostPrice = await convertToUSD(
+      costPrice,
+      company?.buyingCurrency as string
+    );
+    const convertedSellingPrice = await convertToUSD(
+      sellingPrice,
+      company?.buyingCurrency as string
+    );
 
-    const convertedWholesalePrice = await convertNGNToUSD(
-      wholesalePrice as number
+    const convertedWholesalePrice = await convertToUSD(
+      wholesalePrice as number,
+      company?.buyingCurrency as string
     );
 
     const createItemService = await createItem({

@@ -35,13 +35,12 @@ router.patch(
   updateEmployeeOnboardingValidator,
   updateEmployeeOnboardingController
 );
+
+router.use(validateCompany);
 router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
 
 router.post('', createEmployeeValidator, createEmployeeController);
 router.patch('/:id', updateEmployeeValidator, updateEmployeeController);
-
-router.use(validateCompany);
-
 router.get('', getEmployeesController);
 router.post('/jobs', createJobValidator, createJobController);
 router.get('/jobs', getJobsController);

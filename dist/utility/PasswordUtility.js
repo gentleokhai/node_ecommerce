@@ -46,7 +46,7 @@ const ValidateSignature = (req, res) => __awaiter(void 0, void 0, void 0, functi
         return true;
     }
     else {
-        throw new AppError_1.AppError('Unauthorized! Access Token was expired!', 401);
+        throw new AppError_1.AppError('Unauthorized! Access Token was missing!', 401);
     }
 });
 exports.ValidateSignature = ValidateSignature;
