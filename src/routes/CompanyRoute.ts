@@ -20,16 +20,15 @@ import {
 const router = express.Router();
 
 router.use(Authenticate);
+router.get('/currencies', getCompanyCurrenciesController);
+router.patch('/viewingCurrency', updateViewingCurrencyController);
+router.get('/rate', getExchangeRateController);
+router.get('', getCompanyByIdController);
+
 router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
 
 router.post('', createCompanyValidator, createCompanyController);
 router.use(validateCompany);
-
-router.patch('/viewingCurrency', updateViewingCurrencyController);
 router.patch('/sellingCurrency', updateSellingCurrencyController);
-router.patch('', updateCompanyValidator, updateCompanyController);
-router.get('/currencies', getCompanyCurrenciesController);
-router.get('', getCompanyByIdController);
-router.get('/rate', getExchangeRateController);
 
 export { router as CompanyRoute };
