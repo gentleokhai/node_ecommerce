@@ -18,6 +18,9 @@ import {
   convertToUSD,
 } from '../services/exchangeRate.service';
 import { roundUp } from '../utility/helpers';
+import fs from 'fs';
+import csv from 'csv-parser';
+import { Category } from '../models/category.model';
 
 export const createItemController = tryCatch(
   async (req: Request<any, any, CreateItem>, res: Response) => {
@@ -46,6 +49,20 @@ export const createItemController = tryCatch(
 
     if (existingItem !== null)
       throw new AppError('An item already exists with this name', 400);
+
+    if (Number(costPrice) > Number(sellingPrice)) {
+      throw new AppError(
+        `Cost price cannot be greater than Selling price for item`,
+        400
+      );
+    }
+
+    if (Number(lowStock) > Number(stock)) {
+      throw new AppError(
+        `Low stock cannot be greater than opening stock for item`,
+        400
+      );
+    }
 
     const buffer = Buffer.from(image ?? '', 'base64');
 
@@ -348,5 +365,117 @@ export const restockItemsController = tryCatch(
         );
       }
     }
+  }
+);
+
+export const createItemsByCSVs = tryCatch(
+  async (req: Request, res: Response) => {
+    const { file } = req;
+
+    if (!file) throw new AppError('No file uploaded', 400);
+
+    const items: any[] = [];
+    const company = req.company;
+    const results: any[] = [];
+
+    await new Promise<void>((resolve, reject) => {
+      fs.createReadStream(file.path)
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', resolve)
+        .on('error', reject);
+    });
+
+    for (const row of results) {
+      const {
+        image,
+        name,
+        category,
+        unit,
+        sku,
+        stock,
+        lowStock,
+        costPrice,
+        sellingPrice,
+        wholesalePrice,
+      } = row;
+
+      const existingItem = await Item.findOne({
+        name: name,
+        company: company?._id,
+      });
+
+      if (existingItem !== null) {
+        throw new AppError(
+          `An item already exists with the name: ${name}`,
+          400
+        );
+      }
+
+      if (Number(costPrice) > Number(sellingPrice)) {
+        throw new AppError(
+          `Cost price cannot be greater than Selling price for item: ${name}`,
+          400
+        );
+      }
+
+      if (Number(lowStock) > Number(stock)) {
+        throw new AppError(
+          `Low stock cannot be greater than opening stock for item: ${name}`,
+          400
+        );
+      }
+
+      const convertedCostPrice = await convertToUSD(
+        parseFloat(costPrice),
+        company?.buyingCurrency as string
+      );
+
+      const convertedSellingPrice = await convertToUSD(
+        parseFloat(sellingPrice),
+        company?.buyingCurrency as string
+      );
+
+      const convertedWholesalePrice = wholesalePrice
+        ? await convertToUSD(
+            parseFloat(wholesalePrice),
+            company?.buyingCurrency as string
+          )
+        : null;
+
+      const isCategoryAvailable = await Category.findOne({
+        name: category,
+      });
+
+      let categoryId;
+
+      if (!isCategoryAvailable) {
+        const createdCategory = await Category.create({
+          name: category,
+          company: company?._id,
+        });
+        categoryId = createdCategory._id;
+      } else {
+        categoryId = isCategoryAvailable._id;
+      }
+
+      const newItem = await Item.create({
+        image: image,
+        name,
+        category: categoryId,
+        unit,
+        sku,
+        costPrice: convertedCostPrice,
+        sellingPrice: convertedSellingPrice,
+        wholesalePrice: convertedWholesalePrice,
+        stock: parseInt(stock, 10),
+        lowStock: parseInt(lowStock, 10),
+        company: company?._id,
+      });
+
+      items.push(newItem);
+    }
+
+    res.status(201).json({ message: 'Items uploaded' });
   }
 );

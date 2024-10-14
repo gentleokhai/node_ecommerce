@@ -13,8 +13,10 @@ const item_validator_1 = require("../validators/item.validator");
 const general_1 = require("../dto/general");
 const checkRole_1 = require("../middlewares/checkRole");
 const validateCompany_1 = require("../middlewares/validateCompany");
+const multer_1 = __importDefault(require("multer"));
 const router = express_1.default.Router();
 exports.ItemRoute = router;
+const upload = (0, multer_1.default)({ dest: '../../src/uploads' });
 router.use(middlewares_1.Authenticate);
 router.use(validateCompany_1.validateCompany);
 router.get('/pos', item_controller_1.getPOSItemsController);
@@ -24,6 +26,7 @@ router.use((0, checkRole_1.checkRole)([general_1.AccessType.EXECUTIVE, general_1
 router.post('', item_validator_1.createItemValidator, item_controller_1.createItemController);
 router.get('', item_controller_1.getItemsController);
 router.post('/category', category_validator_1.createCategoryValidator, category_controller_1.createCategoryController);
+router.post('/upload', upload.single('file'), item_controller_1.createItemsByCSVs);
 router.get('/:id', item_controller_1.getItemByIdController);
 router.patch('/:id', item_validator_1.updateItemValidator, item_controller_1.updateItemController);
 router.patch('/:id/price', item_validator_1.updateItemPriceValidator, item_controller_1.updateItemPriceController);
