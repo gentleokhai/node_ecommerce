@@ -65,3 +65,16 @@ export interface RestockPayload {
     numberOfItems: number;
   }[];
 }
+
+export type UploadItem = {
+  image: string;
+  name: string;
+  category: string;
+  unit: string;
+  sku: string;
+  costPrice: string;
+  sellingPrice: string;
+  stock: string;
+  lowStock: string;
+  wholesalePrice: string;
+};

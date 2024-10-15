@@ -6,6 +6,7 @@ import {
   UpdateItemStock,
   UpdateItem,
   RestockPayload,
+  UploadItem,
 } from '../dto/item';
 import { getItemsFilter } from '../dto/item/filters';
 import { Item } from '../models/items.model';
@@ -374,9 +375,8 @@ export const createItemsByCSVs = tryCatch(
 
     if (!file) throw new AppError('No file uploaded', 400);
 
-    const items: any[] = [];
     const company = req.company;
-    const results: any[] = [];
+    const results: UploadItem[] = [];
 
     await new Promise<void>((resolve, reject) => {
       fs.createReadStream(file.path)
@@ -472,8 +472,6 @@ export const createItemsByCSVs = tryCatch(
         lowStock: parseInt(lowStock, 10),
         company: company?._id,
       });
-
-      items.push(newItem);
     }
 
     res.status(201).json({ message: 'Items uploaded' });

@@ -223,7 +223,6 @@ exports.createItemsByCSVs = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(voi
     const { file } = req;
     if (!file)
         throw new AppError_1.AppError('No file uploaded', 400);
-    const items = [];
     const company = req.company;
     const results = [];
     yield new Promise((resolve, reject) => {
@@ -280,7 +279,6 @@ exports.createItemsByCSVs = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(voi
             lowStock: parseInt(lowStock, 10),
             company: company === null || company === void 0 ? void 0 : company._id,
         });
-        items.push(newItem);
     }
     res.status(201).json({ message: 'Items uploaded' });
 }));
