@@ -7,6 +7,8 @@ import {
   UpdateItem,
   RestockPayload,
   UploadItem,
+  CreateUploadedItem,
+  CreateUploadPayload,
 } from '../dto/item';
 import { getItemsFilter } from '../dto/item/filters';
 import { Item } from '../models/items.model';
@@ -369,35 +371,22 @@ export const restockItemsController = tryCatch(
   }
 );
 
-export const createItemsByCSVs = tryCatch(
-  async (req: Request, res: Response) => {
-    const { file } = req;
-
-    if (!file) throw new AppError('No file uploaded', 400);
-
+export const createItemsFromUploadController = tryCatch(
+  async (req: Request<any, any, CreateUploadPayload>, res: Response) => {
     const company = req.company;
-    const results: UploadItem[] = [];
 
-    await new Promise<void>((resolve, reject) => {
-      fs.createReadStream(file.path)
-        .pipe(csv())
-        .on('data', (data) => results.push(data))
-        .on('end', resolve)
-        .on('error', reject);
-    });
-
-    for (const row of results) {
+    for (const row of req.body.items) {
       const {
         image,
         name,
         category,
         unit,
         sku,
-        stock,
-        lowStock,
         costPrice,
         sellingPrice,
         wholesalePrice,
+        stock,
+        lowStock,
       } = row;
 
       const existingItem = await Item.findOne({
@@ -441,7 +430,9 @@ export const createItemsByCSVs = tryCatch(
             parseFloat(wholesalePrice),
             company?.buyingCurrency as string
           )
-        : null;
+        : undefined;
+
+      console.log(convertedWholesalePrice);
 
       const isCategoryAvailable = await Category.findOne({
         name: category,
@@ -459,7 +450,7 @@ export const createItemsByCSVs = tryCatch(
         categoryId = isCategoryAvailable._id;
       }
 
-      const newItem = await Item.create({
+      await Item.create({
         image: image,
         name,
         category: categoryId,
@@ -474,6 +465,6 @@ export const createItemsByCSVs = tryCatch(
       });
     }
 
-    res.status(201).json({ message: 'Items uploaded' });
+    res.status(201).json({ message: 'Items created' });
   }
 );

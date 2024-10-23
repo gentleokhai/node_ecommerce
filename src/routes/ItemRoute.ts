@@ -2,7 +2,7 @@ import express from 'express';
 import {
   archiveItemController,
   createItemController,
-  createItemsByCSVs,
+  createItemsFromUploadController,
   deleteItemController,
   getItemByIdController,
   getItemsController,
@@ -46,7 +46,7 @@ router.use(checkRole([AccessType.EXECUTIVE, AccessType.MANAGER]));
 router.post('', createItemValidator, createItemController);
 router.get('', getItemsController);
 router.post('/category', createCategoryValidator, createCategoryController);
-router.post('/upload', upload.single('file'), createItemsByCSVs);
+router.post('/upload', createItemsFromUploadController);
 router.get('/:id', getItemByIdController);
 router.patch('/:id', updateItemValidator, updateItemController);
 router.patch('/:id/price', updateItemPriceValidator, updateItemPriceController);

@@ -26,7 +26,7 @@ router.use((0, checkRole_1.checkRole)([general_1.AccessType.EXECUTIVE, general_1
 router.post('', item_validator_1.createItemValidator, item_controller_1.createItemController);
 router.get('', item_controller_1.getItemsController);
 router.post('/category', category_validator_1.createCategoryValidator, category_controller_1.createCategoryController);
-router.post('/upload', upload.single('file'), item_controller_1.createItemsByCSVs);
+router.post('/upload', item_controller_1.createItemsFromUploadController);
 router.get('/:id', item_controller_1.getItemByIdController);
 router.patch('/:id', item_validator_1.updateItemValidator, item_controller_1.updateItemController);
 router.patch('/:id/price', item_validator_1.updateItemPriceValidator, item_controller_1.updateItemPriceController);

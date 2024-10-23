@@ -14,6 +14,23 @@ export type CreateItem = {
   lowStock: number;
 };
 
+export type CreateUploadedItem = {
+  image: string;
+  name: string;
+  category: string;
+  unit: string;
+  sku: string;
+  costPrice: string;
+  sellingPrice: string;
+  wholesalePrice: string;
+  stock: string;
+  lowStock: string;
+};
+
+export type CreateUploadPayload = {
+  items: CreateUploadedItem[]
+}
+
 export type CreateItemService = {
   image?: string;
   name: string;
