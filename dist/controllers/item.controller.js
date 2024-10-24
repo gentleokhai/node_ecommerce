@@ -8,6 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createItemsFromUploadController = exports.restockItemsController = exports.getPOSItemsController = exports.archiveItemController = exports.deleteItemController = exports.updateItemStockController = exports.updateItemPriceController = exports.updateItemController = exports.getItemByIdController = exports.getItemsController = exports.createItemController = void 0;
 const cloudinary_1 = require("../config/cloudinary");
@@ -19,6 +22,7 @@ const AppError_1 = require("../utility/AppError");
 const exchangeRate_service_1 = require("../services/exchangeRate.service");
 const helpers_1 = require("../utility/helpers");
 const category_model_1 = require("../models/category.model");
+const mongoose_1 = __importDefault(require("mongoose"));
 exports.createItemController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { image, name, category, unit, sku, weight, description, costPrice, sellingPrice, wholesalePrice, quantityInPack, stock, lowStock, } = req.body;
     const company = req.company;
@@ -215,55 +219,70 @@ exports.restockItemsController = (0, tryCatch_1.tryCatch)((req, res) => __awaite
     }
 }));
 exports.createItemsFromUploadController = (0, tryCatch_1.tryCatch)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const company = req.company;
-    for (const row of req.body.items) {
-        const { image, name, category, unit, sku, costPrice, sellingPrice, wholesalePrice, stock, lowStock, } = row;
-        const existingItem = yield items_model_1.Item.findOne({
-            name: name,
-            company: company === null || company === void 0 ? void 0 : company._id,
-        });
-        if (existingItem !== null) {
-            throw new AppError_1.AppError(`An item already exists with the name: ${name}`, 400);
-        }
-        if (Number(costPrice) > Number(sellingPrice)) {
-            throw new AppError_1.AppError(`Cost price cannot be greater than Selling price for item: ${name}`, 400);
-        }
-        if (Number(lowStock) > Number(stock)) {
-            throw new AppError_1.AppError(`Low stock cannot be greater than opening stock for item: ${name}`, 400);
-        }
-        const convertedCostPrice = yield (0, exchangeRate_service_1.convertToUSD)(parseFloat(costPrice), company === null || company === void 0 ? void 0 : company.buyingCurrency);
-        const convertedSellingPrice = yield (0, exchangeRate_service_1.convertToUSD)(parseFloat(sellingPrice), company === null || company === void 0 ? void 0 : company.buyingCurrency);
-        const convertedWholesalePrice = wholesalePrice
-            ? yield (0, exchangeRate_service_1.convertToUSD)(parseFloat(wholesalePrice), company === null || company === void 0 ? void 0 : company.buyingCurrency)
-            : undefined;
-        console.log(convertedWholesalePrice);
-        const isCategoryAvailable = yield category_model_1.Category.findOne({
-            name: category,
-        });
-        let categoryId;
-        if (!isCategoryAvailable) {
-            const createdCategory = yield category_model_1.Category.create({
-                name: category,
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        const company = req.company;
+        for (const row of req.body.items) {
+            const { image, name, category, unit, sku, costPrice, sellingPrice, wholesalePrice, stock, lowStock, } = row;
+            const existingItem = yield items_model_1.Item.findOne({
+                name: name,
                 company: company === null || company === void 0 ? void 0 : company._id,
-            });
-            categoryId = createdCategory._id;
+            }).session(session);
+            if (existingItem !== null) {
+                throw new AppError_1.AppError(`An item already exists with the name: ${name}`, 400);
+            }
+            if (Number(costPrice) > Number(sellingPrice)) {
+                throw new AppError_1.AppError(`Cost price cannot be greater than Selling price for item: ${name}`, 400);
+            }
+            if (Number(lowStock) > Number(stock)) {
+                throw new AppError_1.AppError(`Low stock cannot be greater than opening stock for item: ${name}`, 400);
+            }
+            const convertedCostPrice = yield (0, exchangeRate_service_1.convertToUSD)(parseFloat(costPrice), company === null || company === void 0 ? void 0 : company.buyingCurrency);
+            const convertedSellingPrice = yield (0, exchangeRate_service_1.convertToUSD)(parseFloat(sellingPrice), company === null || company === void 0 ? void 0 : company.buyingCurrency);
+            const convertedWholesalePrice = wholesalePrice
+                ? yield (0, exchangeRate_service_1.convertToUSD)(parseFloat(wholesalePrice), company === null || company === void 0 ? void 0 : company.buyingCurrency)
+                : undefined;
+            const isCategoryAvailable = yield category_model_1.Category.findOne({
+                name: category,
+            }).session(session);
+            let categoryId;
+            if (!isCategoryAvailable) {
+                const createdCategory = yield category_model_1.Category.create([
+                    {
+                        name: category,
+                        company: company === null || company === void 0 ? void 0 : company._id,
+                    },
+                ], { session });
+                categoryId = createdCategory[0]._id;
+            }
+            else {
+                categoryId = isCategoryAvailable._id;
+            }
+            yield items_model_1.Item.create([
+                {
+                    image: image,
+                    name,
+                    category: categoryId,
+                    unit,
+                    sku,
+                    costPrice: convertedCostPrice,
+                    sellingPrice: convertedSellingPrice,
+                    wholesalePrice: convertedWholesalePrice,
+                    stock: parseInt(stock, 10),
+                    lowStock: parseInt(lowStock, 10),
+                    company: company === null || company === void 0 ? void 0 : company._id,
+                },
+            ], { session });
         }
-        else {
-            categoryId = isCategoryAvailable._id;
-        }
-        yield items_model_1.Item.create({
-            image: image,
-            name,
-            category: categoryId,
-            unit,
-            sku,
-            costPrice: convertedCostPrice,
-            sellingPrice: convertedSellingPrice,
-            wholesalePrice: convertedWholesalePrice,
-            stock: parseInt(stock, 10),
-            lowStock: parseInt(lowStock, 10),
-            company: company === null || company === void 0 ? void 0 : company._id,
-        });
+        yield session.commitTransaction();
+        res.status(201).json({ message: 'Items created' });
     }
-    res.status(201).json({ message: 'Items created' });
+    catch (error) {
+        yield session.abortTransaction();
+        throw error;
+    }
+    finally {
+        session.endSession();
+    }
 }));

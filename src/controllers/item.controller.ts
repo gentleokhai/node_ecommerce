@@ -21,9 +21,8 @@ import {
   convertToUSD,
 } from '../services/exchangeRate.service';
 import { roundUp } from '../utility/helpers';
-import fs from 'fs';
-import csv from 'csv-parser';
 import { Category } from '../models/category.model';
+import mongoose from 'mongoose';
 
 export const createItemController = tryCatch(
   async (req: Request<any, any, CreateItem>, res: Response) => {
@@ -373,98 +372,117 @@ export const restockItemsController = tryCatch(
 
 export const createItemsFromUploadController = tryCatch(
   async (req: Request<any, any, CreateUploadPayload>, res: Response) => {
-    const company = req.company;
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    for (const row of req.body.items) {
-      const {
-        image,
-        name,
-        category,
-        unit,
-        sku,
-        costPrice,
-        sellingPrice,
-        wholesalePrice,
-        stock,
-        lowStock,
-      } = row;
+    try {
+      const company = req.company;
 
-      const existingItem = await Item.findOne({
-        name: name,
-        company: company?._id,
-      });
+      for (const row of req.body.items) {
+        const {
+          image,
+          name,
+          category,
+          unit,
+          sku,
+          costPrice,
+          sellingPrice,
+          wholesalePrice,
+          stock,
+          lowStock,
+        } = row;
 
-      if (existingItem !== null) {
-        throw new AppError(
-          `An item already exists with the name: ${name}`,
-          400
-        );
-      }
-
-      if (Number(costPrice) > Number(sellingPrice)) {
-        throw new AppError(
-          `Cost price cannot be greater than Selling price for item: ${name}`,
-          400
-        );
-      }
-
-      if (Number(lowStock) > Number(stock)) {
-        throw new AppError(
-          `Low stock cannot be greater than opening stock for item: ${name}`,
-          400
-        );
-      }
-
-      const convertedCostPrice = await convertToUSD(
-        parseFloat(costPrice),
-        company?.buyingCurrency as string
-      );
-
-      const convertedSellingPrice = await convertToUSD(
-        parseFloat(sellingPrice),
-        company?.buyingCurrency as string
-      );
-
-      const convertedWholesalePrice = wholesalePrice
-        ? await convertToUSD(
-            parseFloat(wholesalePrice),
-            company?.buyingCurrency as string
-          )
-        : undefined;
-
-      console.log(convertedWholesalePrice);
-
-      const isCategoryAvailable = await Category.findOne({
-        name: category,
-      });
-
-      let categoryId;
-
-      if (!isCategoryAvailable) {
-        const createdCategory = await Category.create({
-          name: category,
+        const existingItem = await Item.findOne({
+          name: name,
           company: company?._id,
-        });
-        categoryId = createdCategory._id;
-      } else {
-        categoryId = isCategoryAvailable._id;
+        }).session(session);
+
+        if (existingItem !== null) {
+          throw new AppError(
+            `An item already exists with the name: ${name}`,
+            400
+          );
+        }
+
+        if (Number(costPrice) > Number(sellingPrice)) {
+          throw new AppError(
+            `Cost price cannot be greater than Selling price for item: ${name}`,
+            400
+          );
+        }
+
+        if (Number(lowStock) > Number(stock)) {
+          throw new AppError(
+            `Low stock cannot be greater than opening stock for item: ${name}`,
+            400
+          );
+        }
+
+        const convertedCostPrice = await convertToUSD(
+          parseFloat(costPrice),
+          company?.buyingCurrency as string
+        );
+
+        const convertedSellingPrice = await convertToUSD(
+          parseFloat(sellingPrice),
+          company?.buyingCurrency as string
+        );
+
+        const convertedWholesalePrice = wholesalePrice
+          ? await convertToUSD(
+              parseFloat(wholesalePrice),
+              company?.buyingCurrency as string
+            )
+          : undefined;
+
+        const isCategoryAvailable = await Category.findOne({
+          name: category,
+        }).session(session);
+
+        let categoryId;
+
+        if (!isCategoryAvailable) {
+          const createdCategory = await Category.create(
+            [
+              {
+                name: category,
+                company: company?._id,
+              },
+            ],
+            { session }
+          );
+          categoryId = createdCategory[0]._id;
+        } else {
+          categoryId = isCategoryAvailable._id;
+        }
+
+        await Item.create(
+          [
+            {
+              image: image,
+              name,
+              category: categoryId,
+              unit,
+              sku,
+              costPrice: convertedCostPrice,
+              sellingPrice: convertedSellingPrice,
+              wholesalePrice: convertedWholesalePrice,
+              stock: parseInt(stock, 10),
+              lowStock: parseInt(lowStock, 10),
+              company: company?._id,
+            },
+          ],
+          { session }
+        );
       }
 
-      await Item.create({
-        image: image,
-        name,
-        category: categoryId,
-        unit,
-        sku,
-        costPrice: convertedCostPrice,
-        sellingPrice: convertedSellingPrice,
-        wholesalePrice: convertedWholesalePrice,
-        stock: parseInt(stock, 10),
-        lowStock: parseInt(lowStock, 10),
-        company: company?._id,
-      });
+      await session.commitTransaction();
+      res.status(201).json({ message: 'Items created' });
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
     }
-
-    res.status(201).json({ message: 'Items created' });
   }
 );
