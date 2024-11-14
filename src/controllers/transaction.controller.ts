@@ -5,6 +5,7 @@ import {
   ItemStatus,
   RefundTransaction,
 } from '../dto/transactions/types';
+import { getTransactionFilter } from '../dto/transactions/filters';
 import { Transactions, TransactionsDoc } from '../models/transaction.model';
 import { AppError } from '../utility/AppError';
 import { Customer } from '../models/customer.model';
@@ -136,12 +137,14 @@ export const createTransactionController = tryCatch(
 export const getTransactionsController = tryCatch(
   async (req: Request, res: Response) => {
     const company = req.company;
+    const { query, sort } = getTransactionFilter(req);
 
     const viewingCurrency = company?.viewingCurrency || 'USD';
 
     const transactions = await Transactions.find({
+      ...query,
       company: company?._id,
-    })
+    }).sort(sort)
       .populate([
         {
           path: 'cashier',
@@ -156,7 +159,7 @@ export const getTransactionsController = tryCatch(
           select: 'image name sellingPrice',
         },
       ])
-      .sort('-createdAt');
+      // .sort('-createdAt');
 
     const convertedTransactions = await Promise.all(
       transactions.map(async (transaction) => {

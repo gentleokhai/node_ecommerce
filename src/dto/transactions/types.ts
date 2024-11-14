@@ -21,3 +21,17 @@ export interface RefundTransaction {
   items: Item[];
   typeOfTransaction: 'SALE' | 'REFUND';
 }
+
+
+// New filter type for transactions
+export interface TransactionFilter {
+  // paymentMethod?: string;
+  // staff?: string;
+  // customerType?: 'SALE' | 'REFUND';
+  // keyword?: string;
+  // status?: ItemStatus[];
+  paymentMethod?: { $in: string[] };
+  staff?: { $in: string[] }
+  status?: { $in: string[] };
+  keyword?: string;
+}

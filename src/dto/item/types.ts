@@ -70,6 +70,7 @@ export type UpdateItemStock = {
 
 export interface FilterTypes {
   inventory?: { $in: string[] };
+  category?: { $in: string[] }
   status?: { $in: string[] };
   keyword?: string;
   archived?: boolean;

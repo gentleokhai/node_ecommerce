@@ -49,6 +49,7 @@ export interface UserAuthPayload {
 export interface FilterTypes {
   accessType?: { $in: string[] };
   status?: { $in: string[] };
+  job?: { $in: string[] };
   keyword?: string;
 }
 
